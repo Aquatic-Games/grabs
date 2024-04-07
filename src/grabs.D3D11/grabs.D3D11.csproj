@@ -6,4 +6,14 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\grabs\grabs.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Vortice.D3DCompiler" Version="3.5.0" />
+      <PackageReference Include="Vortice.Direct3D11" Version="3.5.0" />
+      <PackageReference Include="Vortice.DXGI" Version="3.5.0" />
+    </ItemGroup>
+
 </Project>
