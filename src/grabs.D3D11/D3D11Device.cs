@@ -7,10 +7,10 @@ namespace grabs.D3D11;
 
 public sealed class D3D11Device : Device
 {
-    private IDXGIFactory _factory;
+    private readonly IDXGIFactory _factory;
     
-    public ID3D11Device Device;
-    public ID3D11DeviceContext Context;
+    public readonly ID3D11Device Device;
+    public readonly ID3D11DeviceContext Context;
     
     public D3D11Device(IDXGIFactory1 factory, IDXGIAdapter1 adapter)
     {
@@ -29,9 +29,9 @@ public sealed class D3D11Device : Device
         }
     }
 
-    public override Swapchain CreateSwapchain(in SwapchainDescription description)
+    public override Swapchain CreateSwapchain(Surface surface, in SwapchainDescription description)
     {
-        return new D3D11Swapchain(_factory, Device, description);
+        return new D3D11Swapchain(_factory, Device, (D3D11Surface) surface, description);
     }
 
     public override void Dispose()
