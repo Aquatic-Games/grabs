@@ -19,7 +19,16 @@ public sealed class D3D11Instance : Instance
     {
         List<Adapter> adapters = new List<Adapter>();
         for (uint i = 0; Factory.EnumAdapters1((int) i, out IDXGIAdapter1 adapter).Success; i++)
-            adapters.Add(new Adapter(i, adapter.Description1.Description));
+        {
+            AdapterDescription1 desc = adapter.Description1;
+
+            AdapterType type = AdapterType.Discrete;
+
+            if ((desc.Flags & AdapterFlags.Software) != 0)
+                type = AdapterType.Software;
+                
+            adapters.Add(new Adapter(i, desc.Description, (uint) desc.DedicatedVideoMemory, type));
+        }
 
         return adapters.ToArray();
     }

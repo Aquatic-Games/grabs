@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.D3D11", "src\grabs.D3
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{059B98D7-A112-4088-AAF4-A86B83F3A09A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Tests", "tests\grabs.Tests\grabs.Tests.csproj", "{79E326C9-3930-4BD6-B6FD-FB9BACA9E1F7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,5 +22,12 @@ Global
 		{B0C31D4C-699E-4878-BDFD-79359926786B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0C31D4C-699E-4878-BDFD-79359926786B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0C31D4C-699E-4878-BDFD-79359926786B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79E326C9-3930-4BD6-B6FD-FB9BACA9E1F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79E326C9-3930-4BD6-B6FD-FB9BACA9E1F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79E326C9-3930-4BD6-B6FD-FB9BACA9E1F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79E326C9-3930-4BD6-B6FD-FB9BACA9E1F7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{79E326C9-3930-4BD6-B6FD-FB9BACA9E1F7} = {059B98D7-A112-4088-AAF4-A86B83F3A09A}
 	EndGlobalSection
 EndGlobal
