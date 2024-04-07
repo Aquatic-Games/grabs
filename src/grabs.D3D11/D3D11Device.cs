@@ -7,11 +7,15 @@ namespace grabs.D3D11;
 
 public sealed class D3D11Device : Device
 {
+    private IDXGIFactory _factory;
+    
     public ID3D11Device Device;
     public ID3D11DeviceContext Context;
     
     public D3D11Device(IDXGIFactory1 factory, IDXGIAdapter1 adapter)
     {
+        _factory = factory;
+        
         FeatureLevel[] levels = new[]
         {
             FeatureLevel.Level_11_0
@@ -23,6 +27,11 @@ public sealed class D3D11Device : Device
         {
             throw new Exception($"Failed to create D3D11 device: {result.Description}");
         }
+    }
+
+    public override Swapchain CreateSwapchain(in SwapchainDescription description)
+    {
+        return new D3D11Swapchain(_factory, Device, description);
     }
 
     public override void Dispose()
