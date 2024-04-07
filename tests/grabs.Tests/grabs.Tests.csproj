@@ -12,4 +12,8 @@
       <ProjectReference Include="..\..\src\grabs\grabs.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Silk.NET.SDL" Version="2.20.0" />
+    </ItemGroup>
+
 </Project>

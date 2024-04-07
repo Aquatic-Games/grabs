@@ -15,6 +15,13 @@ public sealed class D3D11Instance : Instance
             throw new Exception($"Failed to create DXGI factory. {result.Description}");
     }
 
+    public override Device CreateDevice(Adapter? adapter = null)
+    {
+        Factory.EnumAdapters1((int) (adapter?.Index ?? 0), out IDXGIAdapter1 dxgiAdapter);
+
+        return new D3D11Device(Factory, dxgiAdapter);
+    }
+
     public override Adapter[] EnumerateAdapters()
     {
         List<Adapter> adapters = new List<Adapter>();
