@@ -6,6 +6,9 @@ namespace grabs.D3D11;
 public sealed class D3D11Swapchain : Swapchain
 {
     public readonly IDXGISwapChain SwapChain;
+    
+    public readonly ID3D11Texture2D SwapChainTexture;
+    public readonly ID3D11RenderTargetView SwapChainTarget;
 
     public D3D11Swapchain(IDXGIFactory factory, ID3D11Device device, D3D11Surface surface, SwapchainDescription description)
     {
@@ -22,6 +25,9 @@ public sealed class D3D11Swapchain : Swapchain
         };
 
         SwapChain = factory.CreateSwapChain(device, desc);
+
+        SwapChainTexture = SwapChain.GetBuffer<ID3D11Texture2D>(0);
+        SwapChainTarget = device.CreateRenderTargetView(SwapChainTexture);
     }
     
     public override void Present()
@@ -31,6 +37,8 @@ public sealed class D3D11Swapchain : Swapchain
 
     public override void Dispose()
     {
+        SwapChainTarget.Dispose();
+        SwapChainTexture.Dispose();
         SwapChain.Dispose();
     }
 }

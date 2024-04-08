@@ -1,6 +1,8 @@
 ﻿using grabs;
 using grabs.D3D11;
 using Silk.NET.SDL;
+using Buffer = grabs.Buffer;
+using Surface = grabs.Surface;
 
 Sdl sdl = Sdl.GetApi();
 
@@ -27,8 +29,28 @@ unsafe
     Console.WriteLine(string.Join('\n', adapters));
 
     Device device = instance.CreateDevice();
-    Swapchain swapchain =
-        device.CreateSwapchain(new D3D11Surface(info.Info.Win.Hwnd), new SwapchainDescription(width, height, 2));
+
+    Surface surface = new D3D11Surface(info.Info.Win.Hwnd);
+    Swapchain swapchain = device.CreateSwapchain(surface, new SwapchainDescription(width, height, 2));
+
+    ReadOnlySpan<float> vertices = stackalloc float[]
+    {
+        -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+        -0.5f, +0.5f, 0.0f, 1.0f, 0.0f,
+        +0.5f, +0.5f, 0.0f, 0.0f, 1.0f,
+        +0.5f, -0.5f, 1.0f, 1.0f, 1.0f
+    };
+
+    ReadOnlySpan<uint> indices = stackalloc uint[]
+    {
+        0, 1, 3,
+        1, 2, 3
+    };
+
+    Buffer vertexBuffer =
+        device.CreateBuffer(new BufferDescription(BufferType.Vertex, (uint) (vertices.Length * sizeof(float))), vertices);
+    Buffer indexBuffer =
+        device.CreateBuffer(new BufferDescription(BufferType.Index, (uint) (indices.Length * sizeof(uint))), indices);
 
     bool alive = true;
     while (alive)
@@ -55,6 +77,11 @@ unsafe
         swapchain.Present();
     }
     
+    indexBuffer.Dispose();
+    vertexBuffer.Dispose();
+    
+    swapchain.Dispose();
+    surface.Dispose();
     device.Dispose();
     instance.Dispose();
     

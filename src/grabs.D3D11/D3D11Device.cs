@@ -34,6 +34,12 @@ public sealed class D3D11Device : Device
         return new D3D11Swapchain(_factory, Device, (D3D11Surface) surface, description);
     }
 
+    public override unsafe Buffer CreateBuffer<T>(in BufferDescription description, in ReadOnlySpan<T> data)
+    {
+        fixed (void* pData = data)
+            return new D3D11Buffer(Device, description, pData);
+    }
+
     public override void Dispose()
     {
         Context.Dispose();
