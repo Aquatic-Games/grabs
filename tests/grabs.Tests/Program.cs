@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using grabs;
 using grabs.D3D11;
+using grabs.Vulkan;
 using Silk.NET.SDL;
 using Buffer = grabs.Buffer;
 using Surface = grabs.Surface;
@@ -16,7 +17,7 @@ unsafe
     const uint height = 720;
 
     Window* window = sdl.CreateWindow("Test", Sdl.WindowposCentered, Sdl.WindowposCentered, (int) width, (int) height,
-        (uint) WindowFlags.Shown);
+        (uint) WindowFlags.Vulkan);
 
     SysWMInfo info = new SysWMInfo();
     sdl.GetWindowWMInfo(window, &info);
@@ -24,9 +25,16 @@ unsafe
     if (window == null)
         throw new Exception($"Failed to create SDL window: {sdl.GetErrorS()}");
     
-    Instance instance = new D3D11Instance();
+    //Instance instance = new D3D11Instance();
 
-    Adapter[] adapters = instance.EnumerateAdapters();
+    uint instanceCount = 0;
+    sdl.VulkanGetInstanceExtensions(window, ref instanceCount, (byte**) null);
+    string[] extensions = new string[instanceCount];
+    sdl.VulkanGetInstanceExtensions(window, ref instanceCount, extensions);
+    
+    Instance instance = new VkInstance(extensions);
+
+    /*Adapter[] adapters = instance.EnumerateAdapters();
     Console.WriteLine(string.Join('\n', adapters));
 
     Device device = instance.CreateDevice();
@@ -55,6 +63,8 @@ unsafe
         device.CreateBuffer(new BufferDescription(BufferType.Vertex, (uint) (vertices.Length * sizeof(float))), vertices);
     Buffer indexBuffer =
         device.CreateBuffer(new BufferDescription(BufferType.Index, (uint) (indices.Length * sizeof(uint))), indices);
+        
+    */
     
     bool alive = true;
     while (alive)
@@ -78,7 +88,7 @@ unsafe
             }
         }
         
-        commandList.Begin();
+        /*commandList.Begin();
 
         commandList.BeginRenderPass(new RenderPassDescription(new ReadOnlySpan<ColorTarget>(ref swapchainTarget),
             new Vector4(1.0f, 0.5f, 0.25f, 1.0f)));
@@ -87,16 +97,16 @@ unsafe
         commandList.End();
         
         device.ExecuteCommandList(commandList);
-        swapchain.Present();
+        swapchain.Present();*/
     }
     
-    indexBuffer.Dispose();
+    /*indexBuffer.Dispose();
     vertexBuffer.Dispose();
     
     commandList.Dispose();
     swapchain.Dispose();
     surface.Dispose();
-    device.Dispose();
+    device.Dispose();*/
     instance.Dispose();
     
     sdl.DestroyWindow(window);
