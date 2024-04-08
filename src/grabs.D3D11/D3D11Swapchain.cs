@@ -5,10 +5,28 @@ namespace grabs.D3D11;
 
 public sealed class D3D11Swapchain : Swapchain
 {
+    private PresentMode _presentMode;
+    private int _swapInterval;
+    
     public readonly IDXGISwapChain SwapChain;
     
     public readonly ID3D11Texture2D SwapChainTexture;
     public readonly ID3D11RenderTargetView SwapChainTarget;
+
+    public override PresentMode PresentMode
+    {
+        get => _presentMode;
+        set
+        {
+            (_presentMode, _swapInterval) = value switch
+            {
+                PresentMode.Immediate => (PresentMode.Immediate, 0),
+                PresentMode.VerticalSync => (PresentMode.VerticalSync, 1),
+                PresentMode.AdaptiveSync => (PresentMode.VerticalSync, 1),
+                _ => throw new ArgumentOutOfRangeException(nameof(value), value, null)
+            };
+        }
+    }
 
     public D3D11Swapchain(IDXGIFactory factory, ID3D11Device device, D3D11Surface surface, SwapchainDescription description)
     {
@@ -37,7 +55,7 @@ public sealed class D3D11Swapchain : Swapchain
 
     public override void Present()
     {
-        SwapChain.Present(1);
+        SwapChain.Present(_swapInterval);
     }
 
     public override void Dispose()

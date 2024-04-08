@@ -32,7 +32,7 @@ unsafe
     Device device = instance.CreateDevice();
 
     Surface surface = new D3D11Surface(info.Info.Win.Hwnd);
-    Swapchain swapchain = device.CreateSwapchain(surface, new SwapchainDescription(width, height, 2));
+    Swapchain swapchain = device.CreateSwapchain(surface, new SwapchainDescription(width, height, 2, PresentMode.VerticalSync));
     ColorTarget swapchainTarget = swapchain.GetColorTarget();
 
     CommandList commandList = device.CreateCommandList();
@@ -79,8 +79,9 @@ unsafe
         }
         
         commandList.Begin();
-        
-        commandList.BeginRenderPass(new RenderPassDescription(new ReadOnlySpan<ColorTarget>(ref swapchainTarget), new Vector4(1.0f, 0.5f, 0.25f, 1.0f)));
+
+        commandList.BeginRenderPass(new RenderPassDescription(new ReadOnlySpan<ColorTarget>(ref swapchainTarget),
+            new Vector4(1.0f, 0.5f, 0.25f, 1.0f)));
         commandList.EndRenderPass();
         
         commandList.End();

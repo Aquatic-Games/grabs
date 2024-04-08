@@ -8,10 +8,13 @@ public struct SwapchainDescription
 
     public uint BufferCount;
 
-    public SwapchainDescription(uint width, uint height, uint bufferCount)
+    public PresentMode PresentMode;
+
+    public SwapchainDescription(uint width, uint height, uint bufferCount, PresentMode presentMode)
     {
         Width = width;
         Height = height;
         BufferCount = bufferCount;
+        PresentMode = presentMode;
     }
 }
