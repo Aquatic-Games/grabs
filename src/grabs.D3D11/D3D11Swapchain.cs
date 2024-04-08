@@ -22,6 +22,7 @@ public sealed class D3D11Swapchain : Swapchain
             {
                 PresentMode.Immediate => (PresentMode.Immediate, 0),
                 PresentMode.VerticalSync => (PresentMode.VerticalSync, 1),
+                // Far as I can see, DXGI 1.1 does not support AS, so it becomes VS instead.
                 PresentMode.AdaptiveSync => (PresentMode.VerticalSync, 1),
                 _ => throw new ArgumentOutOfRangeException(nameof(value), value, null)
             };
@@ -33,7 +34,7 @@ public sealed class D3D11Swapchain : Swapchain
         SwapChainDescription desc = new SwapChainDescription()
         {
             Windowed = true,
-            BufferDescription = new ModeDescription((int) description.Width, (int) description.Height),
+            BufferDescription = new ModeDescription((int) description.Width, (int) description.Height, description.Format.ToDXGIFormat()),
             BufferCount = (int) description.BufferCount,
             OutputWindow = surface.Hwnd,
             SampleDescription = new SampleDescription(1, 0),
@@ -41,6 +42,8 @@ public sealed class D3D11Swapchain : Swapchain
             SwapEffect = SwapEffect.FlipDiscard,
             Flags = SwapChainFlags.AllowTearing | SwapChainFlags.AllowModeSwitch
         };
+        
+        PresentMode = description.PresentMode;
 
         SwapChain = factory.CreateSwapChain(device, desc);
 

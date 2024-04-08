@@ -32,7 +32,7 @@ unsafe
     Device device = instance.CreateDevice();
 
     Surface surface = new D3D11Surface(info.Info.Win.Hwnd);
-    Swapchain swapchain = device.CreateSwapchain(surface, new SwapchainDescription(width, height, 2, PresentMode.VerticalSync));
+    Swapchain swapchain = device.CreateSwapchain(surface, new SwapchainDescription(width, height, Format.B8G8R8A8_UNorm, 2, PresentMode.VerticalSync));
     ColorTarget swapchainTarget = swapchain.GetColorTarget();
 
     CommandList commandList = device.CreateCommandList();
