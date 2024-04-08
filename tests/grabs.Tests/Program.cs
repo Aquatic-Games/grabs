@@ -1,4 +1,5 @@
-﻿using grabs;
+﻿using System.Numerics;
+using grabs;
 using grabs.D3D11;
 using Silk.NET.SDL;
 using Buffer = grabs.Buffer;
@@ -32,6 +33,9 @@ unsafe
 
     Surface surface = new D3D11Surface(info.Info.Win.Hwnd);
     Swapchain swapchain = device.CreateSwapchain(surface, new SwapchainDescription(width, height, 2));
+    ColorTarget swapchainTarget = swapchain.GetColorTarget();
+
+    CommandList commandList = device.CreateCommandList();
 
     ReadOnlySpan<float> vertices = stackalloc float[]
     {
@@ -52,8 +56,6 @@ unsafe
     Buffer indexBuffer =
         device.CreateBuffer(new BufferDescription(BufferType.Index, (uint) (indices.Length * sizeof(uint))), indices);
     
-    
-
     bool alive = true;
     while (alive)
     {
@@ -76,12 +78,21 @@ unsafe
             }
         }
         
+        commandList.Begin();
+        
+        commandList.BeginRenderPass(new RenderPassDescription(new ReadOnlySpan<ColorTarget>(ref swapchainTarget), new Vector4(1.0f, 0.5f, 0.25f, 1.0f)));
+        commandList.EndRenderPass();
+        
+        commandList.End();
+        
+        device.ExecuteCommandList(commandList);
         swapchain.Present();
     }
     
     indexBuffer.Dispose();
     vertexBuffer.Dispose();
     
+    commandList.Dispose();
     swapchain.Dispose();
     surface.Dispose();
     device.Dispose();

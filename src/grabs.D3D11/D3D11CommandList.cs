@@ -1,8 +1,9 @@
 ﻿using Vortice.Direct3D11;
+using Vortice.Mathematics;
 
 namespace grabs.D3D11;
 
-public class D3D11CommandList : CommandList
+public sealed class D3D11CommandList : CommandList
 {
     public ID3D11DeviceContext Context;
     public ID3D11CommandList CommandList;
@@ -14,26 +15,33 @@ public class D3D11CommandList : CommandList
 
     public override void Begin()
     {
-        throw new NotImplementedException();
+        CommandList?.Dispose();
+        CommandList = null;
     }
 
     public override void End()
     {
-        throw new NotImplementedException();
+        CommandList = Context.FinishCommandList(false);
     }
 
     public override void BeginRenderPass(in RenderPassDescription description)
     {
-        throw new NotImplementedException();
+        for (int i = 0; i < description.ColorTargets.Length; i++)
+        {
+            D3D11ColorTarget target = (D3D11ColorTarget) description.ColorTargets[i];
+            
+            Context.ClearRenderTargetView(target.RenderTarget, new Color4(description.ClearColor));
+        }
     }
 
     public override void EndRenderPass()
     {
-        throw new NotImplementedException();
+        
     }
 
     public override void Dispose()
     {
+        CommandList?.Dispose();
         Context.Dispose();
     }
 }

@@ -29,7 +29,12 @@ public sealed class D3D11Swapchain : Swapchain
         SwapChainTexture = SwapChain.GetBuffer<ID3D11Texture2D>(0);
         SwapChainTarget = device.CreateRenderTargetView(SwapChainTexture);
     }
-    
+
+    public override ColorTarget GetColorTarget()
+    {
+        return new D3D11ColorTarget(SwapChainTarget);
+    }
+
     public override void Present()
     {
         SwapChain.Present(1);
