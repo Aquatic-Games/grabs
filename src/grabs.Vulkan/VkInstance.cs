@@ -2,13 +2,13 @@
 
 namespace grabs.Vulkan;
 
-public class VkInstance : Instance
+public unsafe class VkInstance : Instance
 {
     public Vk Vk;
 
     public Silk.NET.Vulkan.Instance Instance;
 
-    public unsafe VkInstance(string[] instanceExtensions)
+    public VkInstance(string[] instanceExtensions)
     {
         Vk = Vk.GetApi();
         
@@ -42,10 +42,38 @@ public class VkInstance : Instance
 
     public override Adapter[] EnumerateAdapters()
     {
-        throw new NotImplementedException();
+        uint pDeviceCount = 0;
+        Vk.EnumeratePhysicalDevices(Instance, ref pDeviceCount, null);
+        PhysicalDevice[] devices = new PhysicalDevice[pDeviceCount];
+        Vk.EnumeratePhysicalDevices(Instance, ref pDeviceCount, ref devices[0]);
+
+        Adapter[] adapters = new Adapter[pDeviceCount];
+
+        for (uint i = 0; i < pDeviceCount; i++)
+        {
+            PhysicalDevice device = devices[i];
+
+            Vk.GetPhysicalDeviceProperties(device, out PhysicalDeviceProperties deviceProperties);
+            Vk.GetPhysicalDeviceMemoryProperties(device, out PhysicalDeviceMemoryProperties memoryProperties);
+
+            AdapterType type = deviceProperties.DeviceType switch
+            {
+                PhysicalDeviceType.Other => AdapterType.Other,
+                PhysicalDeviceType.IntegratedGpu => AdapterType.Integrated,
+                PhysicalDeviceType.DiscreteGpu => AdapterType.Discrete,
+                PhysicalDeviceType.VirtualGpu => AdapterType.Other,
+                PhysicalDeviceType.Cpu => AdapterType.Software,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            adapters[i] = new Adapter(i, new string((sbyte*) deviceProperties.DeviceName),
+                memoryProperties.MemoryHeaps.Element0.Size, type);
+        }
+
+        return adapters;
     }
 
-    public override unsafe void Dispose()
+    public override void Dispose()
     {
         Vk.DestroyInstance(Instance, null);
         Vk.Dispose();

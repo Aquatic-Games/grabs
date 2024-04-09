@@ -34,10 +34,10 @@ unsafe
     
     Instance instance = new VkInstance(extensions);
 
-    /*Adapter[] adapters = instance.EnumerateAdapters();
+    Adapter[] adapters = instance.EnumerateAdapters();
     Console.WriteLine(string.Join('\n', adapters));
 
-    Device device = instance.CreateDevice();
+    /*Device device = instance.CreateDevice();
 
     Surface surface = new D3D11Surface(info.Info.Win.Hwnd);
     Swapchain swapchain = device.CreateSwapchain(surface, new SwapchainDescription(width, height, Format.B8G8R8A8_UNorm, 2, PresentMode.VerticalSync));

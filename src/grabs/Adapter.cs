@@ -6,11 +6,11 @@ public readonly struct Adapter
     
     public readonly string Name;
 
-    public readonly uint DedicatedMemory;
+    public readonly ulong DedicatedMemory;
 
     public readonly AdapterType Type;
 
-    public Adapter(uint index, string name, uint dedicatedMemory, AdapterType type)
+    public Adapter(uint index, string name, ulong dedicatedMemory, AdapterType type)
     {
         Index = index;
         Name = name;
