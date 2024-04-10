@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using grabs.Graphics;
 using grabs.ShaderCompiler.HLSL;
 
 const string shaderCode = """
@@ -24,5 +25,5 @@ const string shaderCode = """
                           }
                           """;
 
-byte[] result = Compiler.CompileToSpirV(shaderCode, "Vertex", "vs_6_0");
+byte[] result = Compiler.CompileToSpirV(shaderCode, "Vertex", ShaderStage.Vertex);
 Console.WriteLine(Encoding.UTF8.GetString(result));

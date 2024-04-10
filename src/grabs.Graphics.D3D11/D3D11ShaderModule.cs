@@ -55,7 +55,8 @@ public sealed class D3D11ShaderModule : ShaderModule
         Spirv.CompilerInstallCompilerOptions(compiler, options);
 
         byte* pStrResult;
-        Spirv.CompilerCompile(compiler, &pStrResult);
+        if ((result = Spirv.CompilerCompile(compiler, &pStrResult)) != Result.Success)
+            throw new Exception($"Failed to compile SPIRV shader: {result} - {Spirv.ContextGetLastErrorStringS(context)}");
 
         string strResult = new string((sbyte*) pStrResult);
         
@@ -80,7 +81,7 @@ public sealed class D3D11ShaderModule : ShaderModule
         };
         
         Blob errorBlob;
-        if (Compiler.Compile(hlsl, null, null, entryPoint, null, profile, ShaderFlags.None, EffectFlags.None, out Blob, out errorBlob).Failure)
+        if (Compiler.Compile(hlsl, null, null, "main", null, profile, ShaderFlags.None, EffectFlags.None, out Blob, out errorBlob).Failure)
             throw new Exception($"Failed to compile HLSL shader: {errorBlob.AsString()}");
         
         errorBlob?.Dispose();

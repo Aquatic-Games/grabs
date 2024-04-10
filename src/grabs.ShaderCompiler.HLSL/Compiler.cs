@@ -1,5 +1,7 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using System.Text;
+using grabs.Graphics;
 using SharpGen.Runtime;
 using Vortice.Dxc;
 using static Vortice.Dxc.Dxc;
@@ -8,7 +10,7 @@ namespace grabs.ShaderCompiler.HLSL;
 
 public static unsafe class Compiler
 {
-    public static byte[] CompileToSpirV(string code, string entryPoint, string profile)
+    public static byte[] CompileToSpirV(string code, string entryPoint, ShaderStage stage)
     {
         Result result;
         
@@ -27,6 +29,14 @@ public static unsafe class Compiler
         if ((result = DxcCreateInstance(CLSID_DxcCompiler, out compiler!)).Failure)
             throw new Exception($"Failed to create DXC compiler: {result.Description}");
 
+        string profile = stage switch
+        {
+            ShaderStage.Vertex => "vs_6_0",
+            ShaderStage.Pixel => "ps_6_0",
+            ShaderStage.Compute => "cs_6_0",
+            _ => throw new ArgumentOutOfRangeException(nameof(stage), stage, null)
+        };
+        
         IDxcOperationResult opResult;
         if ((result = compiler.Compile(blobEncoding, null, entryPoint, profile, ["-spirv"], [], null, out opResult!)).Failure)
             throw new Exception($"Failed to compile shader: {result.Description}");

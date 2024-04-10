@@ -1,9 +1,49 @@
 ﻿using System.Numerics;
 using grabs.Graphics;
 using grabs.Graphics.D3D11;
+using grabs.ShaderCompiler.HLSL;
 using Silk.NET.SDL;
 using Buffer = grabs.Graphics.Buffer;
 using Surface = grabs.Graphics.Surface;
+
+const string shaderCode = """
+                          struct VSInput
+                          {
+                              float2 Position: POSITION0;
+                              float3 Color:    COLOR0;
+                          };
+                          
+                          struct VSOutput
+                          {
+                              float4 Position: SV_Position;
+                              float4 Color:    COLOR0;
+                          };
+                          
+                          struct PSOutput
+                          {
+                              float4 Color: SV_Target0;
+                          };
+                          
+                          VSOutput Vertex(const in VSInput input)
+                          {
+                              VSOutput output;
+                              
+                              output.Position = float4(input.Position, 0.0, 1.0);
+                              output.Color = float4(input.Color, 1.0);
+                              
+                              return output;
+                          }
+                          
+                          PSOutput Pixel(const in VSOutput input)
+                          {
+                              PSOutput output;
+                              
+                              output.Color = input.Color;
+                              
+                              return output;
+                          }
+                          
+                          """;
 
 Sdl sdl = Sdl.GetApi();
 
@@ -62,6 +102,14 @@ unsafe
         device.CreateBuffer(new BufferDescription(BufferType.Vertex, (uint) (vertices.Length * sizeof(float))), vertices);
     Buffer indexBuffer =
         device.CreateBuffer(new BufferDescription(BufferType.Index, (uint) (indices.Length * sizeof(uint))), indices);
+
+    ShaderModule vertexModule = device.CreateShaderModule(ShaderStage.Vertex,
+        Compiler.CompileToSpirV(shaderCode, "Vertex", ShaderStage.Vertex), "Vertex");
+    ShaderModule pixelModule = device.CreateShaderModule(ShaderStage.Pixel,
+        Compiler.CompileToSpirV(shaderCode, "Pixel", ShaderStage.Pixel), "Pixel");
+    
+    pixelModule.Dispose();
+    vertexModule.Dispose();
     
     bool alive = true;
     while (alive)
