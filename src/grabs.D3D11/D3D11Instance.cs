@@ -1,4 +1,6 @@
-﻿using SharpGen.Runtime;
+﻿using System;
+using System.Collections.Generic;
+using SharpGen.Runtime;
 using Vortice.DXGI;
 
 namespace grabs.D3D11;

@@ -1,4 +1,5 @@
-﻿using DXGIFormat = Vortice.DXGI.Format;
+﻿using System;
+using DXGIFormat = Vortice.DXGI.Format;
 
 namespace grabs.D3D11;
 

@@ -1,4 +1,6 @@
-﻿namespace grabs;
+﻿using System;
+
+namespace grabs;
 
 public abstract class Device : IDisposable
 {
@@ -10,6 +12,8 @@ public abstract class Device : IDisposable
         => CreateBuffer(description, new ReadOnlySpan<T>(ref data));
     
     public abstract Buffer CreateBuffer<T>(in BufferDescription description, in ReadOnlySpan<T> data) where T : unmanaged;
+    
+    public abstract ShaderModule CreateShaderModule(byte[] spirv, string entryPoint);
 
     public abstract void ExecuteCommandList(CommandList list);
     

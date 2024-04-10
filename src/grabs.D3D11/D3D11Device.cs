@@ -1,4 +1,5 @@
-﻿using SharpGen.Runtime;
+﻿using System;
+using SharpGen.Runtime;
 using Vortice.Direct3D;
 using Vortice.Direct3D11;
 using Vortice.DXGI;
@@ -43,6 +44,11 @@ public sealed class D3D11Device : Device
     {
         fixed (void* pData = data)
             return new D3D11Buffer(Device, description, pData);
+    }
+
+    public override ShaderModule CreateShaderModule(byte[] spirv, string entryPoint)
+    {
+        throw new NotImplementedException();
     }
 
     public override void ExecuteCommandList(CommandList list)

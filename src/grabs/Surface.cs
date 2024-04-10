@@ -1,4 +1,6 @@
-﻿namespace grabs;
+﻿using System;
+
+namespace grabs;
 
 public abstract class Surface : IDisposable
 {
