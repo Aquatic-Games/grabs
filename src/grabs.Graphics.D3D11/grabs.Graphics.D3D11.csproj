@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\grabs.Graphics\grabs.Graphics.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Silk.NET.SPIRV.Cross" Version="2.20.0" />
+      <PackageReference Include="Silk.NET.SPIRV.Cross.Native" Version="2.20.0" />
+      <PackageReference Include="Vortice.D3DCompiler" Version="3.5.0" />
+      <PackageReference Include="Vortice.Direct3D11" Version="3.5.0" />
+      <PackageReference Include="Vortice.DXGI" Version="3.5.0" />
+    </ItemGroup>
+
+</Project>

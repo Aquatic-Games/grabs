@@ -1,10 +1,9 @@
 ﻿using System.Numerics;
-using grabs;
-using grabs.D3D11;
-using grabs.Vulkan;
+using grabs.Graphics;
+using grabs.Graphics.D3D11;
 using Silk.NET.SDL;
-using Buffer = grabs.Buffer;
-using Surface = grabs.Surface;
+using Buffer = grabs.Graphics.Buffer;
+using Surface = grabs.Graphics.Surface;
 
 Sdl sdl = Sdl.GetApi();
 

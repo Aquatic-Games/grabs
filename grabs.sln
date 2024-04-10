@@ -1,14 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs", "src\grabs\grabs.csproj", "{7D9BD92E-BF42-40C2-921E-C7206CD22DE2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Graphics", "src\grabs.Graphics\grabs.Graphics.csproj", "{7D9BD92E-BF42-40C2-921E-C7206CD22DE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.D3D11", "src\grabs.D3D11\grabs.D3D11.csproj", "{B0C31D4C-699E-4878-BDFD-79359926786B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Graphics.D3D11", "src\grabs.Graphics.D3D11\grabs.Graphics.D3D11.csproj", "{B0C31D4C-699E-4878-BDFD-79359926786B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{059B98D7-A112-4088-AAF4-A86B83F3A09A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Tests", "tests\grabs.Tests\grabs.Tests.csproj", "{79E326C9-3930-4BD6-B6FD-FB9BACA9E1F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Vulkan", "src\grabs.Vulkan\grabs.Vulkan.csproj", "{28C49234-3059-4117-9F5C-7637E082C4C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Graphics.Vulkan", "src\grabs.Graphics.Vulkan\grabs.Graphics.Vulkan.csproj", "{28C49234-3059-4117-9F5C-7637E082C4C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

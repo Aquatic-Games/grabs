@@ -9,9 +9,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\grabs.D3D11\grabs.D3D11.csproj" />
-      <ProjectReference Include="..\..\src\grabs.Vulkan\grabs.Vulkan.csproj" />
-      <ProjectReference Include="..\..\src\grabs\grabs.csproj" />
+      <ProjectReference Include="..\..\src\grabs.Graphics.D3D11\grabs.Graphics.D3D11.csproj" />
+      <ProjectReference Include="..\..\src\grabs.Graphics.Vulkan\grabs.Graphics.Vulkan.csproj" />
+      <ProjectReference Include="..\..\src\grabs.Graphics\grabs.Graphics.csproj" />
     </ItemGroup>
 
     <ItemGroup>
