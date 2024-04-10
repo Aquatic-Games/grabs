@@ -46,9 +46,9 @@ public sealed class D3D11Device : Device
             return new D3D11Buffer(Device, description, pData);
     }
 
-    public override ShaderModule CreateShaderModule(byte[] spirv, string entryPoint)
+    public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint)
     {
-        throw new NotImplementedException();
+        return new D3D11ShaderModule(stage, spirv, entryPoint);
     }
 
     public override void ExecuteCommandList(CommandList list)
