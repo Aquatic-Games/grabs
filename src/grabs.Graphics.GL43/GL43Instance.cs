@@ -6,6 +6,8 @@ public sealed class GL43Instance : Instance
 {
     public readonly GL GL;
 
+    public override GraphicsApi Api => GraphicsApi.OpenGL;
+
     public GL43Instance(Func<string, nint> getProcAddressFunc)
     {
         GL = GL.GetApi(getProcAddressFunc);

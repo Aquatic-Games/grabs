@@ -9,6 +9,8 @@ public sealed class D3D11Instance : Instance
 {
     public readonly IDXGIFactory1 Factory;
 
+    public override GraphicsApi Api => GraphicsApi.D3D11;
+
     public D3D11Instance()
     {
         Result result;

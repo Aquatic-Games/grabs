@@ -74,6 +74,8 @@ unsafe
 
     //Instance instance = new D3D11Instance();
     Instance instance = new GL43Instance(s => (nint) sdl.GLGetProcAddress(s));
+    
+    Console.WriteLine(instance.Api);
 
     Adapter[] adapters = instance.EnumerateAdapters();
     Console.WriteLine(string.Join('\n', adapters));
