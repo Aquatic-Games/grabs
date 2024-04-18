@@ -23,7 +23,7 @@ public class GL43Device : Device
 
     public override Pipeline CreatePipeline(in PipelineDescription description)
     {
-        throw new NotImplementedException();
+        return new GL43Pipeline(_gl, description);
     }
 
     public override unsafe Buffer CreateBuffer<T>(in BufferDescription description, in ReadOnlySpan<T> data)
@@ -46,7 +46,7 @@ public class GL43Device : Device
         throw new NotImplementedException();
     }
 
-    public override void ExecuteCommandList(CommandList list)
+    public override unsafe void ExecuteCommandList(CommandList list)
     {
         GL43CommandList cl = (GL43CommandList) list;
 
@@ -55,17 +55,47 @@ public class GL43Device : Device
             switch (action.Type)
             {
                 case CommandListActionType.BeginRenderPass:
+                {
                     RenderPassDescription desc = action.BeginRenderPass.RenderPassDescription;
 
                     if (desc.Framebuffer is GL43SwapchainFramebuffer)
                         _gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
                     else
                         throw new NotImplementedException();
-                    
+
                     _gl.ClearColor(desc.ClearColor.X, desc.ClearColor.Y, desc.ClearColor.Z, desc.ClearColor.W);
                     _gl.Clear(ClearBufferMask.ColorBufferBit);
                     break;
+                }
+                
                 case CommandListActionType.EndRenderPass:
+                    break;
+
+                case CommandListActionType.SetPipeline:
+                {
+                    GL43Pipeline pipeline = (GL43Pipeline) action.SetPipeline.Pipeline;
+                    
+                    _gl.BindVertexArray(pipeline.Vao);
+                    _gl.UseProgram(pipeline.ShaderProgram);
+                    break;
+                }
+                case CommandListActionType.SetVertexBuffer:
+                {
+                    CommandListAction.SetVertexBufferAction bufferAction = action.SetVertexBuffer;
+
+                    _gl.BindVertexBuffer(bufferAction.Slot, ((GL43Buffer) bufferAction.Buffer).Buffer,
+                        (nint) bufferAction.Offset, bufferAction.Stride);
+                    break;
+                }
+                case CommandListActionType.SetIndexBuffer:
+                {
+                    CommandListAction.SetIndexBufferAction bufferAction = action.SetIndexBuffer;
+
+                    _gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, ((GL43Buffer) bufferAction.Buffer).Buffer);
+                    break;
+                }
+                case CommandListActionType.DrawIndexed:
+                    _gl.DrawElements(PrimitiveType.Triangles, action.Draw.NumVerticesOrIndices, DrawElementsType.UnsignedInt, null);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

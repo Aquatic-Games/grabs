@@ -30,30 +30,55 @@ public class GL43CommandList : CommandList
 
     public override void EndRenderPass()
     {
-        Actions.Add(new CommandListAction()
-        {
-            Type = CommandListActionType.EndRenderPass
-        });
+        Actions.Add(new CommandListAction(CommandListActionType.EndRenderPass));
     }
 
     public override void SetPipeline(Pipeline pipeline)
     {
-        throw new NotImplementedException();
+        Actions.Add(new CommandListAction(CommandListActionType.SetPipeline)
+        {
+            SetPipeline = new CommandListAction.SetPipelineAction()
+            {
+                Pipeline = pipeline
+            }
+        });
     }
 
     public override void SetVertexBuffer(uint slot, Buffer buffer, uint stride, uint offset)
     {
-        throw new NotImplementedException();
+        Actions.Add(new CommandListAction(CommandListActionType.SetVertexBuffer)
+        {
+            SetVertexBuffer = new CommandListAction.SetVertexBufferAction()
+            {
+                Slot = slot,
+                Buffer = buffer,
+                Stride = stride,
+                Offset = offset
+            }
+        });
     }
 
     public override void SetIndexBuffer(Buffer buffer, Format format)
     {
-        throw new NotImplementedException();
+        Actions.Add(new CommandListAction(CommandListActionType.SetIndexBuffer)
+        {
+            SetIndexBuffer = new CommandListAction.SetIndexBufferAction()
+            {
+                Buffer = buffer,
+                Format = format
+            }
+        });
     }
 
     public override void DrawIndexed(uint numIndices)
     {
-        throw new NotImplementedException();
+        Actions.Add(new CommandListAction(CommandListActionType.DrawIndexed)
+        {
+            Draw = new CommandListAction.DrawAction()
+            {
+                NumVerticesOrIndices = numIndices
+            }
+        });
     }
 
     public override void Dispose() { }

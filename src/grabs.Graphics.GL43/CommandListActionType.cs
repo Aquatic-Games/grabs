@@ -3,5 +3,9 @@
 public enum CommandListActionType
 {
     BeginRenderPass,
-    EndRenderPass
+    EndRenderPass,
+    SetPipeline,
+    SetVertexBuffer,
+    SetIndexBuffer,
+    DrawIndexed
 }
