@@ -1,6 +1,6 @@
 ﻿namespace grabs.Graphics.GL43;
 
-public class GL43Swapchain : Swapchain
+public sealed class GL43Swapchain : Swapchain
 {
     private GL43Surface _surface;
     
@@ -26,6 +26,8 @@ public class GL43Swapchain : Swapchain
     public GL43Swapchain(GL43Surface surface, in SwapchainDescription description)
     {
         _surface = surface;
+
+        PresentMode = description.PresentMode;
     }
 
     public override Texture GetSwapchainTexture()
