@@ -26,12 +26,12 @@ public sealed class D3D11CommandList : CommandList
 
     public override void BeginRenderPass(in RenderPassDescription description)
     {
-        for (int i = 0; i < description.ColorTargets.Length; i++)
+        /*for (int i = 0; i < description.ColorTargets.Length; i++)
         {
             D3D11ColorTarget target = (D3D11ColorTarget) description.ColorTargets[i];
             
             Context.ClearRenderTargetView(target.RenderTarget, new Color4(description.ClearColor));
-        }
+        }*/
     }
 
     public override void EndRenderPass()

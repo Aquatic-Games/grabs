@@ -1,18 +1,18 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace grabs.Graphics;
 
-public ref struct RenderPassDescription
+public struct RenderPassDescription
 {
-    public ReadOnlySpan<ColorTarget> ColorTargets;
+    public ColorTarget ColorTarget1;
+    public ColorTarget ColorTarget2;
+    public ColorTarget ColorTarget3;
+    public ColorTarget ColorTarget4;
+    public ColorTarget ColorTarget5;
+    public ColorTarget ColorTarget6;
+    public ColorTarget ColorTarget7;
+    public ColorTarget ColorTarget8;
     
     // TODO: Maybe don't use Vector4? Some custom type?
     public Vector4 ClearColor;
-
-    public RenderPassDescription(ReadOnlySpan<ColorTarget> colorTargets, Vector4 clearColor)
-    {
-        ColorTargets = colorTargets;
-        ClearColor = clearColor;
-    }
 }
