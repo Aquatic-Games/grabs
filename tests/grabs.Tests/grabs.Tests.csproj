@@ -10,6 +10,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\grabs.Graphics.D3D11\grabs.Graphics.D3D11.csproj" />
+      <ProjectReference Include="..\..\src\grabs.Graphics.GL43\grabs.Graphics.GL43.csproj" />
       <ProjectReference Include="..\..\src\grabs.Graphics\grabs.Graphics.csproj" />
       <ProjectReference Include="..\..\src\grabs.ShaderCompiler.HLSL\grabs.ShaderCompiler.HLSL.csproj" />
     </ItemGroup>

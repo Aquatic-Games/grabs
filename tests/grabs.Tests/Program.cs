@@ -1,7 +1,9 @@
 ﻿using System.Numerics;
 using grabs.Graphics;
 using grabs.Graphics.D3D11;
+using grabs.Graphics.GL43;
 using grabs.ShaderCompiler.HLSL;
+using Silk.NET.OpenGL;
 using Silk.NET.SDL;
 using Buffer = grabs.Graphics.Buffer;
 using Surface = grabs.Graphics.Surface;
@@ -55,32 +57,34 @@ unsafe
     const uint width = 1280;
     const uint height = 720;
 
+    sdl.GLSetAttribute(GLattr.ContextProfileMask, (int) ContextProfileMask.CoreProfileBit);
+    sdl.GLSetAttribute(GLattr.ContextMajorVersion, 4);
+    sdl.GLSetAttribute(GLattr.ContextMinorVersion, 3);
+    
     Window* window = sdl.CreateWindow("Test", Sdl.WindowposCentered, Sdl.WindowposCentered, (int) width, (int) height,
-        (uint) WindowFlags.Vulkan);
+        (uint) WindowFlags.Opengl);
+
+    void* glCtx = sdl.GLCreateContext(window);
+    sdl.GLMakeCurrent(window, glCtx);
 
     SysWMInfo info = new SysWMInfo();
     sdl.GetWindowWMInfo(window, &info);
 
     if (window == null)
         throw new Exception($"Failed to create SDL window: {sdl.GetErrorS()}");
-    
-    Instance instance = new D3D11Instance();
 
-    /*uint instanceCount = 0;
-    sdl.VulkanGetInstanceExtensions(window, ref instanceCount, (byte**) null);
-    string[] extensions = new string[instanceCount];
-    sdl.VulkanGetInstanceExtensions(window, ref instanceCount, extensions);
-    
-    Instance instance = new VkInstance(extensions);*/
+    //Instance instance = new D3D11Instance();
+    Instance instance = new GL43Instance(s => (nint) sdl.GLGetProcAddress(s));
 
     Adapter[] adapters = instance.EnumerateAdapters();
     Console.WriteLine(string.Join('\n', adapters));
 
     Device device = instance.CreateDevice();
 
-    Surface surface = new D3D11Surface(info.Info.Win.Hwnd);
+    //Surface surface = new D3D11Surface(info.Info.Win.Hwnd);
+    Surface surface = new GL43Surface(i => { sdl.GLSetSwapInterval(i); sdl.GLSwapWindow(window); });
     Swapchain swapchain = device.CreateSwapchain(surface, new SwapchainDescription(width, height, Format.B8G8R8A8_UNorm, 2, PresentMode.VerticalSync));
-    ColorTarget swapchainTarget = swapchain.GetColorTarget();
+    /*ColorTarget swapchainTarget = swapchain.GetColorTarget();
 
     CommandList commandList = device.CreateCommandList();
 
@@ -109,7 +113,7 @@ unsafe
         Compiler.CompileToSpirV(shaderCode, "Pixel", ShaderStage.Pixel), "Pixel");
     
     pixelModule.Dispose();
-    vertexModule.Dispose();
+    vertexModule.Dispose();*/
     
     bool alive = true;
     while (alive)
@@ -133,7 +137,7 @@ unsafe
             }
         }
         
-        commandList.Begin();
+        /*commandList.Begin();
 
         commandList.BeginRenderPass(new RenderPassDescription(new ReadOnlySpan<ColorTarget>(ref swapchainTarget),
             new Vector4(1.0f, 0.5f, 0.25f, 1.0f)));
@@ -141,14 +145,14 @@ unsafe
         
         commandList.End();
         
-        device.ExecuteCommandList(commandList);
+        device.ExecuteCommandList(commandList);*/
         swapchain.Present();
     }
     
-    indexBuffer.Dispose();
+    /*indexBuffer.Dispose();
     vertexBuffer.Dispose();
     
-    commandList.Dispose();
+    commandList.Dispose();*/
     swapchain.Dispose();
     surface.Dispose();
     device.Dispose();

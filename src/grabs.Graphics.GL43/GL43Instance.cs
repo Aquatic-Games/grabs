@@ -13,7 +13,7 @@ public sealed class GL43Instance : Instance
     
     public override Device CreateDevice(Adapter? adapter = null)
     {
-        throw new NotImplementedException();
+        return new GL43Device(GL);
     }
 
     public override Adapter[] EnumerateAdapters()
