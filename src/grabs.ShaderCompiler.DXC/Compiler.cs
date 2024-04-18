@@ -6,7 +6,7 @@ using SharpGen.Runtime;
 using Vortice.Dxc;
 using static Vortice.Dxc.Dxc;
 
-namespace grabs.ShaderCompiler.HLSL;
+namespace grabs.ShaderCompiler.DXC;
 
 public static unsafe class Compiler
 {

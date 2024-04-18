@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using grabs.Graphics;
-using grabs.ShaderCompiler.HLSL;
+using grabs.ShaderCompiler.DXC;
 
 const string shaderCode = """
                           struct VSInput
@@ -9,12 +9,12 @@ const string shaderCode = """
                               float2 TexCoord: TEXCOORD0;
                               float4 Color:    COLOR0;
                           };
-                          
+
                           struct VSOutput
                           {
                               float4 Position: SV_Position;
                           };
-                          
+
                           VSOutput Vertex(const in VSInput input)
                           {
                               VSOutput output;

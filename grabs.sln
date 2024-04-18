@@ -8,7 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{059B98D7
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Tests", "tests\grabs.Tests\grabs.Tests.csproj", "{79E326C9-3930-4BD6-B6FD-FB9BACA9E1F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.ShaderCompiler.HLSL", "src\grabs.ShaderCompiler.HLSL\grabs.ShaderCompiler.HLSL.csproj", "{FD0015A3-A618-4DF8-A2BE-BEE5268FBC16}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.ShaderCompiler.DXC", "src\grabs.ShaderCompiler.DXC\grabs.ShaderCompiler.DXC.csproj", "{FD0015A3-A618-4DF8-A2BE-BEE5268FBC16}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Tests.Compilers", "tests\grabs.Tests.Compilers\grabs.Tests.Compilers.csproj", "{5738189B-4854-4E3C-A3A3-4EDCD38AAD5B}"
 EndProject

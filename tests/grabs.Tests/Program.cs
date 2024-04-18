@@ -2,7 +2,6 @@
 using grabs.Graphics;
 using grabs.Graphics.D3D11;
 using grabs.Graphics.GL43;
-using grabs.ShaderCompiler.HLSL;
 using Silk.NET.OpenGL;
 using Silk.NET.SDL;
 using Buffer = grabs.Graphics.Buffer;
