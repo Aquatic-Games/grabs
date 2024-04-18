@@ -1,4 +1,5 @@
-﻿using Vortice.Direct3D11;
+﻿using Vortice.Direct3D;
+using Vortice.Direct3D11;
 using Vortice.Mathematics;
 
 namespace grabs.Graphics.D3D11;
@@ -37,6 +38,18 @@ public sealed class D3D11CommandList : CommandList
     public override void EndRenderPass()
     {
         
+    }
+
+    public override void SetPipeline(Pipeline pipeline)
+    {
+        D3D11Pipeline d3dPipeline = (D3D11Pipeline) pipeline;
+        
+        Context.VSSetShader(d3dPipeline.VertexShader);
+        Context.PSSetShader(d3dPipeline.PixelShader);
+        Context.IASetInputLayout(d3dPipeline.InputLayout);
+        
+        // TODO: Add these to pipelines.
+        Context.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
     }
 
     public override void Dispose()

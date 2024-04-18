@@ -36,5 +36,10 @@ public class GL43CommandList : CommandList
         });
     }
 
+    public override void SetPipeline(Pipeline pipeline)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void Dispose() { }
 }

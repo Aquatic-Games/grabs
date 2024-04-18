@@ -42,7 +42,7 @@ public sealed class D3D11Device : Device
 
     public override Pipeline CreatePipeline(in PipelineDescription description)
     {
-        throw new NotImplementedException();
+        return new D3D11Pipeline(Device, description);
     }
 
     public override unsafe Buffer CreateBuffer<T>(in BufferDescription description, in ReadOnlySpan<T> data)

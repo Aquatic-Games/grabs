@@ -11,6 +11,8 @@ public abstract class CommandList : IDisposable
     public abstract void BeginRenderPass(in RenderPassDescription description);
 
     public abstract void EndRenderPass();
+
+    public abstract void SetPipeline(Pipeline pipeline);
     
     public abstract void Dispose();
 }
