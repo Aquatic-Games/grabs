@@ -18,7 +18,7 @@ public class GL43Device : Device
 
     public override CommandList CreateCommandList()
     {
-        throw new NotImplementedException();
+        return new GL43CommandList();
     }
 
     public override Buffer CreateBuffer<T>(in BufferDescription description, in ReadOnlySpan<T> data)
@@ -33,7 +33,24 @@ public class GL43Device : Device
 
     public override void ExecuteCommandList(CommandList list)
     {
-        throw new NotImplementedException();
+        GL43CommandList cl = (GL43CommandList) list;
+
+        foreach (CommandListAction action in cl.Actions)
+        {
+            switch (action.Type)
+            {
+                case CommandListActionType.BeginRenderPass:
+                    RenderPassDescription desc = action.BeginRenderPass.RenderPassDescription;
+                    
+                    _gl.ClearColor(desc.ClearColor.X, desc.ClearColor.Y, desc.ClearColor.Z, desc.ClearColor.W);
+                    _gl.Clear(ClearBufferMask.ColorBufferBit);
+                    break;
+                case CommandListActionType.EndRenderPass:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
     }
 
     public override void Dispose() { }

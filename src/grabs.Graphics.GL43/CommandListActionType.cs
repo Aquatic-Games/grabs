@@ -2,8 +2,6 @@
 
 public enum CommandListActionType
 {
-    Begin,
-    End,
     BeginRenderPass,
     EndRenderPass
 }

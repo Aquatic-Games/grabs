@@ -84,11 +84,11 @@ unsafe
     //Surface surface = new D3D11Surface(info.Info.Win.Hwnd);
     Surface surface = new GL43Surface(i => { sdl.GLSetSwapInterval(i); sdl.GLSwapWindow(window); });
     Swapchain swapchain = device.CreateSwapchain(surface, new SwapchainDescription(width, height, Format.B8G8R8A8_UNorm, 2, PresentMode.VerticalSync));
-    /*ColorTarget swapchainTarget = swapchain.GetColorTarget();
+    //ColorTarget swapchainTarget = swapchain.GetColorTarget();
 
     CommandList commandList = device.CreateCommandList();
 
-    ReadOnlySpan<float> vertices = stackalloc float[]
+    /*ReadOnlySpan<float> vertices = stackalloc float[]
     {
         -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
         -0.5f, +0.5f, 0.0f, 1.0f, 0.0f,
@@ -137,22 +137,24 @@ unsafe
             }
         }
         
-        /*commandList.Begin();
+        commandList.Begin();
 
-        commandList.BeginRenderPass(new RenderPassDescription(new ReadOnlySpan<ColorTarget>(ref swapchainTarget),
-            new Vector4(1.0f, 0.5f, 0.25f, 1.0f)));
+        commandList.BeginRenderPass(new RenderPassDescription()
+        {
+            ClearColor = new Vector4(1.0f, 0.5f, 0.25f, 1.0f)
+        });
         commandList.EndRenderPass();
         
         commandList.End();
         
-        device.ExecuteCommandList(commandList);*/
+        device.ExecuteCommandList(commandList);
         swapchain.Present();
     }
     
     /*indexBuffer.Dispose();
-    vertexBuffer.Dispose();
+    vertexBuffer.Dispose();*/
     
-    commandList.Dispose();*/
+    commandList.Dispose();
     swapchain.Dispose();
     surface.Dispose();
     device.Dispose();
