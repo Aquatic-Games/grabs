@@ -13,7 +13,7 @@ public class SpirvCompiler
         Spirv = Cross.GetApi();
     }
     
-    public static unsafe string TranspileSpirv(ShaderStage stage, Backend backend, byte[] spirv, string entryPoint)
+    public static unsafe string TranspileSpirv(ShaderStage stage, ShaderLanguage language, byte[] spirv, string entryPoint)
     {
         Result result;
         
@@ -28,6 +28,13 @@ public class SpirvCompiler
                 throw new Exception($"Failed to parse SPIRV: {result} - {Spirv.ContextGetLastErrorStringS(context)}");
         }
 
+        Backend backend = language switch
+        {
+            ShaderLanguage.Hlsl50 => Backend.Hlsl,
+            ShaderLanguage.Glsl430 => Backend.Glsl,
+            _ => throw new ArgumentOutOfRangeException(nameof(language), language, null)
+        };
+        
         Compiler* compiler;
         if ((result = Spirv.ContextCreateCompiler(context, backend, ir, CaptureMode.TakeOwnership, &compiler)) != Result.Success)
             throw new Exception($"Failed to create compiler: {result} - {Spirv.ContextGetLastErrorStringS(context)}");
@@ -46,8 +53,19 @@ public class SpirvCompiler
 
         Spirv.CompilerSetEntryPoint(compiler, entryPoint, model);
 
-        // Use shader model 5.0
-        Spirv.CompilerOptionsSetUint(options, CompilerOption.HlslShaderModel, 50);
+        switch (language)
+        {
+            case ShaderLanguage.Hlsl50:
+                // Use shader model 5.0
+                Spirv.CompilerOptionsSetUint(options, CompilerOption.HlslShaderModel, 50);
+                break;
+            case ShaderLanguage.Glsl430:
+                Spirv.CompilerOptionsSetUint(options, CompilerOption.GlslVersion, 430);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(language), language, null);
+        }
+        
         Spirv.CompilerInstallCompilerOptions(compiler, options);
 
         byte* pStrResult;

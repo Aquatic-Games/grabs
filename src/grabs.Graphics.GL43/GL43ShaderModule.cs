@@ -1,6 +1,5 @@
 ﻿using grabs.ShaderCompiler.Spirv;
 using Silk.NET.OpenGL;
-using Silk.NET.SPIRV.Cross;
 
 namespace grabs.Graphics.GL43;
 
@@ -24,7 +23,7 @@ public sealed class GL43ShaderModule : ShaderModule
 
         Shader = _gl.CreateShader(type);
 
-        string source = SpirvCompiler.TranspileSpirv(stage, Backend.Glsl, spirv, entryPoint);
+        string source = SpirvCompiler.TranspileSpirv(stage, ShaderLanguage.Glsl430, spirv, entryPoint);
         _gl.ShaderSource(Shader, source);
         _gl.CompileShader(Shader);
 

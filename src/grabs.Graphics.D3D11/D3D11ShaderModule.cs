@@ -1,9 +1,7 @@
 ﻿using System;
 using grabs.ShaderCompiler.Spirv;
-using Silk.NET.SPIRV.Cross;
 using Vortice.D3DCompiler;
 using Vortice.Direct3D;
-using Compiler = Vortice.D3DCompiler.Compiler;
 
 namespace grabs.Graphics.D3D11;
 
@@ -13,7 +11,7 @@ public sealed class D3D11ShaderModule : ShaderModule
     
     public D3D11ShaderModule(ShaderStage stage, byte[] spirv, string entryPoint) : base(stage)
     {
-        string hlsl = SpirvCompiler.TranspileSpirv(stage, Backend.Hlsl, spirv, entryPoint);
+        string hlsl = SpirvCompiler.TranspileSpirv(stage, ShaderLanguage.Hlsl50, spirv, entryPoint);
 
         string profile = stage switch
         {

@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace grabs.Graphics.GL43;
+﻿namespace grabs.Graphics.GL43;
 
 public struct CommandListAction
 {
