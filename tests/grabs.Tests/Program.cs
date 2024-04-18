@@ -99,7 +99,7 @@ unsafe
         -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
         -0.5f, +0.5f, 0.0f, 1.0f, 0.0f,
         +0.5f, +0.5f, 0.0f, 0.0f, 1.0f,
-        +0.5f, -0.5f, 1.0f, 1.0f, 1.0f
+        +0.5f, -0.5f, 0.0f, 0.0f, 0.0f
     };
 
     ReadOnlySpan<uint> indices = stackalloc uint[]
@@ -160,6 +160,10 @@ unsafe
         commandList.EndRenderPass();
         
         commandList.SetPipeline(pipeline);
+        commandList.SetVertexBuffer(0, vertexBuffer, 5 * sizeof(float), 0);
+        commandList.SetIndexBuffer(indexBuffer, Format.R32_UInt);
+        
+        commandList.DrawIndexed(6);
         
         commandList.End();
         

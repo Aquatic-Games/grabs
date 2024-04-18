@@ -35,10 +35,7 @@ public sealed class D3D11CommandList : CommandList
             Context.ClearRenderTargetView(framebuffer.RenderTargets[i], new Color4(description.ClearColor));
     }
 
-    public override void EndRenderPass()
-    {
-        
-    }
+    public override void EndRenderPass() { }
 
     public override void SetPipeline(Pipeline pipeline)
     {
@@ -50,6 +47,24 @@ public sealed class D3D11CommandList : CommandList
         
         // TODO: Add these to pipelines.
         Context.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
+        
+        // TODO: Viewport in Device
+        Context.RSSetViewport(0, 0, 1280, 720);
+    }
+
+    public override void SetVertexBuffer(uint slot, Buffer buffer, uint stride, uint offset)
+    {
+        Context.IASetVertexBuffer((int) slot, ((D3D11Buffer) buffer).Buffer, (int) stride, (int) offset);
+    }
+
+    public override void SetIndexBuffer(Buffer buffer, Format format)
+    {
+        Context.IASetIndexBuffer(((D3D11Buffer) buffer).Buffer, format.ToDXGIFormat(), 0);
+    }
+
+    public override void DrawIndexed(uint numIndices)
+    {
+        Context.DrawIndexed((int) numIndices, 0, 0);
     }
 
     public override void Dispose()

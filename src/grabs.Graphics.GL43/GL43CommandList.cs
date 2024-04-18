@@ -41,5 +41,20 @@ public class GL43CommandList : CommandList
         throw new NotImplementedException();
     }
 
+    public override void SetVertexBuffer(uint slot, Buffer buffer, uint stride, uint offset)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void SetIndexBuffer(Buffer buffer, Format format)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void DrawIndexed(uint numIndices)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void Dispose() { }
 }
