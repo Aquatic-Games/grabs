@@ -88,7 +88,7 @@ unsafe
 
     CommandList commandList = device.CreateCommandList();
 
-    /*ReadOnlySpan<float> vertices = stackalloc float[]
+    ReadOnlySpan<float> vertices = stackalloc float[]
     {
         -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
         -0.5f, +0.5f, 0.0f, 1.0f, 0.0f,
@@ -107,7 +107,7 @@ unsafe
     Buffer indexBuffer =
         device.CreateBuffer(new BufferDescription(BufferType.Index, (uint) (indices.Length * sizeof(uint))), indices);
 
-    ShaderModule vertexModule = device.CreateShaderModule(ShaderStage.Vertex,
+    /*ShaderModule vertexModule = device.CreateShaderModule(ShaderStage.Vertex,
         Compiler.CompileToSpirV(shaderCode, "Vertex", ShaderStage.Vertex), "Vertex");
     ShaderModule pixelModule = device.CreateShaderModule(ShaderStage.Pixel,
         Compiler.CompileToSpirV(shaderCode, "Pixel", ShaderStage.Pixel), "Pixel");
@@ -151,8 +151,8 @@ unsafe
         swapchain.Present();
     }
     
-    /*indexBuffer.Dispose();
-    vertexBuffer.Dispose();*/
+    indexBuffer.Dispose();
+    vertexBuffer.Dispose();
     
     commandList.Dispose();
     swapchain.Dispose();

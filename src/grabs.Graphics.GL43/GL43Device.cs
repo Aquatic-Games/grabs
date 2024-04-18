@@ -21,9 +21,10 @@ public class GL43Device : Device
         return new GL43CommandList();
     }
 
-    public override Buffer CreateBuffer<T>(in BufferDescription description, in ReadOnlySpan<T> data)
+    public override unsafe Buffer CreateBuffer<T>(in BufferDescription description, in ReadOnlySpan<T> data)
     {
-        throw new NotImplementedException();
+        fixed (void* pData = data)
+            return new GL43Buffer(_gl, description, pData);
     }
 
     public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint)
