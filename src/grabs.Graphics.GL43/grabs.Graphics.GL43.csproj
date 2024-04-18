@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\grabs.Graphics\grabs.Graphics.csproj" />
+      <ProjectReference Include="..\grabs.ShaderCompiler.Spirv\grabs.ShaderCompiler.Spirv.csproj" />
     </ItemGroup>
 
     <ItemGroup>

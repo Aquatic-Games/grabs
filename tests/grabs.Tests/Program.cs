@@ -2,6 +2,7 @@
 using grabs.Graphics;
 using grabs.Graphics.D3D11;
 using grabs.Graphics.GL43;
+using grabs.ShaderCompiler.DXC;
 using Silk.NET.OpenGL;
 using Silk.NET.SDL;
 using Buffer = grabs.Graphics.Buffer;
@@ -108,13 +109,13 @@ unsafe
     Buffer indexBuffer =
         device.CreateBuffer(new BufferDescription(BufferType.Index, (uint) (indices.Length * sizeof(uint))), indices);
 
-    /*ShaderModule vertexModule = device.CreateShaderModule(ShaderStage.Vertex,
+    ShaderModule vertexModule = device.CreateShaderModule(ShaderStage.Vertex,
         Compiler.CompileToSpirV(shaderCode, "Vertex", ShaderStage.Vertex), "Vertex");
     ShaderModule pixelModule = device.CreateShaderModule(ShaderStage.Pixel,
         Compiler.CompileToSpirV(shaderCode, "Pixel", ShaderStage.Pixel), "Pixel");
     
     pixelModule.Dispose();
-    vertexModule.Dispose();*/
+    vertexModule.Dispose();
     
     bool alive = true;
     while (alive)

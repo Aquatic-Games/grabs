@@ -29,7 +29,7 @@ public class GL43Device : Device
 
     public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint)
     {
-        throw new NotImplementedException();
+        return new GL43ShaderModule(_gl, stage, spirv, entryPoint);
     }
 
     public override void ExecuteCommandList(CommandList list)
