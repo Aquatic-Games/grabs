@@ -39,13 +39,20 @@ public class GL43Pipeline : Pipeline
             
             InputLayoutDescription desc = description.InputLayout[i];
 
+            // TODO: THE REST OF THESE!!!
             switch (desc.Format)
             {
+                case Format.R32_Float:
+                    _gl.VertexAttribFormat(i, 1, VertexAttribType.Float, false, desc.Offset);
+                    break;
                 case Format.R32G32_Float:
                     _gl.VertexAttribFormat(i, 2, VertexAttribType.Float, false, desc.Offset);
                     break;
                 case Format.R32G32B32_Float:
                     _gl.VertexAttribFormat(i, 3, VertexAttribType.Float, false, desc.Offset);
+                    break;
+                case Format.R32G32B32A32_Float:
+                    _gl.VertexAttribFormat(i, 4, VertexAttribType.Float, false, desc.Offset);
                     break;
                 default:
                     throw new NotImplementedException();
