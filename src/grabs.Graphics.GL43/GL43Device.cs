@@ -34,6 +34,10 @@ public class GL43Device : Device
 
     public override Framebuffer CreateFramebuffer(in ReadOnlySpan<Texture> colorTextures, Texture depthTexture)
     {
+        // As OpenGL doesn't support a user accessible swapchain framebuffer, we have to fake it.
+        if (colorTextures[0] is GL43SwapchainTexture)
+            return new GL43SwapchainFramebuffer();
+
         throw new NotImplementedException();
     }
 
@@ -47,6 +51,11 @@ public class GL43Device : Device
             {
                 case CommandListActionType.BeginRenderPass:
                     RenderPassDescription desc = action.BeginRenderPass.RenderPassDescription;
+
+                    if (desc.Framebuffer is GL43SwapchainFramebuffer)
+                        _gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+                    else
+                        throw new NotImplementedException();
                     
                     _gl.ClearColor(desc.ClearColor.X, desc.ClearColor.Y, desc.ClearColor.Z, desc.ClearColor.W);
                     _gl.Clear(ClearBufferMask.ColorBufferBit);

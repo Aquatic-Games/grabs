@@ -59,24 +59,24 @@ unsafe
     const uint width = 1280;
     const uint height = 720;
 
-    /*sdl.GLSetAttribute(GLattr.ContextProfileMask, (int) ContextProfileMask.CoreProfileBit);
+    sdl.GLSetAttribute(GLattr.ContextProfileMask, (int) ContextProfileMask.CoreProfileBit);
     sdl.GLSetAttribute(GLattr.ContextMajorVersion, 4);
-    sdl.GLSetAttribute(GLattr.ContextMinorVersion, 3);*/
+    sdl.GLSetAttribute(GLattr.ContextMinorVersion, 3);
     
     Window* window = sdl.CreateWindow("Test", Sdl.WindowposCentered, Sdl.WindowposCentered, (int) width, (int) height,
-        (uint) WindowFlags.Shown);
+        (uint) WindowFlags.Opengl);
     
     if (window == null)
         throw new Exception($"Failed to create SDL window: {sdl.GetErrorS()}");
 
-    /*void* glCtx = sdl.GLCreateContext(window);
-    sdl.GLMakeCurrent(window, glCtx);*/
+    void* glCtx = sdl.GLCreateContext(window);
+    sdl.GLMakeCurrent(window, glCtx);
 
     SysWMInfo info = new SysWMInfo();
     sdl.GetWindowWMInfo(window, &info);
 
-    Instance instance = new D3D11Instance();
-    //Instance instance = new GL43Instance(s => (nint) sdl.GLGetProcAddress(s));
+    //Instance instance = new D3D11Instance();
+    Instance instance = new GL43Instance(s => (nint) sdl.GLGetProcAddress(s));
     
     Console.WriteLine(instance.Api);
 
@@ -85,8 +85,8 @@ unsafe
 
     Device device = instance.CreateDevice();
 
-    Surface surface = new D3D11Surface(info.Info.Win.Hwnd);
-    //Surface surface = new GL43Surface(i => { sdl.GLSetSwapInterval(i); sdl.GLSwapWindow(window); });
+    //Surface surface = new D3D11Surface(info.Info.Win.Hwnd);
+    Surface surface = new GL43Surface(i => { sdl.GLSetSwapInterval(i); sdl.GLSwapWindow(window); });
     
     Swapchain swapchain = device.CreateSwapchain(surface, new SwapchainDescription(width, height, Format.B8G8R8A8_UNorm, 2, PresentMode.VerticalSync));
     Texture swapchainTexture = swapchain.GetSwapchainTexture();

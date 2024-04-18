@@ -30,7 +30,7 @@ public class GL43Swapchain : Swapchain
 
     public override Texture GetSwapchainTexture()
     {
-        throw new NotImplementedException();
+        return new GL43SwapchainTexture();
     }
 
     public override void Present()
