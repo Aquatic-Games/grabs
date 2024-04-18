@@ -21,10 +21,7 @@ public class GL43CommandList : CommandList
         Actions.Add(new CommandListAction()
         {
             Type = CommandListActionType.BeginRenderPass,
-            BeginRenderPass = new CommandListAction.BeginRenderPassAction()
-            {
-                RenderPassDescription = description
-            }
+            RenderPassDescription = description
         });
     }
 
@@ -33,14 +30,24 @@ public class GL43CommandList : CommandList
         Actions.Add(new CommandListAction(CommandListActionType.EndRenderPass));
     }
 
+    public override void UpdateBuffer<T>(Buffer buffer, uint offsetInBytes, uint sizeInBytes, in ReadOnlySpan<T> data)
+    {
+        Actions.Add(new CommandListAction(CommandListActionType.UpdateBuffer)
+        {
+            Buffer = buffer,
+            Stride = sizeInBytes,
+            Offset = offsetInBytes,
+            // I hate this but it works. The OpenGL backend is not the most performant anyway.
+            // TODO: Is there a better solution?
+            MiscObject = data.ToArray()
+        });
+    }
+
     public override void SetPipeline(Pipeline pipeline)
     {
         Actions.Add(new CommandListAction(CommandListActionType.SetPipeline)
         {
-            SetPipeline = new CommandListAction.SetPipelineAction()
-            {
-                Pipeline = pipeline
-            }
+            Pipeline = pipeline
         });
     }
 
@@ -48,13 +55,10 @@ public class GL43CommandList : CommandList
     {
         Actions.Add(new CommandListAction(CommandListActionType.SetVertexBuffer)
         {
-            SetVertexBuffer = new CommandListAction.SetVertexBufferAction()
-            {
-                Slot = slot,
-                Buffer = buffer,
-                Stride = stride,
-                Offset = offset
-            }
+            Slot = slot,
+            Buffer = buffer,
+            Stride = stride,
+            Offset = offset
         });
     }
 
@@ -62,11 +66,8 @@ public class GL43CommandList : CommandList
     {
         Actions.Add(new CommandListAction(CommandListActionType.SetIndexBuffer)
         {
-            SetIndexBuffer = new CommandListAction.SetIndexBufferAction()
-            {
-                Buffer = buffer,
-                Format = format
-            }
+            Buffer = buffer,
+            Format = format
         });
     }
 
@@ -74,11 +75,8 @@ public class GL43CommandList : CommandList
     {
         Actions.Add(new CommandListAction(CommandListActionType.SetConstantBuffer)
         {
-            SetConstantBuffer = new CommandListAction.SetConstantBufferAction()
-            {
-                Slot = slot,
-                Buffer = buffer
-            }
+            Slot = slot,
+            Buffer = buffer
         });
     }
 
@@ -86,10 +84,7 @@ public class GL43CommandList : CommandList
     {
         Actions.Add(new CommandListAction(CommandListActionType.DrawIndexed)
         {
-            Draw = new CommandListAction.DrawAction()
-            {
-                NumVerticesOrIndices = numIndices
-            }
+            Slot = numIndices
         });
     }
 

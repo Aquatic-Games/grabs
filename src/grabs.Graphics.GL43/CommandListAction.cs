@@ -3,56 +3,21 @@
 public struct CommandListAction
 {
     public CommandListActionType Type;
+    
+    public RenderPassDescription RenderPassDescription;
+    
+    public Pipeline Pipeline;
+    
+    public Buffer Buffer;
+    public uint Slot;
+    public uint Stride;
+    public uint Offset;
+    public Format Format;
 
-    public BeginRenderPassAction BeginRenderPass;
-
-    public SetPipelineAction SetPipeline;
-
-    public SetVertexBufferAction SetVertexBuffer;
-
-    public SetIndexBufferAction SetIndexBuffer;
-
-    public SetConstantBufferAction SetConstantBuffer;
-
-    public DrawAction Draw;
+    public object MiscObject;
 
     public CommandListAction(CommandListActionType type)
     {
         Type = type;
-    }
-
-    public struct BeginRenderPassAction
-    {
-        public RenderPassDescription RenderPassDescription;
-    }
-
-    public struct SetPipelineAction
-    {
-        public Pipeline Pipeline;
-    }
-
-    public struct SetVertexBufferAction
-    {
-        public uint Slot;
-        public Buffer Buffer;
-        public uint Stride;
-        public uint Offset;
-    }
-
-    public struct SetIndexBufferAction
-    {
-        public Buffer Buffer;
-        public Format Format;
-    }
-
-    public struct SetConstantBufferAction
-    {
-        public uint Slot;
-        public Buffer Buffer;
-    }
-
-    public struct DrawAction
-    {
-        public uint NumVerticesOrIndices;
     }
 }

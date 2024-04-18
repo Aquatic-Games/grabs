@@ -12,6 +12,12 @@ public abstract class CommandList : IDisposable
 
     public abstract void EndRenderPass();
 
+    public void UpdateBuffer<T>(Buffer buffer, uint offsetInBytes, uint sizeInBytes, T data) where T : unmanaged
+        => UpdateBuffer(buffer, offsetInBytes, sizeInBytes, new ReadOnlySpan<T>(ref data));
+
+    public abstract void UpdateBuffer<T>(Buffer buffer, uint offsetInBytes, uint sizeInBytes, in ReadOnlySpan<T> data)
+        where T : unmanaged;
+
     public abstract void SetPipeline(Pipeline pipeline);
 
     public abstract void SetVertexBuffer(uint slot, Buffer buffer, uint stride, uint offset);

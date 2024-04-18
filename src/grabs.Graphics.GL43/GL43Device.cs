@@ -1,4 +1,5 @@
-﻿using Silk.NET.OpenGL;
+﻿using System.Runtime.InteropServices;
+using Silk.NET.OpenGL;
 
 namespace grabs.Graphics.GL43;
 
@@ -56,7 +57,7 @@ public class GL43Device : Device
             {
                 case CommandListActionType.BeginRenderPass:
                 {
-                    RenderPassDescription desc = action.BeginRenderPass.RenderPassDescription;
+                    RenderPassDescription desc = action.RenderPassDescription;
 
                     if (desc.Framebuffer is GL43SwapchainFramebuffer)
                         _gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
@@ -71,9 +72,23 @@ public class GL43Device : Device
                 case CommandListActionType.EndRenderPass:
                     break;
 
+                case CommandListActionType.UpdateBuffer:
+                {
+                    GL43Buffer buffer = (GL43Buffer) action.Buffer;
+                    GCHandle handle = GCHandle.Alloc(action.MiscObject, GCHandleType.Pinned);
+                    
+                    _gl.BindBuffer(BufferTargetARB.UniformBuffer, buffer.Buffer);
+                    _gl.BufferSubData(BufferTargetARB.UniformBuffer, (nint) action.Offset, (nuint) action.Stride,
+                        (void*) handle.AddrOfPinnedObject());
+                    
+                    handle.Free();
+
+                    break;
+                }
+
                 case CommandListActionType.SetPipeline:
                 {
-                    GL43Pipeline pipeline = (GL43Pipeline) action.SetPipeline.Pipeline;
+                    GL43Pipeline pipeline = (GL43Pipeline) action.Pipeline;
                     
                     _gl.BindVertexArray(pipeline.Vao);
                     _gl.UseProgram(pipeline.ShaderProgram);
@@ -82,34 +97,26 @@ public class GL43Device : Device
                 
                 case CommandListActionType.SetVertexBuffer:
                 {
-                    CommandListAction.SetVertexBufferAction bufferAction = action.SetVertexBuffer;
-
-                    _gl.BindVertexBuffer(bufferAction.Slot, ((GL43Buffer) bufferAction.Buffer).Buffer,
-                        (nint) bufferAction.Offset, bufferAction.Stride);
+                    _gl.BindVertexBuffer(action.Slot, ((GL43Buffer) action.Buffer).Buffer, (nint) action.Offset,
+                        action.Stride);
                     break;
                 }
                 
                 case CommandListActionType.SetIndexBuffer:
                 {
-                    CommandListAction.SetIndexBufferAction bufferAction = action.SetIndexBuffer;
-
-                    _gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, ((GL43Buffer) bufferAction.Buffer).Buffer);
+                    _gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, ((GL43Buffer) action.Buffer).Buffer);
                     break;
                 }
 
                 case CommandListActionType.SetConstantBuffer:
                 {
-                    CommandListAction.SetConstantBufferAction bufferAction = action.SetConstantBuffer;
-
-                    _gl.BindBufferBase(BufferTargetARB.UniformBuffer, bufferAction.Slot,
-                        ((GL43Buffer) bufferAction.Buffer).Buffer);
+                    _gl.BindBufferBase(BufferTargetARB.UniformBuffer, action.Slot, ((GL43Buffer) action.Buffer).Buffer);
                     break;
                 }
 
                 case CommandListActionType.DrawIndexed:
                 {
-                    _gl.DrawElements(PrimitiveType.Triangles, action.Draw.NumVerticesOrIndices,
-                        DrawElementsType.UnsignedInt, null);
+                    _gl.DrawElements(PrimitiveType.Triangles, action.Slot, DrawElementsType.UnsignedInt, null);
                     break;
                 }
 
