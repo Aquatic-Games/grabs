@@ -64,7 +64,7 @@ unsafe
     const uint width = 1280;
     const uint height = 720;
 
-    const GraphicsApi api = GraphicsApi.OpenGL;
+    const GraphicsApi api = GraphicsApi.D3D11;
 
     WindowFlags flags = WindowFlags.Shown;
     

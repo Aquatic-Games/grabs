@@ -7,7 +7,7 @@ public sealed class D3D11Buffer : Buffer
 {
     public ID3D11Buffer Buffer;
 
-    public unsafe D3D11Buffer(ID3D11Device device, BufferDescription description, void* data) : base(description)
+    public unsafe D3D11Buffer(ID3D11Device device, BufferDescription description, void* pData) : base(description)
     {
         BindFlags flags = description.Type switch
         {
@@ -25,9 +25,9 @@ public sealed class D3D11Buffer : Buffer
             CPUAccessFlags = description.Dynamic ? CpuAccessFlags.Write : CpuAccessFlags.None
         };
 
-        SubresourceData sData = new SubresourceData(data);
+        SubresourceData sData = new SubresourceData(pData);
 
-        Buffer = device.CreateBuffer(desc, sData);
+        Buffer = device.CreateBuffer(desc, pData == null ? null : sData);
     }
     
     public override void Dispose()

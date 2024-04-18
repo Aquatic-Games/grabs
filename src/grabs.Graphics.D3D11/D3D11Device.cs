@@ -45,10 +45,9 @@ public sealed class D3D11Device : Device
         return new D3D11Pipeline(Device, description);
     }
 
-    public override unsafe Buffer CreateBuffer<T>(in BufferDescription description, in ReadOnlySpan<T> data)
+    public override unsafe Buffer CreateBuffer(in BufferDescription description, void* pData)
     {
-        fixed (void* pData = data)
-            return new D3D11Buffer(Device, description, pData);
+        return new D3D11Buffer(Device, description, pData);
     }
 
     public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint)
