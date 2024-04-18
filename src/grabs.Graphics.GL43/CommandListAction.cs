@@ -12,6 +12,8 @@ public struct CommandListAction
 
     public SetIndexBufferAction SetIndexBuffer;
 
+    public SetConstantBufferAction SetConstantBuffer;
+
     public DrawAction Draw;
 
     public CommandListAction(CommandListActionType type)
@@ -41,6 +43,12 @@ public struct CommandListAction
     {
         public Buffer Buffer;
         public Format Format;
+    }
+
+    public struct SetConstantBufferAction
+    {
+        public uint Slot;
+        public Buffer Buffer;
     }
 
     public struct DrawAction

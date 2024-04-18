@@ -79,6 +79,7 @@ public class GL43Device : Device
                     _gl.UseProgram(pipeline.ShaderProgram);
                     break;
                 }
+                
                 case CommandListActionType.SetVertexBuffer:
                 {
                     CommandListAction.SetVertexBufferAction bufferAction = action.SetVertexBuffer;
@@ -87,6 +88,7 @@ public class GL43Device : Device
                         (nint) bufferAction.Offset, bufferAction.Stride);
                     break;
                 }
+                
                 case CommandListActionType.SetIndexBuffer:
                 {
                     CommandListAction.SetIndexBufferAction bufferAction = action.SetIndexBuffer;
@@ -94,9 +96,23 @@ public class GL43Device : Device
                     _gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, ((GL43Buffer) bufferAction.Buffer).Buffer);
                     break;
                 }
-                case CommandListActionType.DrawIndexed:
-                    _gl.DrawElements(PrimitiveType.Triangles, action.Draw.NumVerticesOrIndices, DrawElementsType.UnsignedInt, null);
+
+                case CommandListActionType.SetConstantBuffer:
+                {
+                    CommandListAction.SetConstantBufferAction bufferAction = action.SetConstantBuffer;
+
+                    _gl.BindBufferBase(BufferTargetARB.UniformBuffer, bufferAction.Slot,
+                        ((GL43Buffer) bufferAction.Buffer).Buffer);
                     break;
+                }
+
+                case CommandListActionType.DrawIndexed:
+                {
+                    _gl.DrawElements(PrimitiveType.Triangles, action.Draw.NumVerticesOrIndices,
+                        DrawElementsType.UnsignedInt, null);
+                    break;
+                }
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }

@@ -28,11 +28,16 @@ const string shaderCode = """
                               float4 Color: SV_Target0;
                           };
 
+                          cbuffer TransformMatrix : register(b0)
+                          {
+                              float4x4 Transform;
+                          }
+                          
                           VSOutput Vertex(const in VSInput input)
                           {
                               VSOutput output;
                               
-                              output.Position = float4(input.Position, 0.0, 1.0);
+                              output.Position = mul(Transform, float4(input.Position, 0.0, 1.0));
                               output.Color = float4(input.Color, 1.0);
                               
                               return output;
@@ -59,24 +64,64 @@ unsafe
     const uint width = 1280;
     const uint height = 720;
 
-    sdl.GLSetAttribute(GLattr.ContextProfileMask, (int) ContextProfileMask.CoreProfileBit);
-    sdl.GLSetAttribute(GLattr.ContextMajorVersion, 4);
-    sdl.GLSetAttribute(GLattr.ContextMinorVersion, 3);
+    const GraphicsApi api = GraphicsApi.OpenGL;
+
+    WindowFlags flags = WindowFlags.Shown;
     
+    switch (api)
+    {
+        case GraphicsApi.OpenGL:
+            sdl.GLSetAttribute(GLattr.ContextProfileMask, (int) ContextProfileMask.CoreProfileBit);
+            sdl.GLSetAttribute(GLattr.ContextMajorVersion, 4);
+            sdl.GLSetAttribute(GLattr.ContextMinorVersion, 3);
+
+            flags |= WindowFlags.Opengl;
+            break;
+        case GraphicsApi.D3D11:
+            break;
+        case GraphicsApi.OpenGLES:
+            break;
+        case GraphicsApi.Vulkan:
+            break;
+        default:
+            throw new ArgumentOutOfRangeException();
+    }
+
     Window* window = sdl.CreateWindow("Test", Sdl.WindowposCentered, Sdl.WindowposCentered, (int) width, (int) height,
-        (uint) WindowFlags.Shown);
+        (uint) flags);
     
     if (window == null)
         throw new Exception($"Failed to create SDL window: {sdl.GetErrorS()}");
 
-    //void* glCtx = sdl.GLCreateContext(window);
-    //sdl.GLMakeCurrent(window, glCtx);
+    void* glCtx;
+    if (api is GraphicsApi.OpenGL or GraphicsApi.OpenGLES)
+    {
+        glCtx = sdl.GLCreateContext(window);
+        sdl.GLMakeCurrent(window, glCtx);
+    }
 
     SysWMInfo info = new SysWMInfo();
     sdl.GetWindowWMInfo(window, &info);
 
-    Instance instance = new D3D11Instance();
-    //Instance instance = new GL43Instance(s => (nint) sdl.GLGetProcAddress(s));
+    Instance instance;
+    Surface surface;
+    switch (api)
+    {
+        case GraphicsApi.D3D11:
+            instance = new D3D11Instance();
+            surface = new D3D11Surface(info.Info.Win.Hwnd);
+            break;
+        case GraphicsApi.OpenGL:
+            instance = new GL43Instance(s => (nint) sdl.GLGetProcAddress(s));
+            surface = new GL43Surface(i => { sdl.GLSetSwapInterval(i); sdl.GLSwapWindow(window); });
+            break;
+        case GraphicsApi.OpenGLES:
+            break;
+        case GraphicsApi.Vulkan:
+            break;
+        default:
+            throw new ArgumentOutOfRangeException();
+    }
     
     Console.WriteLine(instance.Api);
 
@@ -84,9 +129,6 @@ unsafe
     Console.WriteLine(string.Join('\n', adapters));
 
     Device device = instance.CreateDevice();
-
-    Surface surface = new D3D11Surface(info.Info.Win.Hwnd);
-    //Surface surface = new GL43Surface(i => { sdl.GLSetSwapInterval(i); sdl.GLSwapWindow(window); });
     
     Swapchain swapchain = device.CreateSwapchain(surface, new SwapchainDescription(width, height, Format.B8G8R8A8_UNorm, 2, PresentMode.VerticalSync));
     Texture swapchainTexture = swapchain.GetSwapchainTexture();
@@ -112,6 +154,9 @@ unsafe
         device.CreateBuffer(new BufferDescription(BufferType.Vertex, (uint) (vertices.Length * sizeof(float))), vertices);
     Buffer indexBuffer =
         device.CreateBuffer(new BufferDescription(BufferType.Index, (uint) (indices.Length * sizeof(uint))), indices);
+
+    Buffer transformBuffer =
+        device.CreateBuffer(new BufferDescription(BufferType.Constant, 64, true), Matrix4x4.CreateTranslation(1, 0, 0));
 
     ShaderModule vertexModule = device.CreateShaderModule(ShaderStage.Vertex,
         Compiler.CompileToSpirV(shaderCode, "Vertex", ShaderStage.Vertex), "Vertex");
@@ -161,6 +206,8 @@ unsafe
         commandList.SetPipeline(pipeline);
         commandList.SetVertexBuffer(0, vertexBuffer, 5 * sizeof(float), 0);
         commandList.SetIndexBuffer(indexBuffer, Format.R32_UInt);
+        
+        commandList.SetConstantBuffer(0, transformBuffer);
         
         commandList.DrawIndexed(6);
         

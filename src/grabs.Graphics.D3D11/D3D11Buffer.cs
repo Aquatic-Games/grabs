@@ -22,6 +22,7 @@ public sealed class D3D11Buffer : Buffer
             BindFlags = flags,
             ByteWidth = (int) description.SizeInBytes,
             Usage = description.Dynamic ? ResourceUsage.Dynamic : ResourceUsage.Default,
+            CPUAccessFlags = description.Dynamic ? CpuAccessFlags.Write : CpuAccessFlags.None
         };
 
         SubresourceData sData = new SubresourceData(data);
