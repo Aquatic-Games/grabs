@@ -9,11 +9,10 @@
 
     <ItemGroup>
       <ProjectReference Include="..\grabs.Graphics\grabs.Graphics.csproj" />
+      <ProjectReference Include="..\grabs.ShaderCompiler.Spirv\grabs.ShaderCompiler.Spirv.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Silk.NET.SPIRV.Cross" Version="2.20.0" />
-      <PackageReference Include="Silk.NET.SPIRV.Cross.Native" Version="2.20.0" />
       <PackageReference Include="Vortice.D3DCompiler" Version="3.5.0" />
       <PackageReference Include="Vortice.Direct3D11" Version="3.5.0" />
       <PackageReference Include="Vortice.DXGI" Version="3.5.0" />
