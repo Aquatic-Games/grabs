@@ -21,6 +21,11 @@ public class GL43Device : Device
         return new GL43CommandList();
     }
 
+    public override Pipeline CreatePipeline(in PipelineDescription description)
+    {
+        throw new NotImplementedException();
+    }
+
     public override unsafe Buffer CreateBuffer<T>(in BufferDescription description, in ReadOnlySpan<T> data)
     {
         fixed (void* pData = data)

@@ -40,6 +40,11 @@ public sealed class D3D11Device : Device
         return new D3D11CommandList(Device);
     }
 
+    public override Pipeline CreatePipeline(in PipelineDescription description)
+    {
+        throw new NotImplementedException();
+    }
+
     public override unsafe Buffer CreateBuffer<T>(in BufferDescription description, in ReadOnlySpan<T> data)
     {
         fixed (void* pData = data)

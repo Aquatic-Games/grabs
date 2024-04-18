@@ -8,6 +8,8 @@ public abstract class Device : IDisposable
 
     public abstract CommandList CreateCommandList();
 
+    public abstract Pipeline CreatePipeline(in PipelineDescription description);
+
     public Buffer CreateBuffer<T>(in BufferDescription description, T data) where T : unmanaged
         => CreateBuffer(description, new ReadOnlySpan<T>(ref data));
     
