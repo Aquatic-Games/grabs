@@ -27,8 +27,8 @@ public class GL43Swapchain : Swapchain
     {
         _surface = surface;
     }
-    
-    public override ColorTarget GetColorTarget()
+
+    public override Texture GetSwapchainTexture()
     {
         throw new NotImplementedException();
     }

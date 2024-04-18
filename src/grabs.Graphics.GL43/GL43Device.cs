@@ -32,6 +32,11 @@ public class GL43Device : Device
         return new GL43ShaderModule(_gl, stage, spirv, entryPoint);
     }
 
+    public override Framebuffer CreateFramebuffer(in ReadOnlySpan<Texture> colorTextures, Texture depthTexture)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void ExecuteCommandList(CommandList list)
     {
         GL43CommandList cl = (GL43CommandList) list;

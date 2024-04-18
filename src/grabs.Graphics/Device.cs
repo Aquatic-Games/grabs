@@ -15,6 +15,8 @@ public abstract class Device : IDisposable
     
     public abstract ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint);
 
+    public abstract Framebuffer CreateFramebuffer(in ReadOnlySpan<Texture> colorTextures, Texture depthTexture = null);
+
     public abstract void ExecuteCommandList(CommandList list);
     
     public abstract void Dispose();

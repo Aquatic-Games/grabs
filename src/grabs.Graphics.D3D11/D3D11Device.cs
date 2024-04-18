@@ -51,6 +51,11 @@ public sealed class D3D11Device : Device
         return new D3D11ShaderModule(stage, spirv, entryPoint);
     }
 
+    public override Framebuffer CreateFramebuffer(in ReadOnlySpan<Texture> colorTextures, Texture depthTexture)
+    {
+        return new D3D11Framebuffer(Device, colorTextures, depthTexture);
+    }
+
     public override void ExecuteCommandList(CommandList list)
     { 
         Context.ExecuteCommandList(((D3D11CommandList) list).CommandList, false); 

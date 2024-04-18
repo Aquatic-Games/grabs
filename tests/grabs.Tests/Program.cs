@@ -6,7 +6,9 @@ using grabs.ShaderCompiler.DXC;
 using Silk.NET.OpenGL;
 using Silk.NET.SDL;
 using Buffer = grabs.Graphics.Buffer;
+using Framebuffer = grabs.Graphics.Framebuffer;
 using Surface = grabs.Graphics.Surface;
+using Texture = grabs.Graphics.Texture;
 
 const string shaderCode = """
                           struct VSInput
@@ -14,18 +16,18 @@ const string shaderCode = """
                               float2 Position: POSITION0;
                               float3 Color:    COLOR0;
                           };
-                          
+
                           struct VSOutput
                           {
                               float4 Position: SV_Position;
                               float4 Color:    COLOR0;
                           };
-                          
+
                           struct PSOutput
                           {
                               float4 Color: SV_Target0;
                           };
-                          
+
                           VSOutput Vertex(const in VSInput input)
                           {
                               VSOutput output;
@@ -35,7 +37,7 @@ const string shaderCode = """
                               
                               return output;
                           }
-                          
+
                           PSOutput Pixel(const in VSOutput input)
                           {
                               PSOutput output;
@@ -44,7 +46,7 @@ const string shaderCode = """
                               
                               return output;
                           }
-                          
+
                           """;
 
 Sdl sdl = Sdl.GetApi();
@@ -57,24 +59,24 @@ unsafe
     const uint width = 1280;
     const uint height = 720;
 
-    sdl.GLSetAttribute(GLattr.ContextProfileMask, (int) ContextProfileMask.CoreProfileBit);
+    /*sdl.GLSetAttribute(GLattr.ContextProfileMask, (int) ContextProfileMask.CoreProfileBit);
     sdl.GLSetAttribute(GLattr.ContextMajorVersion, 4);
-    sdl.GLSetAttribute(GLattr.ContextMinorVersion, 3);
+    sdl.GLSetAttribute(GLattr.ContextMinorVersion, 3);*/
     
     Window* window = sdl.CreateWindow("Test", Sdl.WindowposCentered, Sdl.WindowposCentered, (int) width, (int) height,
-        (uint) WindowFlags.Opengl);
+        (uint) WindowFlags.Shown);
+    
+    if (window == null)
+        throw new Exception($"Failed to create SDL window: {sdl.GetErrorS()}");
 
-    void* glCtx = sdl.GLCreateContext(window);
-    sdl.GLMakeCurrent(window, glCtx);
+    /*void* glCtx = sdl.GLCreateContext(window);
+    sdl.GLMakeCurrent(window, glCtx);*/
 
     SysWMInfo info = new SysWMInfo();
     sdl.GetWindowWMInfo(window, &info);
 
-    if (window == null)
-        throw new Exception($"Failed to create SDL window: {sdl.GetErrorS()}");
-
-    //Instance instance = new D3D11Instance();
-    Instance instance = new GL43Instance(s => (nint) sdl.GLGetProcAddress(s));
+    Instance instance = new D3D11Instance();
+    //Instance instance = new GL43Instance(s => (nint) sdl.GLGetProcAddress(s));
     
     Console.WriteLine(instance.Api);
 
@@ -83,10 +85,12 @@ unsafe
 
     Device device = instance.CreateDevice();
 
-    //Surface surface = new D3D11Surface(info.Info.Win.Hwnd);
-    Surface surface = new GL43Surface(i => { sdl.GLSetSwapInterval(i); sdl.GLSwapWindow(window); });
+    Surface surface = new D3D11Surface(info.Info.Win.Hwnd);
+    //Surface surface = new GL43Surface(i => { sdl.GLSetSwapInterval(i); sdl.GLSwapWindow(window); });
+    
     Swapchain swapchain = device.CreateSwapchain(surface, new SwapchainDescription(width, height, Format.B8G8R8A8_UNorm, 2, PresentMode.VerticalSync));
-    //ColorTarget swapchainTarget = swapchain.GetColorTarget();
+    Texture swapchainTexture = swapchain.GetSwapchainTexture();
+    Framebuffer swapchainBuffer = device.CreateFramebuffer(new ReadOnlySpan<Texture>(ref swapchainTexture));
 
     CommandList commandList = device.CreateCommandList();
 
@@ -143,6 +147,7 @@ unsafe
 
         commandList.BeginRenderPass(new RenderPassDescription()
         {
+            Framebuffer = swapchainBuffer,
             ClearColor = new Vector4(1.0f, 0.5f, 0.25f, 1.0f)
         });
         commandList.EndRenderPass();
