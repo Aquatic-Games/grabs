@@ -39,24 +39,20 @@ public sealed class D3D11CommandList : CommandList
 
     public override void EndRenderPass() { }
 
-    public override unsafe void UpdateBuffer<T>(Buffer buffer, uint offsetInBytes, uint sizeInBytes, in ReadOnlySpan<T> data)
+    public override unsafe void UpdateBuffer(Buffer buffer, uint offsetInBytes, uint sizeInBytes, void* pData)
     {
         D3D11Buffer d3dBuffer = (D3D11Buffer) buffer;
 
         if (d3dBuffer.Description.Dynamic)
         {
             MappedSubresource mResource = Context.Map(d3dBuffer.Buffer, MapMode.WriteDiscard);
-            fixed (void* pData = data)
-                Unsafe.CopyBlock((byte*) mResource.DataPointer + offsetInBytes, pData, sizeInBytes);
+            Unsafe.CopyBlock((byte*) mResource.DataPointer + offsetInBytes, pData, sizeInBytes);
             Context.Unmap(d3dBuffer.Buffer);
         }
         else
         {
-            fixed (void* pData = data)
-            {
-                Context.UpdateSubresource(d3dBuffer.Buffer, 0,
-                    new Box((int) offsetInBytes, 0, 0, (int) (offsetInBytes + sizeInBytes), 1, 1), (nint) pData, 0, 0);
-            }
+            Context.UpdateSubresource(d3dBuffer.Buffer, 0,
+                new Box((int) offsetInBytes, 0, 0, (int) (offsetInBytes + sizeInBytes), 1, 1), (nint) pData, 0, 0);
         }
     }
 

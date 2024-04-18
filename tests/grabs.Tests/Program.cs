@@ -150,13 +150,10 @@ unsafe
         1, 2, 3
     };
 
-    Buffer vertexBuffer =
-        device.CreateBuffer(new BufferDescription(BufferType.Vertex, (uint) (vertices.Length * sizeof(float))), vertices);
-    Buffer indexBuffer =
-        device.CreateBuffer(new BufferDescription(BufferType.Index, (uint) (indices.Length * sizeof(uint))), indices);
+    Buffer vertexBuffer = device.CreateBuffer(BufferType.Vertex, vertices);
+    Buffer indexBuffer = device.CreateBuffer(BufferType.Index, indices);
 
-    Buffer transformBuffer =
-        device.CreateBuffer(new BufferDescription(BufferType.Constant, 64, true), Matrix4x4.Identity);
+    Buffer transformBuffer = device.CreateBuffer(BufferType.Constant, Matrix4x4.Identity, true);
 
     ShaderModule vertexModule = device.CreateShaderModule(ShaderStage.Vertex,
         Compiler.CompileToSpirV(shaderCode, "Vertex", ShaderStage.Vertex), "Vertex");
@@ -199,7 +196,7 @@ unsafe
         
         commandList.Begin();
         
-        commandList.UpdateBuffer(transformBuffer, 0, 64, Matrix4x4.CreateRotationZ(rotation));
+        commandList.UpdateBuffer(transformBuffer, 0, Matrix4x4.CreateRotationZ(rotation));
         rotation += 0.01f;
 
         commandList.BeginRenderPass(new RenderPassDescription()

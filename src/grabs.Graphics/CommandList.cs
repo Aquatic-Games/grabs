@@ -12,11 +12,23 @@ public abstract class CommandList : IDisposable
 
     public abstract void EndRenderPass();
 
+    public unsafe void UpdateBuffer<T>(Buffer buffer, uint offsetInBytes, T data) where T : unmanaged
+        => UpdateBuffer(buffer, offsetInBytes, (uint) sizeof(T), data);
+    
     public void UpdateBuffer<T>(Buffer buffer, uint offsetInBytes, uint sizeInBytes, T data) where T : unmanaged
         => UpdateBuffer(buffer, offsetInBytes, sizeInBytes, new ReadOnlySpan<T>(ref data));
 
-    public abstract void UpdateBuffer<T>(Buffer buffer, uint offsetInBytes, uint sizeInBytes, in ReadOnlySpan<T> data)
-        where T : unmanaged;
+    public unsafe void UpdateBuffer<T>(Buffer buffer, uint offsetInBytes, in ReadOnlySpan<T> data) where T : unmanaged
+        => UpdateBuffer(buffer, offsetInBytes, (uint) (data.Length * sizeof(T)), data);
+    
+    public unsafe void UpdateBuffer<T>(Buffer buffer, uint offsetInBytes, uint sizeInBytes, in ReadOnlySpan<T> data)
+        where T : unmanaged
+    {
+        fixed (void* pData = data)
+            UpdateBuffer(buffer, offsetInBytes, sizeInBytes, pData);
+    }
+
+    public abstract unsafe void UpdateBuffer(Buffer buffer, uint offsetInBytes, uint sizeInBytes, void* pData);
 
     public abstract void SetPipeline(Pipeline pipeline);
 

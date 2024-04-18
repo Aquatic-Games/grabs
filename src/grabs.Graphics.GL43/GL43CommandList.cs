@@ -1,4 +1,6 @@
-﻿namespace grabs.Graphics.GL43;
+﻿using System.Runtime.CompilerServices;
+
+namespace grabs.Graphics.GL43;
 
 public class GL43CommandList : CommandList
 {
@@ -30,16 +32,20 @@ public class GL43CommandList : CommandList
         Actions.Add(new CommandListAction(CommandListActionType.EndRenderPass));
     }
 
-    public override void UpdateBuffer<T>(Buffer buffer, uint offsetInBytes, uint sizeInBytes, in ReadOnlySpan<T> data)
+    public override unsafe void UpdateBuffer(Buffer buffer, uint offsetInBytes, uint sizeInBytes, void* pData)
     {
+        // I REALLY hate this but it works. The OpenGL backend is not the most performant anyway.
+        // TODO: Is there a better solution?
+        byte[] dataArray = new byte[sizeInBytes];
+        fixed (void* pDataArray = dataArray)
+            Unsafe.CopyBlock(pDataArray, pData, sizeInBytes);
+        
         Actions.Add(new CommandListAction(CommandListActionType.UpdateBuffer)
         {
             Buffer = buffer,
             Stride = sizeInBytes,
             Offset = offsetInBytes,
-            // I hate this but it works. The OpenGL backend is not the most performant anyway.
-            // TODO: Is there a better solution?
-            MiscObject = data.ToArray()
+            MiscObject = dataArray
         });
     }
 
