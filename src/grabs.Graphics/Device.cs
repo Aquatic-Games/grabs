@@ -29,6 +29,18 @@ public abstract class Device : IDisposable
     }
 
     public abstract unsafe Buffer CreateBuffer(in BufferDescription description, void* pData);
+
+    public unsafe Texture CreateTexture<T>(in TextureDescription description)
+        => CreateTexture(description, null);
+
+    public unsafe Texture CreateTexture<T>(in TextureDescription description, in ReadOnlySpan<T> data)
+        where T : unmanaged
+    {
+        fixed (void* pData = data)
+            return CreateTexture(description, pData);
+    }
+    
+    public abstract unsafe Texture CreateTexture(in TextureDescription description, void* pData);
     
     public abstract ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint);
 

@@ -37,6 +37,11 @@ public class GL43Device : Device
         return new GL43Buffer(_gl, description, pData);
     }
 
+    public override unsafe Texture CreateTexture(in TextureDescription description, void* pData)
+    {
+        throw new NotImplementedException();
+    }
+
     public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint)
     {
         return new GL43ShaderModule(_gl, stage, spirv, entryPoint);

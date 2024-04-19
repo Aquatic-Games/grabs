@@ -50,6 +50,11 @@ public sealed class D3D11Device : Device
         return new D3D11Buffer(Device, description, pData);
     }
 
+    public override unsafe Texture CreateTexture(in TextureDescription description, void* pData)
+    {
+        throw new NotImplementedException();
+    }
+
     public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint)
     {
         return new D3D11ShaderModule(stage, spirv, entryPoint);
