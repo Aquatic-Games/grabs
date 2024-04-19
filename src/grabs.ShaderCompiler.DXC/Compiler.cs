@@ -10,7 +10,7 @@ namespace grabs.ShaderCompiler.DXC;
 
 public static unsafe class Compiler
 {
-    public static byte[] CompileToSpirV(string code, string entryPoint, ShaderStage stage)
+    public static byte[] CompileToSpirV(string code, string entryPoint, ShaderStage stage, bool debug = false)
     {
         Result result;
         
@@ -38,7 +38,7 @@ public static unsafe class Compiler
         };
         
         IDxcOperationResult opResult;
-        if ((result = compiler.Compile(blobEncoding, null, entryPoint, profile, ["-spirv"], [], null, out opResult!)).Failure)
+        if ((result = compiler.Compile(blobEncoding, null, entryPoint, profile, ["-spirv", debug ? "-O0" : ""], [], null, out opResult!)).Failure)
             throw new Exception($"Failed to compile shader: {result.Description}");
 
         if ((result = opResult.GetStatus(out Result status)).Failure)
