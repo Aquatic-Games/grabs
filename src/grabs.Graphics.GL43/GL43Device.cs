@@ -6,6 +6,8 @@ namespace grabs.Graphics.GL43;
 public class GL43Device : Device
 {
     private readonly GL _gl;
+
+    private GL43Swapchain _swapchain;
     
     public GL43Device(GL gl)
     {
@@ -14,7 +16,10 @@ public class GL43Device : Device
     
     public override Swapchain CreateSwapchain(Surface surface, in SwapchainDescription description)
     {
-        return new GL43Swapchain((GL43Surface) surface, description);
+        // Unfortunately we have to store a reference to the swapchain, so we can get its size, which are used in the
+        // viewport and scissor commands.
+        _swapchain = new GL43Swapchain((GL43Surface) surface, description);
+        return _swapchain;
     }
 
     public override CommandList CreateCommandList()
@@ -82,6 +87,14 @@ public class GL43Device : Device
                     
                     handle.Free();
 
+                    break;
+                }
+
+                case CommandListActionType.SetViewport:
+                {
+                    Viewport viewport = action.Viewport;
+                    
+                    _gl.Viewport(viewport.X, (int) _swapchain.Height - viewport.Y - (int) viewport.Height, viewport.Width, viewport.Height);
                     break;
                 }
 

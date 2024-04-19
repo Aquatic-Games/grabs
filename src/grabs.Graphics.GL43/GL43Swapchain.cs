@@ -6,6 +6,9 @@ public sealed class GL43Swapchain : Swapchain
     
     private PresentMode _presentMode;
     private int _swapInterval;
+
+    public uint Width;
+    public uint Height;
     
     public override PresentMode PresentMode
     {
@@ -27,6 +30,9 @@ public sealed class GL43Swapchain : Swapchain
     {
         _surface = surface;
 
+        Width = description.Width;
+        Height = description.Height;
+        
         PresentMode = description.PresentMode;
     }
 

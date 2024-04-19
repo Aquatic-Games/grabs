@@ -56,6 +56,12 @@ public sealed class D3D11CommandList : CommandList
         }
     }
 
+    public override void SetViewport(in Viewport viewport)
+    {
+        Context.RSSetViewport(viewport.X, viewport.Y, viewport.Width, viewport.Height, viewport.MinDepth,
+            viewport.MaxDepth);
+    }
+
     public override void SetPipeline(Pipeline pipeline)
     {
         D3D11Pipeline d3dPipeline = (D3D11Pipeline) pipeline;
@@ -66,9 +72,6 @@ public sealed class D3D11CommandList : CommandList
         
         // TODO: Add these to pipelines.
         Context.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
-        
-        // TODO: Viewport in Device
-        Context.RSSetViewport(0, 0, 1280, 720);
     }
 
     public override void SetVertexBuffer(uint slot, Buffer buffer, uint stride, uint offset)

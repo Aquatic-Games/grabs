@@ -5,6 +5,7 @@ public enum CommandListActionType
     BeginRenderPass,
     EndRenderPass,
     UpdateBuffer,
+    SetViewport,
     SetPipeline,
     SetVertexBuffer,
     SetIndexBuffer,

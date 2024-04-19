@@ -49,6 +49,14 @@ public class GL43CommandList : CommandList
         });
     }
 
+    public override void SetViewport(in Viewport viewport)
+    {
+        Actions.Add(new CommandListAction(CommandListActionType.SetViewport)
+        {
+            Viewport = viewport
+        });
+    }
+
     public override void SetPipeline(Pipeline pipeline)
     {
         Actions.Add(new CommandListAction(CommandListActionType.SetPipeline)

@@ -198,6 +198,8 @@ unsafe
         
         commandList.UpdateBuffer(transformBuffer, 0, Matrix4x4.CreateRotationZ(rotation));
         rotation += 0.01f;
+        
+        commandList.SetViewport(new Viewport(100, 100, width / 2, height / 2));
 
         commandList.BeginRenderPass(new RenderPassDescription()
         {
