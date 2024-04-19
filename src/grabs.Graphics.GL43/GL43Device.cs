@@ -68,8 +68,19 @@ public class GL43Device : Device
                     else
                         throw new NotImplementedException();
 
-                    _gl.ClearColor(desc.ClearColor.X, desc.ClearColor.Y, desc.ClearColor.Z, desc.ClearColor.W);
-                    _gl.Clear(ClearBufferMask.ColorBufferBit);
+                    switch (desc.LoadOp)
+                    {
+                        case LoadOp.Clear:
+                            _gl.ClearColor(desc.ClearColor.X, desc.ClearColor.Y, desc.ClearColor.Z, desc.ClearColor.W);
+                            _gl.Clear(ClearBufferMask.ColorBufferBit);
+                            break;
+                        
+                        case LoadOp.Load:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    
                     break;
                 }
                 

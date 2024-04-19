@@ -32,9 +32,19 @@ public sealed class D3D11CommandList : CommandList
         D3D11Framebuffer framebuffer = (D3D11Framebuffer) description.Framebuffer;
         
         Context.OMSetRenderTargets(framebuffer.RenderTargets, framebuffer.DepthTarget);
-        
-        for (int i = 0; i < framebuffer.RenderTargets.Length; i++)
-            Context.ClearRenderTargetView(framebuffer.RenderTargets[i], new Color4(description.ClearColor));
+
+        switch (description.LoadOp)
+        {
+            case LoadOp.Clear:
+                for (int i = 0; i < framebuffer.RenderTargets.Length; i++)
+                    Context.ClearRenderTargetView(framebuffer.RenderTargets[i], new Color4(description.ClearColor));
+                break;
+
+            case LoadOp.Load:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     public override void EndRenderPass() { }

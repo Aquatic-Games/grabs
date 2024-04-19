@@ -172,6 +172,15 @@ unsafe
 
     float rotation = 0;
     
+    /*commandList.Begin();
+    
+    commandList.BeginRenderPass(new RenderPassDescription(swapchainBuffer, new Vector4(1.0f, 0.5f, 0.25f, 1.0f), LoadOp.Clear));
+    commandList.EndRenderPass();
+    
+    commandList.End();*/
+    
+    device.ExecuteCommandList(commandList);
+    
     bool alive = true;
     while (alive)
     {
@@ -201,11 +210,7 @@ unsafe
         
         commandList.SetViewport(new Viewport(100, 100, width / 2, height / 2));
 
-        commandList.BeginRenderPass(new RenderPassDescription()
-        {
-            Framebuffer = swapchainBuffer,
-            ClearColor = new Vector4(1.0f, 0.5f, 0.25f, 1.0f)
-        });
+        commandList.BeginRenderPass(new RenderPassDescription(swapchainBuffer, new Vector4(1.0f, 0.5f, 0.25f, 1.0f)));
         
         commandList.SetPipeline(pipeline);
         commandList.SetVertexBuffer(0, vertexBuffer, 5 * sizeof(float), 0);

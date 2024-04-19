@@ -9,9 +9,12 @@ public struct RenderPassDescription
     // TODO: Maybe don't use Vector4? Some custom type?
     public Vector4 ClearColor;
 
-    public RenderPassDescription(Framebuffer framebuffer, Vector4 clearColor)
+    public LoadOp LoadOp;
+
+    public RenderPassDescription(Framebuffer framebuffer, Vector4 clearColor, LoadOp loadOp = LoadOp.Clear)
     {
         Framebuffer = framebuffer;
         ClearColor = clearColor;
+        LoadOp = loadOp;
     }
 }
