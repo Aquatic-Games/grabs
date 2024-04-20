@@ -5,6 +5,7 @@ using grabs.Graphics.GL43;
 using grabs.ShaderCompiler.DXC;
 using Silk.NET.OpenGL;
 using Silk.NET.SDL;
+using StbImageSharp;
 using Buffer = grabs.Graphics.Buffer;
 using Framebuffer = grabs.Graphics.Framebuffer;
 using Surface = grabs.Graphics.Surface;
@@ -14,13 +15,13 @@ const string shaderCode = """
                           struct VSInput
                           {
                               float2 Position: POSITION0;
-                              float3 Color:    COLOR0;
+                              float2 TexCoord: TEXCOORD0;
                           };
 
                           struct VSOutput
                           {
                               float4 Position: SV_Position;
-                              float4 Color:    COLOR0;
+                              float2 TexCoord: TEXCOORD0;
                           };
 
                           struct PSOutput
@@ -33,12 +34,15 @@ const string shaderCode = """
                               float4x4 Transform;
                           }
                           
+                          Texture2D Texture : register(t1);
+                          SamplerState State : register(s1);
+                          
                           VSOutput Vertex(const in VSInput input)
                           {
                               VSOutput output;
                               
                               output.Position = mul(Transform, float4(input.Position, 0.0, 1.0));
-                              output.Color = float4(input.Color, 1.0);
+                              output.TexCoord = input.TexCoord;
                               
                               return output;
                           }
@@ -47,7 +51,7 @@ const string shaderCode = """
                           {
                               PSOutput output;
                               
-                              output.Color = input.Color;
+                              output.Color = Texture.Sample(State, input.TexCoord);
                               
                               return output;
                           }
@@ -138,10 +142,10 @@ unsafe
 
     ReadOnlySpan<float> vertices = stackalloc float[]
     {
-        -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-        -0.5f, +0.5f, 0.0f, 1.0f, 0.0f,
-        +0.5f, +0.5f, 0.0f, 0.0f, 1.0f,
-        +0.5f, -0.5f, 0.0f, 0.0f, 0.0f
+        -0.5f, -0.5f, 0.0f, 0.0f,
+        -0.5f, +0.5f, 0.0f, 1.0f,
+        +0.5f, +0.5f, 1.0f, 1.0f,
+        +0.5f, -0.5f, 1.0f, 0.0f
     };
 
     ReadOnlySpan<uint> indices = stackalloc uint[]
@@ -164,11 +168,15 @@ unsafe
         new[]
         {
             new InputLayoutDescription(Format.R32G32_Float, 0, 0, InputType.PerVertex),
-            new InputLayoutDescription(Format.R32G32B32_Float, 8, 0, InputType.PerVertex)
+            new InputLayoutDescription(Format.R32G32_Float, 8, 0, InputType.PerVertex)
         }));
     
     pixelModule.Dispose();
     vertexModule.Dispose();
+    
+    ImageResult result = ImageResult.FromMemory(File.ReadAllBytes(@"C:\Users\ollie\Pictures\awesomeface.png"));
+    Texture texture = device.CreateTexture(TextureDescription.Texture2D((uint) result.Width, (uint) result.Height, 1,
+        Format.R8G8B8A8_UNorm, TextureUsage.ShaderResource | TextureUsage.GenerateMips), new ReadOnlySpan<byte>(result.Data));
 
     float rotation = 0;
     
@@ -177,9 +185,9 @@ unsafe
     commandList.BeginRenderPass(new RenderPassDescription(swapchainBuffer, new Vector4(1.0f, 0.5f, 0.25f, 1.0f), LoadOp.Clear));
     commandList.EndRenderPass();
     
-    commandList.End();*/
+    commandList.End();
     
-    device.ExecuteCommandList(commandList);
+    device.ExecuteCommandList(commandList);*/
     
     bool alive = true;
     while (alive)
@@ -213,10 +221,11 @@ unsafe
         commandList.BeginRenderPass(new RenderPassDescription(swapchainBuffer, new Vector4(1.0f, 0.5f, 0.25f, 1.0f)));
         
         commandList.SetPipeline(pipeline);
-        commandList.SetVertexBuffer(0, vertexBuffer, 5 * sizeof(float), 0);
+        commandList.SetVertexBuffer(0, vertexBuffer, 4 * sizeof(float), 0);
         commandList.SetIndexBuffer(indexBuffer, Format.R32_UInt);
         
         commandList.SetConstantBuffer(0, transformBuffer);
+        commandList.SetTexture(1, texture);
         
         commandList.DrawIndexed(6);
         
@@ -227,6 +236,8 @@ unsafe
         device.ExecuteCommandList(commandList);
         swapchain.Present();
     }
+    
+    texture.Dispose();
     
     pipeline.Dispose();
     

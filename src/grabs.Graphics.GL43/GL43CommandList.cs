@@ -94,6 +94,11 @@ public class GL43CommandList : CommandList
         });
     }
 
+    public override void SetTexture(uint slot, Texture texture)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void DrawIndexed(uint numIndices)
     {
         Actions.Add(new CommandListAction(CommandListActionType.DrawIndexed)

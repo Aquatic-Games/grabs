@@ -7,16 +7,18 @@ public struct TextureDescription
     public uint Height;
     public uint MipLevels;
     public Format Format;
-
-    public TextureDescription(TextureType type, uint width, uint height, uint mipLevels, Format format)
+    public TextureUsage Usage;
+    
+    public TextureDescription(TextureType type, uint width, uint height, uint mipLevels, Format format, TextureUsage usage)
     {
         Type = type;
         Width = width;
         Height = height;
         MipLevels = mipLevels;
         Format = format;
+        Usage = usage;
     }
 
-    public static TextureDescription Texture2D(uint width, uint height, uint mipLevels, Format format)
-        => new TextureDescription(TextureType.Texture2D, width, height, mipLevels, format);
+    public static TextureDescription Texture2D(uint width, uint height, uint mipLevels, Format format, TextureUsage usage)
+        => new TextureDescription(TextureType.Texture2D, width, height, mipLevels, format, usage);
 }

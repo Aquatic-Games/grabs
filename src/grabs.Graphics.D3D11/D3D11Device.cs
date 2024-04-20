@@ -52,7 +52,7 @@ public sealed class D3D11Device : Device
 
     public override unsafe Texture CreateTexture(in TextureDescription description, void* pData)
     {
-        throw new NotImplementedException();
+        return new D3D11Texture(Device, Context, description, pData);
     }
 
     public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint)

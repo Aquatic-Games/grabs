@@ -1,18 +1,82 @@
-﻿using Vortice.Direct3D11;
+﻿using System;
+using Vortice.Direct3D;
+using Vortice.Direct3D11;
+using Vortice.DXGI;
 
 namespace grabs.Graphics.D3D11;
 
 public sealed class D3D11Texture : Texture
 {
     public readonly ID3D11Resource Texture;
+    public readonly ID3D11ShaderResourceView ResourceView;
 
-    public D3D11Texture(ID3D11Resource texture)
+    public unsafe D3D11Texture(ID3D11Device device, ID3D11DeviceContext context, in TextureDescription description,
+        void* pData)
+    {
+        BindFlags flags = BindFlags.None;
+
+        if ((description.Usage & TextureUsage.ShaderResource) != 0)
+            flags |= BindFlags.ShaderResource;
+
+        if ((description.Usage & TextureUsage.Framebuffer) != 0 || (description.Usage & TextureUsage.GenerateMips) != 0)
+            flags |= BindFlags.RenderTarget;
+        
+        ShaderResourceViewDescription srvDesc = new ShaderResourceViewDescription()
+        {
+            Format = description.Format.ToDXGIFormat()
+        };
+
+        switch (description.Type)
+        {
+            case TextureType.Texture2D:
+            {
+                Texture2DDescription desc = new Texture2DDescription()
+                {
+                    Width = (int) description.Width,
+                    Height = (int) description.Height,
+                    Format = srvDesc.Format,
+                    ArraySize = 1,
+                    MipLevels = (int) description.MipLevels,
+                    SampleDescription = new SampleDescription(1, 0),
+                    Usage = ResourceUsage.Default,
+                    BindFlags = flags,
+                    CPUAccessFlags = CpuAccessFlags.None,
+                    MiscFlags = (description.Usage & TextureUsage.GenerateMips) != 0
+                        ? ResourceOptionFlags.GenerateMips
+                        : ResourceOptionFlags.None
+                };
+
+                Texture = device.CreateTexture2D(desc);
+
+                srvDesc.ViewDimension = ShaderResourceViewDimension.Texture2D;
+                srvDesc.Texture2D = new Texture2DShaderResourceView()
+                {
+                    MipLevels = -1,
+                    MostDetailedMip = 0
+                };
+                
+                break;
+            }
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        int pitch = 4 * (int) description.Width;
+        context.UpdateSubresource(Texture, 0, null, (nint) pData, pitch, 0);
+
+        ResourceView = device.CreateShaderResourceView(Texture, srvDesc);
+    }
+
+    public D3D11Texture(ID3D11Resource texture, ID3D11ShaderResourceView resourceView)
     {
         Texture = texture;
+        ResourceView = resourceView;
     }
     
     public override void Dispose()
     {
+        ResourceView?.Dispose();
+        
         Texture.Dispose();
     }
 }

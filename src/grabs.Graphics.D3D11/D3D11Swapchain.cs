@@ -52,7 +52,7 @@ public sealed class D3D11Swapchain : Swapchain
 
     public override Texture GetSwapchainTexture()
     {
-        return new D3D11Texture(SwapChainTexture);
+        return new D3D11Texture(SwapChainTexture, null);
     }
 
     public override void Present()
