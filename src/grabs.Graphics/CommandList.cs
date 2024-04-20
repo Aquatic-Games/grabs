@@ -30,6 +30,8 @@ public abstract class CommandList : IDisposable
 
     public abstract unsafe void UpdateBuffer(Buffer buffer, uint offsetInBytes, uint sizeInBytes, void* pData);
 
+    public abstract void GenerateMipmaps(Texture texture);
+
     public abstract void SetViewport(in Viewport viewport);
 
     public abstract void SetPipeline(Pipeline pipeline);

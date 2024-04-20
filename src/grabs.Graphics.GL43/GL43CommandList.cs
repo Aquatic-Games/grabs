@@ -49,6 +49,11 @@ public class GL43CommandList : CommandList
         });
     }
 
+    public override void GenerateMipmaps(Texture texture)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void SetViewport(in Viewport viewport)
     {
         Actions.Add(new CommandListAction(CommandListActionType.SetViewport)

@@ -66,6 +66,11 @@ public sealed class D3D11CommandList : CommandList
         }
     }
 
+    public override void GenerateMipmaps(Texture texture)
+    {
+        Context.GenerateMips(((D3D11Texture) texture).ResourceView);
+    }
+
     public override void SetViewport(in Viewport viewport)
     {
         Context.RSSetViewport(viewport.X, viewport.Y, viewport.Width, viewport.Height, viewport.MinDepth,

@@ -64,6 +64,7 @@ public sealed class D3D11Texture : Texture
         int pitch = 4 * (int) description.Width;
         context.UpdateSubresource(Texture, 0, null, (nint) pData, pitch, 0);
 
+        // TODO: TextureView in GRABS
         ResourceView = device.CreateShaderResourceView(Texture, srvDesc);
     }
 

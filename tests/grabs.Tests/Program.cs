@@ -175,8 +175,13 @@ unsafe
     vertexModule.Dispose();
     
     ImageResult result = ImageResult.FromMemory(File.ReadAllBytes(@"C:\Users\ollie\Pictures\awesomeface.png"));
-    Texture texture = device.CreateTexture(TextureDescription.Texture2D((uint) result.Width, (uint) result.Height, 1,
+    Texture texture = device.CreateTexture(TextureDescription.Texture2D((uint) result.Width, (uint) result.Height, 0,
         Format.R8G8B8A8_UNorm, TextureUsage.ShaderResource | TextureUsage.GenerateMips), new ReadOnlySpan<byte>(result.Data));
+    
+    commandList.Begin();
+    commandList.GenerateMipmaps(texture);
+    commandList.End();
+    device.ExecuteCommandList(commandList);
 
     float rotation = 0;
     
