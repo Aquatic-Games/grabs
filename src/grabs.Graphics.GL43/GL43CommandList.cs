@@ -51,7 +51,10 @@ public class GL43CommandList : CommandList
 
     public override void GenerateMipmaps(Texture texture)
     {
-        throw new NotImplementedException();
+        Actions.Add(new CommandListAction(CommandListActionType.GenerateMipmaps)
+        {
+            Texture = texture
+        });
     }
 
     public override void SetViewport(in Viewport viewport)
@@ -101,7 +104,11 @@ public class GL43CommandList : CommandList
 
     public override void SetTexture(uint slot, Texture texture)
     {
-        throw new NotImplementedException();
+        Actions.Add(new CommandListAction(CommandListActionType.SetTexture)
+        {
+            Slot = slot,
+            Texture = texture
+        });
     }
 
     public override void DrawIndexed(uint numIndices)

@@ -39,7 +39,7 @@ public class GL43Device : Device
 
     public override unsafe Texture CreateTexture(in TextureDescription description, void* pData)
     {
-        throw new NotImplementedException();
+        return new GL43Texture(_gl, description, pData);
     }
 
     public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint)
@@ -92,6 +92,15 @@ public class GL43Device : Device
                 case CommandListActionType.EndRenderPass:
                     break;
 
+                case CommandListActionType.GenerateMipmaps:
+                {
+                    GL43Texture texture = (GL43Texture) action.Texture;
+                    _gl.BindTexture(texture.Target, texture.Texture);
+                    _gl.GenerateMipmap(texture.Target);
+                    
+                    break;
+                }
+
                 case CommandListActionType.UpdateBuffer:
                 {
                     GL43Buffer buffer = (GL43Buffer) action.Buffer;
@@ -142,12 +151,21 @@ public class GL43Device : Device
                     break;
                 }
 
+                case CommandListActionType.SetTexture:
+                {
+                    GL43Texture texture = (GL43Texture) action.Texture;
+                    _gl.ActiveTexture(TextureUnit.Texture0 + (int) action.Slot);
+                    _gl.BindTexture(texture.Target, texture.Texture);
+                    
+                    break;
+                }
+
                 case CommandListActionType.DrawIndexed:
                 {
                     _gl.DrawElements(PrimitiveType.Triangles, action.Slot, DrawElementsType.UnsignedInt, null);
                     break;
                 }
-
+                
                 default:
                     throw new ArgumentOutOfRangeException();
             }

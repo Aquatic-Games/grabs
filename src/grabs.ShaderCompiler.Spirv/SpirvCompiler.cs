@@ -61,6 +61,8 @@ public class SpirvCompiler
                 break;
             case ShaderLanguage.Glsl430:
                 Spirv.CompilerOptionsSetUint(options, CompilerOption.GlslVersion, 430);
+                // TODO: This probably needs work.
+                Spirv.CompilerBuildCombinedImageSamplers(compiler);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(language), language, null);

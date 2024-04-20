@@ -9,13 +9,14 @@ public struct CommandListAction
     
     public Pipeline Pipeline;
     
-    public Buffer Buffer;
     public uint Slot;
     public uint Stride;
     public uint Offset;
     public Format Format;
-
+    
+    public Buffer Buffer;
     public Viewport Viewport;
+    public Texture Texture;
 
     public object MiscObject;
 
