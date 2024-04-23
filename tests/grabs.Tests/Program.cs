@@ -135,8 +135,12 @@ unsafe
     Device device = instance.CreateDevice();
     
     Swapchain swapchain = device.CreateSwapchain(surface, new SwapchainDescription(width, height, Format.B8G8R8A8_UNorm, 2, PresentMode.VerticalSync));
+    
     Texture swapchainTexture = swapchain.GetSwapchainTexture();
-    Framebuffer swapchainBuffer = device.CreateFramebuffer(new ReadOnlySpan<Texture>(ref swapchainTexture));
+    Texture swapchainDepth = device.CreateTexture(new TextureDescription(TextureType.Texture2D, width, height, 1,
+        Format.D32_Float, TextureUsage.None));
+    
+    Framebuffer swapchainBuffer = device.CreateFramebuffer(new ReadOnlySpan<Texture>(ref swapchainTexture), swapchainDepth);
 
     CommandList commandList = device.CreateCommandList();
 

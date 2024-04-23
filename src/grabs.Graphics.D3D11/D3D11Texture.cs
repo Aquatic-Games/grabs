@@ -20,6 +20,9 @@ public sealed class D3D11Texture : Texture
 
         if ((description.Usage & TextureUsage.Framebuffer) != 0 || (description.Usage & TextureUsage.GenerateMips) != 0)
             flags |= BindFlags.RenderTarget;
+
+        if (description.Format is Format.D32_Float or Format.D16_UNorm or Format.D24_UNorm_S8_UInt)
+            flags |= BindFlags.DepthStencil;
         
         ShaderResourceViewDescription srvDesc = new ShaderResourceViewDescription()
         {
@@ -61,11 +64,15 @@ public sealed class D3D11Texture : Texture
                 throw new ArgumentOutOfRangeException();
         }
 
-        int pitch = 4 * (int) description.Width;
-        context.UpdateSubresource(Texture, 0, null, (nint) pData, pitch, 0);
+        if (pData != null)
+        {
+            int pitch = 4 * (int) description.Width;
+            context.UpdateSubresource(Texture, 0, null, (nint) pData, pitch, 0);
+        }
 
         // TODO: TextureView in GRABS
-        ResourceView = device.CreateShaderResourceView(Texture, srvDesc);
+        if ((description.Usage & TextureUsage.ShaderResource) != 0)
+            ResourceView = device.CreateShaderResourceView(Texture, srvDesc);
     }
 
     public D3D11Texture(ID3D11Resource texture, ID3D11ShaderResourceView resourceView)

@@ -30,7 +30,7 @@ public abstract class Device : IDisposable
 
     public abstract unsafe Buffer CreateBuffer(in BufferDescription description, void* pData);
 
-    public unsafe Texture CreateTexture<T>(in TextureDescription description)
+    public unsafe Texture CreateTexture(in TextureDescription description)
         => CreateTexture(description, null);
 
     public unsafe Texture CreateTexture<T>(in TextureDescription description, in ReadOnlySpan<T> data)

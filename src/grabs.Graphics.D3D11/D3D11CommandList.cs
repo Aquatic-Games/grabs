@@ -33,17 +33,22 @@ public sealed class D3D11CommandList : CommandList
         
         Context.OMSetRenderTargets(framebuffer.RenderTargets, framebuffer.DepthTarget);
 
-        switch (description.LoadOp)
+        if (description.ColorLoadOp is LoadOp.Clear)
         {
-            case LoadOp.Clear:
-                for (int i = 0; i < framebuffer.RenderTargets.Length; i++)
-                    Context.ClearRenderTargetView(framebuffer.RenderTargets[i], new Color4(description.ClearColor));
-                break;
+            for (int i = 0; i < framebuffer.RenderTargets.Length; i++)
+                Context.ClearRenderTargetView(framebuffer.RenderTargets[i], new Color4(description.ClearColor));
+        }
 
-            case LoadOp.Load:
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
+        if (framebuffer.DepthTarget != null)
+        {
+            DepthStencilClearFlags dscf = DepthStencilClearFlags.None;
+            if (description.DepthLoadOp == LoadOp.Clear)
+                dscf |= DepthStencilClearFlags.Depth;
+            if (description.StencilLoadOp == LoadOp.Clear)
+                dscf |= DepthStencilClearFlags.Stencil;
+
+            Context.ClearDepthStencilView(framebuffer.DepthTarget, dscf, description.DepthValue,
+                description.StencilValue);
         }
     }
 

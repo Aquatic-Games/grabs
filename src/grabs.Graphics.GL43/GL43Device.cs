@@ -73,7 +73,7 @@ public class GL43Device : Device
                     else
                         throw new NotImplementedException();
 
-                    switch (desc.LoadOp)
+                    switch (desc.ColorLoadOp)
                     {
                         case LoadOp.Clear:
                             _gl.ClearColor(desc.ClearColor.X, desc.ClearColor.Y, desc.ClearColor.Z, desc.ClearColor.W);

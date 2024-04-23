@@ -8,13 +8,24 @@ public struct RenderPassDescription
     
     // TODO: Maybe don't use Vector4? Some custom type?
     public Vector4 ClearColor;
+    public LoadOp ColorLoadOp;
 
-    public LoadOp LoadOp;
+    public float DepthValue;
+    public LoadOp DepthLoadOp;
 
-    public RenderPassDescription(Framebuffer framebuffer, Vector4 clearColor, LoadOp loadOp = LoadOp.Clear)
+    public byte StencilValue;
+    public LoadOp StencilLoadOp;
+    
+    public RenderPassDescription(Framebuffer framebuffer, Vector4 clearColor, LoadOp colorLoadOp = LoadOp.Clear,
+        float depthValue = 1.0f, LoadOp depthLoadOp = LoadOp.Clear, byte stencilValue = byte.MaxValue,
+        LoadOp stencilLoadOp = LoadOp.Clear)
     {
         Framebuffer = framebuffer;
         ClearColor = clearColor;
-        LoadOp = loadOp;
+        ColorLoadOp = colorLoadOp;
+        DepthValue = depthValue;
+        DepthLoadOp = depthLoadOp;
+        StencilValue = stencilValue;
+        StencilLoadOp = stencilLoadOp;
     }
 }
