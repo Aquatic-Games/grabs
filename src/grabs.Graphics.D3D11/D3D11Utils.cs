@@ -9,7 +9,6 @@ public static class D3D11Utils
     {
         return format switch
         {
-            Format.R1_UNorm => DXGIFormat.R1_UNorm,
             Format.B5G6R5_UNorm => DXGIFormat.B5G6R5_UNorm,
             Format.B5G5R5A1_UNorm => DXGIFormat.B5G5R5A1_UNorm,
             Format.R8_UNorm => DXGIFormat.R8_UNorm,

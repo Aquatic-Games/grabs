@@ -2,8 +2,6 @@
 
 public enum Format
 {
-    R1_UNorm,
-    
     B5G6R5_UNorm,
     B5G5R5A1_UNorm,
     
