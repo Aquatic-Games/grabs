@@ -29,17 +29,20 @@ public class GL43Framebuffer : Framebuffer
                     glTexture.Texture, 0);
             }
         }
-        
-        GL43Texture glDepth = (GL43Texture) depthTexture;
-        if (glDepth.IsRenderbuffer)
+
+        if (depthTexture != null)
         {
-            gl.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment,
-                RenderbufferTarget.Renderbuffer, glDepth.Texture);
-        }
-        else
-        {
-            gl.FramebufferTexture(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, glDepth.Texture,
-                0);
+            GL43Texture glDepth = (GL43Texture) depthTexture;
+            if (glDepth.IsRenderbuffer)
+            {
+                gl.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment,
+                    RenderbufferTarget.Renderbuffer, glDepth.Texture);
+            }
+            else
+            {
+                gl.FramebufferTexture(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment,
+                    glDepth.Texture, 0);
+            }
         }
 
         if (_gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != (GLEnum) FramebufferStatus.Complete)
