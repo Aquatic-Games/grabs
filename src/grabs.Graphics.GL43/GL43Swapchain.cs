@@ -1,12 +1,19 @@
-﻿namespace grabs.Graphics.GL43;
+﻿using Silk.NET.OpenGL;
+
+namespace grabs.Graphics.GL43;
 
 public sealed class GL43Swapchain : Swapchain
 {
+    private GL _gl;
+    
     private GL43Surface _surface;
+    private GL43Texture _swapchainTexture;
     
     private PresentMode _presentMode;
     private int _swapInterval;
 
+    private Format _swapchainFormat;
+    
     public uint Width;
     public uint Height;
     
@@ -26,19 +33,26 @@ public sealed class GL43Swapchain : Swapchain
         }
     }
 
-    public GL43Swapchain(GL43Surface surface, in SwapchainDescription description)
+    public GL43Swapchain(GL gl, GL43Surface surface, in SwapchainDescription description)
     {
+        _gl = gl;
         _surface = surface;
 
+        _swapchainFormat = description.Format;
+        
         Width = description.Width;
         Height = description.Height;
         
         PresentMode = description.PresentMode;
     }
 
-    public override Texture GetSwapchainTexture()
+    public override unsafe Texture GetSwapchainTexture()
     {
-        return new GL43SwapchainTexture();
+        _swapchainTexture = new GL43Texture(_gl,
+            TextureDescription.Texture2D(Width, Height, 1, _swapchainFormat,
+                TextureUsage.Framebuffer | TextureUsage.ShaderResource), null);
+        
+        return _swapchainTexture;
     }
 
     public override void Present()

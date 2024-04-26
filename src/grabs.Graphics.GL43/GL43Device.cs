@@ -18,7 +18,7 @@ public class GL43Device : Device
     {
         // Unfortunately we have to store a reference to the swapchain, so we can get its size, which are used in the
         // viewport and scissor commands.
-        _swapchain = new GL43Swapchain((GL43Surface) surface, description);
+        _swapchain = new GL43Swapchain(_gl, (GL43Surface) surface, description);
         return _swapchain;
     }
 
@@ -49,11 +49,7 @@ public class GL43Device : Device
 
     public override Framebuffer CreateFramebuffer(in ReadOnlySpan<Texture> colorTextures, Texture depthTexture)
     {
-        // As OpenGL doesn't support a user accessible swapchain framebuffer, we have to fake it.
-        if (colorTextures[0] is GL43SwapchainTexture)
-            return new GL43SwapchainFramebuffer();
-
-        throw new NotImplementedException();
+        return new GL43Framebuffer(_gl, colorTextures, depthTexture);
     }
 
     public override unsafe void ExecuteCommandList(CommandList list)
@@ -67,11 +63,8 @@ public class GL43Device : Device
                 case CommandListActionType.BeginRenderPass:
                 {
                     RenderPassDescription desc = action.RenderPassDescription;
-
-                    if (desc.Framebuffer is GL43SwapchainFramebuffer)
-                        _gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-                    else
-                        throw new NotImplementedException();
+                    
+                    _gl.BindFramebuffer(FramebufferTarget.Framebuffer, ((GL43Framebuffer) desc.Framebuffer).Framebuffer);
 
                     switch (desc.ColorLoadOp)
                     {

@@ -103,7 +103,9 @@ public sealed class GL43Texture : Texture
         {
             case TextureType.Texture2D:
                 _gl.TexStorage2D(Target, mipLevels, iFmt, description.Width, description.Height);
-                _gl.TexSubImage2D(Target, 0, 0, 0, description.Width, description.Height, fmt, pType, pData);
+                
+                if (pData != null)
+                    _gl.TexSubImage2D(Target, 0, 0, 0, description.Width, description.Height, fmt, pType, pData);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
