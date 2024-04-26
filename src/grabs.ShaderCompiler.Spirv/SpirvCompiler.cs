@@ -61,14 +61,27 @@ public class SpirvCompiler
                 break;
             case ShaderLanguage.Glsl430:
                 Spirv.CompilerOptionsSetUint(options, CompilerOption.GlslVersion, 430);
-                // TODO: This probably needs work.
-                Spirv.CompilerBuildCombinedImageSamplers(compiler);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(language), language, null);
         }
         
         Spirv.CompilerInstallCompilerOptions(compiler, options);
+
+        // I have absolutely no idea how I figured this out. Copied directly from Pie's compiler.
+        uint id;
+        Spirv.CompilerBuildDummySamplerForCombinedImages(compiler, &id);
+        Spirv.CompilerBuildCombinedImageSamplers(compiler);
+
+        CombinedImageSampler* samplers;
+        nuint numSamplers;
+        Spirv.CompilerGetCombinedImageSamplers(compiler, &samplers, &numSamplers);
+
+        for (uint i = 0; i < numSamplers; i++)
+        {
+            uint decoration = Spirv.CompilerGetDecoration(compiler, samplers[i].ImageId, Decoration.Binding);
+            Spirv.CompilerSetDecoration(compiler, samplers[i].CombinedId, Decoration.Binding, decoration);
+        }
 
         byte* pStrResult;
         if ((result = Spirv.CompilerCompile(compiler, &pStrResult)) != Result.Success)
