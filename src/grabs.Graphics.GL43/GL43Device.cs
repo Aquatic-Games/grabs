@@ -66,18 +66,28 @@ public class GL43Device : Device
                     
                     _gl.BindFramebuffer(FramebufferTarget.Framebuffer, ((GL43Framebuffer) desc.Framebuffer).Framebuffer);
 
-                    switch (desc.ColorLoadOp)
+                    ClearBufferMask mask = ClearBufferMask.None;
+
+                    if (desc.ColorLoadOp == LoadOp.Clear)
                     {
-                        case LoadOp.Clear:
-                            _gl.ClearColor(desc.ClearColor.X, desc.ClearColor.Y, desc.ClearColor.Z, desc.ClearColor.W);
-                            _gl.Clear(ClearBufferMask.ColorBufferBit);
-                            break;
-                        
-                        case LoadOp.Load:
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
+                        _gl.ClearColor(desc.ClearColor.X, desc.ClearColor.Y, desc.ClearColor.Z, desc.ClearColor.W);
+                        mask |= ClearBufferMask.ColorBufferBit;
                     }
+
+                    if (desc.DepthLoadOp == LoadOp.Clear)
+                    {
+                        _gl.ClearDepth(desc.DepthValue);
+                        mask |= ClearBufferMask.DepthBufferBit;
+                    }
+
+                    if (desc.StencilLoadOp == LoadOp.Clear)
+                    {
+                        _gl.ClearStencil(desc.StencilValue);
+                        mask |= ClearBufferMask.StencilBufferBit;
+                    }
+                    
+                    if (mask != ClearBufferMask.None)
+                        _gl.Clear(mask);
                     
                     break;
                 }

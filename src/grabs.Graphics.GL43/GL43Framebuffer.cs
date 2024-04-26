@@ -17,8 +17,29 @@ public class GL43Framebuffer : Framebuffer
 
         for (int i = 0; i < colorTextures.Length; i++)
         {
-            gl.FramebufferTexture(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0 + i,
-                ((GL43Texture) colorTextures[i]).Texture, 0);
+            GL43Texture glTexture = (GL43Texture) colorTextures[i];
+            if (glTexture.IsRenderbuffer)
+            {
+                gl.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0 + i,
+                    RenderbufferTarget.Renderbuffer, glTexture.Texture);
+            }
+            else
+            {
+                gl.FramebufferTexture(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0 + i,
+                    glTexture.Texture, 0);
+            }
+        }
+        
+        GL43Texture glDepth = (GL43Texture) depthTexture;
+        if (glDepth.IsRenderbuffer)
+        {
+            gl.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment,
+                RenderbufferTarget.Renderbuffer, glDepth.Texture);
+        }
+        else
+        {
+            gl.FramebufferTexture(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, glDepth.Texture,
+                0);
         }
 
         if (_gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != (GLEnum) FramebufferStatus.Complete)

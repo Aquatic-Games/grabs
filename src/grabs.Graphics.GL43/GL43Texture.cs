@@ -9,6 +9,8 @@ public sealed class GL43Texture : Texture
     public readonly uint Texture;
     public readonly TextureTarget Target;
 
+    public readonly bool IsRenderbuffer;
+
     public unsafe GL43Texture(GL gl, in TextureDescription description, void* pData)
     {
         _gl = gl;
@@ -18,9 +20,6 @@ public sealed class GL43Texture : Texture
             TextureType.Texture2D => TextureTarget.Texture2D,
             _ => throw new ArgumentOutOfRangeException()
         };
-        
-        Texture = _gl.GenTexture();
-        _gl.BindTexture(Target, Texture);
 
         // If mip levels are 0 then calculate the number of mip levels.
         uint mipLevels = description.MipLevels == 0
@@ -98,6 +97,28 @@ public sealed class GL43Texture : Texture
             Format.BC7_UNorm_SRGB => (SizedInternalFormat.CompressedSrgbAlphaBptcUnorm, PixelFormat.Rgba, PixelType.UnsignedByte),
             _ => throw new NotImplementedException()
         };
+
+        // Renderbuffer requirements:
+        //   - Must not be a shader resource
+        //   - Must be a Texture2D
+        //   - Must not have initial data
+        //   - Must only have 1 mip level
+        // If these requirements are met, then it will be created as a renderbuffer instead.
+        // If this causes issues later down the line then it will be re-evaluated.
+        if ((description.Usage & TextureUsage.ShaderResource) == 0 && description.Type == TextureType.Texture2D && pData == null && description.MipLevels == 1)
+        {
+            Console.WriteLine("Info: Texture creating as renderbuffer.");
+            IsRenderbuffer = true;
+            Texture = _gl.GenRenderbuffer();
+            _gl.BindRenderbuffer(RenderbufferTarget.Renderbuffer, Texture);
+            _gl.RenderbufferStorage(RenderbufferTarget.Renderbuffer, (InternalFormat) iFmt, description.Width,
+                description.Height);
+
+            return;
+        }
+        
+        Texture = _gl.GenTexture();
+        _gl.BindTexture(Target, Texture);
 
         switch (description.Type)
         {

@@ -24,9 +24,6 @@ public sealed class GL43ShaderModule : ShaderModule
         Shader = _gl.CreateShader(type);
 
         string source = SpirvCompiler.TranspileSpirv(stage, ShaderLanguage.Glsl430, spirv, entryPoint);
-        Console.WriteLine("------------------------------------------");
-        Console.WriteLine(source);
-        
         _gl.ShaderSource(Shader, source);
         _gl.CompileShader(Shader);
 
