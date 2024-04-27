@@ -25,7 +25,13 @@ public sealed class GL43Instance : Instance
         // Sure there is no dedicated memory but who needs VRAM anyway :)
         
         string renderer = GL.GetStringS(StringName.Renderer);
-        Adapter adapter = new Adapter(0, renderer, 0, AdapterType.Discrete);
+
+        ulong memory = 0;
+
+        if (GL.IsExtensionPresent("GL_NVX_gpu_memory_info"))
+            memory = (ulong) GL.GetInteger((GLEnum) 0x9047) * 1024;
+        
+        Adapter adapter = new Adapter(0, renderer, memory, AdapterType.Discrete);
 
         return [adapter];
     }
