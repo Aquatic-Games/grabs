@@ -15,10 +15,10 @@ public sealed class D3D11Texture : Texture
     {
         BindFlags flags = BindFlags.None;
 
-        if ((description.Usage & TextureUsage.ShaderResource) != 0)
+        if ((description.Usage & TextureUsage.ShaderResource) == TextureUsage.ShaderResource)
             flags |= BindFlags.ShaderResource;
 
-        if ((description.Usage & TextureUsage.Framebuffer) != 0 || (description.Usage & TextureUsage.GenerateMips) != 0)
+        if ((description.Usage & TextureUsage.Framebuffer) == TextureUsage.Framebuffer || (description.Usage & TextureUsage.GenerateMips) == TextureUsage.GenerateMips)
             flags |= BindFlags.RenderTarget;
 
         if (description.Format is Format.D32_Float or Format.D16_UNorm or Format.D24_UNorm_S8_UInt)
@@ -44,7 +44,7 @@ public sealed class D3D11Texture : Texture
                     Usage = ResourceUsage.Default,
                     BindFlags = flags,
                     CPUAccessFlags = CpuAccessFlags.None,
-                    MiscFlags = (description.Usage & TextureUsage.GenerateMips) != 0
+                    MiscFlags = (description.Usage & TextureUsage.GenerateMips) == TextureUsage.GenerateMips
                         ? ResourceOptionFlags.GenerateMips
                         : ResourceOptionFlags.None
                 };
@@ -66,8 +66,8 @@ public sealed class D3D11Texture : Texture
 
         if (pData != null)
         {
-            int pitch = 4 * (int) description.Width;
-            context.UpdateSubresource(Texture, 0, null, (nint) pData, pitch, 0);
+            uint pitch = GrabsUtils.CalculatePitch(description.Format, description.Width);
+            context.UpdateSubresource(Texture, 0, null, (nint) pData, (int) pitch, 0);
         }
 
         // TODO: TextureView in GRABS
