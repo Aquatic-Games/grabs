@@ -111,11 +111,39 @@ public static class GrabsUtils
 
     public static uint CalculatePitch(Format format, uint width)
     {
-        uint bpp = format.BitsPerPixel();
-
         if (format is >= Format.BC1_UNorm and <= Format.BC7_UNorm_SRGB)
-            return (bpp / 2) * width;
+        {
+            uint blockSize = 0;
+            switch (format)
+            {
+                case Format.BC1_UNorm:
+                case Format.BC1_UNorm_SRGB:
+                case Format.BC4_UNorm:
+                case Format.BC4_SNorm:
+                    blockSize = 8;
+                    break;
+                
+                case Format.BC2_UNorm:
+                case Format.BC2_UNorm_SRGB:
+                case Format.BC3_UNorm:
+                case Format.BC3_UNorm_SRGB:
+                case Format.BC5_UNorm:
+                case Format.BC5_SNorm:
+                case Format.BC6H_UF16:
+                case Format.BC6H_SF16:
+                case Format.BC7_UNorm:
+                case Format.BC7_UNorm_SRGB:
+                    blockSize = 16;
+                    break;
+                
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(format), format, null);
+            }
 
-        return (bpp / 8) * width;
+            return uint.Max(1, ((width + 3) >> 2)) * blockSize;
+        }
+
+        uint bpp = format.BitsPerPixel();
+        return (width * bpp + 7) >> 3;
     }
 }
