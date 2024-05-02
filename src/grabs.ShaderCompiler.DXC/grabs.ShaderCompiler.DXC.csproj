@@ -8,11 +8,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Vortice.Dxc" Version="3.5.0" />
+      <ProjectReference Include="..\grabs.Core\grabs.Core.csproj" />
+      <ProjectReference Include="..\grabs.Graphics\grabs.Graphics.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\grabs.Graphics\grabs.Graphics.csproj" />
+      <PackageReference Include="TerraFX.Interop.Windows" Version="10.0.22621.6" />
     </ItemGroup>
 
 </Project>
