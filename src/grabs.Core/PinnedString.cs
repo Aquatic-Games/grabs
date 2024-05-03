@@ -3,7 +3,7 @@ using System.Text;
 
 namespace grabs.Core;
 
-public struct PinnedString : IPinnedObject
+public unsafe struct PinnedString : IPinnedObject
 {
     private GCHandle _gcHandle;
 
@@ -16,9 +16,28 @@ public struct PinnedString : IPinnedObject
         byte[] bytes = encoding.GetBytes(@string);
         _gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
     }
+
+    public static PinnedString FromChars(string @string)
+    {
+        char[] chars = @string.ToCharArray();
+        GCHandle gcHandle = GCHandle.Alloc(chars, GCHandleType.Pinned);
+
+        return new PinnedString()
+        {
+            _gcHandle = gcHandle
+        };
+    }
     
     public void Dispose()
     {
         _gcHandle.Free();
     }
+
+    public override string ToString()
+    {
+        return new string((sbyte*) Handle);
+    }
+
+    public static implicit operator byte*(PinnedString pString)
+        => (byte*) pString.Handle;
 }
