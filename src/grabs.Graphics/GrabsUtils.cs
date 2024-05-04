@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace grabs.Graphics;
 
@@ -109,9 +110,13 @@ public static class GrabsUtils
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsCompressed(this Format format)
+        => format is >= Format.BC1_UNorm and <= Format.BC7_UNorm_SRGB;
+
     public static uint CalculatePitch(Format format, uint width)
     {
-        if (format is >= Format.BC1_UNorm and <= Format.BC7_UNorm_SRGB)
+        if (format.IsCompressed())
         {
             uint blockSize = 0;
             switch (format)
@@ -145,5 +150,13 @@ public static class GrabsUtils
 
         uint bpp = format.BitsPerPixel();
         return (width * bpp + 7) >> 3;
+    }
+
+    public static uint CalculateTextureSizeInBytes(Format format, uint width, uint height)
+    {
+        if (format.IsCompressed())
+            return uint.Max(1, (width + 3) >> 2) * uint.Max(1, (height + 3) >> 2) * format.BitsPerPixel() * 2;
+
+        return CalculatePitch(format, width) * height;
     }
 }
