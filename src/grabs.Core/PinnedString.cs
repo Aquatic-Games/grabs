@@ -16,17 +16,6 @@ public unsafe struct PinnedString : IPinnedObject
         byte[] bytes = encoding.GetBytes(@string);
         _gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
     }
-
-    public static PinnedString FromChars(string @string)
-    {
-        char[] chars = @string.ToCharArray();
-        GCHandle gcHandle = GCHandle.Alloc(chars, GCHandleType.Pinned);
-
-        return new PinnedString()
-        {
-            _gcHandle = gcHandle
-        };
-    }
     
     public void Dispose()
     {

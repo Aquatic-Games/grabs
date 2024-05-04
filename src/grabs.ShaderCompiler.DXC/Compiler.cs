@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
+using grabs.Core;
 using grabs.Graphics;
 using TerraFX.Interop.DirectX;
 using TerraFX.Interop.Windows;
@@ -11,8 +16,19 @@ using static TerraFX.Interop.Windows.Windows;
 
 namespace grabs.ShaderCompiler.DXC;
 
+[SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
 public static unsafe class Compiler
 {
+    static Compiler()
+    {
+        ResolveLibrary += OnResolveLibrary;
+    }
+
+    private static IntPtr OnResolveLibrary(string libraryname, Assembly assembly, DllImportSearchPath? searchpath)
+    {
+        return NativeLibrary.Load(libraryname, assembly, DllImportSearchPath.AssemblyDirectory);
+    }
+
     public static byte[] CompileToSpirV(string code, string entryPoint, ShaderStage stage, bool debug = false)
     {
         HRESULT result;
@@ -31,8 +47,8 @@ public static unsafe class Compiler
                 throw new Exception($"Failed to create blob: {result}");
         }
 
-        IDxcCompiler* compiler;
-        if ((result = DxcCreateInstance(&dxcCompilerGuid, __uuidof<IDxcCompiler>(), (void**) &compiler)).FAILED)
+        IDxcCompiler3* compiler;
+        if ((result = DxcCreateInstance(&dxcCompilerGuid, __uuidof<IDxcCompiler3>(), (void**) &compiler)).FAILED)
             throw new Exception($"Failed to create DXC compiler: {result}");
 
         string profile = stage switch
@@ -43,31 +59,59 @@ public static unsafe class Compiler
             _ => throw new ArgumentOutOfRangeException(nameof(stage), stage, null)
         };
 
-        using PinnedS
-        string[] args = ["-spirv", debug ? "-O0" : ""];
+        using WidePinnedString pEntryPoint = new WidePinnedString(entryPoint);
+        using WidePinnedString pTargetProfile = new WidePinnedString(profile);
+
+        List<string> args = new List<string>()
+        {
+            "-spirv"
+        };
+        
+        if (debug)
+            args.Add("-O0");
+        
+        using WidePinnedStringArray pArgs = new WidePinnedStringArray(args.ToArray());
+
+        IDxcCompilerArgs* compilerArgs;
+        if ((result = utils->BuildArguments(null, pEntryPoint, pTargetProfile, pArgs, (uint) pArgs.Length, null, 0, &compilerArgs)).FAILED)
+            throw new Exception($"Failed to build arguments: {result}");
+            
+        DxcBuffer buffer = new DxcBuffer()
+        {
+            Ptr = blobEncoding->GetBufferPointer(),
+            Size = blobEncoding->GetBufferSize(),
+            Encoding = 0
+        };
         
         IDxcOperationResult* opResult;
-        if ((result = compiler->Compile((IDxcBlob*) blobEncoding, null, pEntryPoint, pTargetProfile, )).Failure)
-            throw new Exception($"Failed to compile shader: {result.Description}");
+        if ((result = compiler->Compile(&buffer, compilerArgs->GetArguments(), compilerArgs->GetCount(), null, __uuidof<IDxcOperationResult>(), (void**) &opResult)).FAILED)
+            throw new Exception($"Failed to compile shader: {result}");
 
-        if ((result = opResult.GetStatus(out Result status)).Failure)
-            throw new Exception($"Failed to get result status: {result.Description}");
-        if (status.Failure)
-            throw new Exception($"Failed to compile shader: {new string((sbyte*) opResult.GetErrorBuffer().BufferPointer)}");
+        HRESULT status;
+        if ((result = opResult->GetStatus(&status)).FAILED)
+            throw new Exception($"Failed to get result status: {result}");
+        if (status.FAILED)
+        {
+            IDxcBlobEncoding* errorBlob;
+            opResult->GetErrorBuffer(&errorBlob);
+            
+            throw new Exception($"Failed to compile shader: {new string((sbyte*) errorBlob->GetBufferPointer())}");
+        }
 
-        IDxcBlob blob;
-        if ((result = opResult.GetResult(out blob)).Failure)
+        IDxcBlob* blob;
+        if ((result = opResult->GetResult(&blob)).FAILED)
             throw new Exception($"Failed to get result: {result}");
 
-        byte[] bytes = new byte[blob.BufferSize];
+        byte[] bytes = new byte[blob->GetBufferSize()];
         fixed (byte* pBytes = bytes)
-            Unsafe.CopyBlock(pBytes, (void*) blob.BufferPointer, (uint) blob.BufferSize);
+            Unsafe.CopyBlock(pBytes, blob->GetBufferPointer(), (uint) bytes.Length);
         
-        blob.Dispose();
-        opResult.Dispose();
-        compiler.Dispose();
-        blobEncoding.Dispose();
-        utils.Dispose();
+        blob->Release();
+        opResult->Release();
+        compilerArgs->Release();
+        compiler->Release();
+        blobEncoding->Release();
+        utils->Release();
 
         return bytes;
     }

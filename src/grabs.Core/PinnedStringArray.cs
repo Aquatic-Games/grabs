@@ -10,7 +10,7 @@ public unsafe struct PinnedStringArray : IPinnedObject
 
     public nint Handle => (nint) _stringPtrs;
 
-    public int Length;
+    public readonly int Length;
 
     public PinnedStringArray(params string[] strings) : this(strings, Encoding.UTF8) { }
 
@@ -55,34 +55,6 @@ public unsafe struct PinnedStringArray : IPinnedObject
         builder.Append(']');
 
         return builder.ToString();
-    }
-
-    public static PinnedStringArray FromChars(params string[] strings)
-    {
-        int length = strings.Length;
-        byte** stringPtrs = (byte**) NativeMemory.Alloc((nuint) (length * sizeof(char*)));
-
-        for (int i = 0; i < length; i++)
-        {
-            char[] chars = strings[i].ToCharArray();
-            if (chars.Length == 0)
-            {
-                stringPtrs[i] = null;
-                continue;
-            }
-
-            uint size = (uint) (chars.Length + 1) * sizeof(char);
-            stringPtrs[i] = (byte*) NativeMemory.Alloc(size);
-            
-            fixed (char* pChars = chars)
-                Unsafe.CopyBlock(stringPtrs[i], pChars, size);
-        }
-
-        return new PinnedStringArray()
-        {
-            _stringPtrs = stringPtrs,
-            Length = length
-        };
     }
     
     public static implicit operator byte**(PinnedStringArray pStringArray)

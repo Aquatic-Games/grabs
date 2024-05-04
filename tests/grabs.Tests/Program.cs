@@ -178,7 +178,7 @@ unsafe
     pixelModule.Dispose();
     vertexModule.Dispose();
     
-    ImageResult result = ImageResult.FromMemory(File.ReadAllBytes(@"C:\Users\ollie\Pictures\awesomeface.png"));
+    ImageResult result = ImageResult.FromMemory(File.ReadAllBytes("/home/aqua/Pictures/awesomeface.png"));
     Texture texture = device.CreateTexture(TextureDescription.Texture2D((uint) result.Width, (uint) result.Height, 0,
         Format.R8G8B8A8_UNorm, TextureUsage.ShaderResource | TextureUsage.GenerateMips), new ReadOnlySpan<byte>(result.Data));
     
