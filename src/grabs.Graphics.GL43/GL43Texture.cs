@@ -21,14 +21,11 @@ public sealed class GL43Texture : Texture
             _ => throw new ArgumentOutOfRangeException()
         };
 
-        // If mip levels are 0 then calculate the number of mip levels.
-        uint mipLevels = description.MipLevels == 0
-            ? (uint) float.Floor(float.Log2(uint.Max(description.Width, description.Height))) + 1
-            : description.MipLevels;
+        Format format = description.Format;
 
         // i think this legitimately gave me a brain aneurysm
         // TODO: Test these
-        (SizedInternalFormat iFmt, PixelFormat fmt, PixelType pType) = description.Format switch
+        (SizedInternalFormat iFmt, PixelFormat fmt, PixelType pType) = format switch
         {
             Format.R8G8B8A8_UNorm => (SizedInternalFormat.Rgba8, PixelFormat.Rgba, PixelType.UnsignedByte),
             Format.B5G6R5_UNorm => (SizedInternalFormat.Rgb565, PixelFormat.Bgr, PixelType.UnsignedShort565),
@@ -120,13 +117,32 @@ public sealed class GL43Texture : Texture
         Texture = _gl.GenTexture();
         _gl.BindTexture(Target, Texture);
 
+        bool isCompressed = format.IsCompressed();
+        
+        // If mip levels are 0 then calculate the number of mip levels.
+        uint mipLevels = description.MipLevels == 0
+            ? (uint) float.Floor(float.Log2(uint.Max(description.Width, description.Height))) + 1
+            : description.MipLevels;
+
+        uint width = description.Width;
+        uint height = description.Height;
+
         switch (description.Type)
         {
             case TextureType.Texture2D:
-                _gl.TexStorage2D(Target, mipLevels, iFmt, description.Width, description.Height);
-                
+                _gl.TexStorage2D(Target, mipLevels, iFmt, width, height);
+
                 if (pData != null)
-                    _gl.TexSubImage2D(Target, 0, 0, 0, description.Width, description.Height, fmt, pType, pData);
+                {
+                    if (isCompressed)
+                    {
+                        _gl.CompressedTexSubImage2D(Target, 0, 0, 0, width, height, (InternalFormat) iFmt,
+                            GrabsUtils.CalculateTextureSizeInBytes(format, width, height), pData);
+                    }
+                    else
+                        _gl.TexSubImage2D(Target, 0, 0, 0, description.Width, description.Height, fmt, pType, pData);
+                }
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

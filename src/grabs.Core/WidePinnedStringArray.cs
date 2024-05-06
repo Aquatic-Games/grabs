@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace grabs.Core;
 
-public unsafe class WidePinnedStringArray : IPinnedObject
+public unsafe struct WidePinnedStringArray : IPinnedObject
 {
     private void** _stringPtrs;
     
