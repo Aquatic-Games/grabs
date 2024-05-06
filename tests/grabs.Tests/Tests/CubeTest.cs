@@ -58,11 +58,16 @@ public class CubeTest : TestBase
             new InputLayoutDescription(Format.R32G32_Float, 12, 0, InputType.PerVertex) // TexCoord
         }, DepthStencilDescription.DepthLessEqual, RasterizerDescription.CullClockwise));
 
-        using FileStream stream = File.OpenRead(@"C:\Users\ollie\Pictures\awesomeface.png");
+        using FileStream stream = File.OpenRead("Assets/awesomeface.png");
         ImageResult result = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
         
-        _texture = Device.CreateTexture(TextureDescription.Texture2D((uint) result.Width, (uint) result.Height, 1,
+        _texture = Device.CreateTexture(TextureDescription.Texture2D((uint) result.Width, (uint) result.Height, 0,
             Format.R8G8B8A8_UNorm, TextureUsage.ShaderResource | TextureUsage.GenerateMips), new ReadOnlySpan<byte>(result.Data));
+        
+        CommandList.Begin();
+        CommandList.GenerateMipmaps(_texture);
+        CommandList.End();
+        Device.ExecuteCommandList(CommandList);
     }
 
     protected override void Update(float dt)
