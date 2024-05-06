@@ -12,6 +12,7 @@ public sealed class D3D11Pipeline : Pipeline
     public readonly ID3D11InputLayout InputLayout;
 
     public readonly ID3D11DepthStencilState DepthStencilState;
+    public readonly ID3D11RasterizerState RasterizerState;
 
     public readonly PrimitiveTopology PrimitiveTopology;
     
@@ -41,8 +42,7 @@ public sealed class D3D11Pipeline : Pipeline
 
         InputLayout = device.CreateInputLayout(elementDescs, vShaderModule.Blob);
 
-        DepthStencilDescription depthDesc = description.DepthStencilDescription;
-        
+        DepthStencilDescription depthDesc = description.DepthStencilState;
         Vortice.Direct3D11.DepthStencilDescription dsDesc = new Vortice.Direct3D11.DepthStencilDescription()
         {
             DepthEnable = depthDesc.DepthEnabled,
@@ -53,13 +53,33 @@ public sealed class D3D11Pipeline : Pipeline
 
         DepthStencilState = device.CreateDepthStencilState(dsDesc);
 
+        RasterizerDescription rasterizerDesc = description.RasterizerState;
+        Vortice.Direct3D11.RasterizerDescription rsDesc = new Vortice.Direct3D11.RasterizerDescription()
+        {
+            FillMode = rasterizerDesc.FillMode == FillMode.Solid
+                ? Vortice.Direct3D11.FillMode.Solid
+                : Vortice.Direct3D11.FillMode.Wireframe,
+            CullMode = rasterizerDesc.CullFace switch
+            {
+                CullFace.None => CullMode.None,
+                CullFace.Front => CullMode.Front,
+                CullFace.Back => CullMode.Back,
+                _ => throw new ArgumentOutOfRangeException()
+            },
+            FrontCounterClockwise = rasterizerDesc.FrontFace == CullDirection.CounterClockwise
+        };
+
+        RasterizerState = device.CreateRasterizerState(rsDesc);
+
         PrimitiveTopology = description.PrimitiveType.ToPrimitiveTopology();
     }
     
     public override void Dispose()
     {
-        VertexShader.Dispose();
-        PixelShader.Dispose();
+        RasterizerState.Dispose();
+        DepthStencilState.Dispose();
         InputLayout.Dispose();
+        PixelShader.Dispose();
+        VertexShader.Dispose();
     }
 }

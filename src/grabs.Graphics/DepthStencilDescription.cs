@@ -7,6 +7,8 @@ public struct DepthStencilDescription
     public bool DepthWrite;
 
     public ComparisonFunction ComparisonFunction;
+    
+    // TODO: Stencil
 
     public DepthStencilDescription(bool depthEnabled, bool depthWrite, ComparisonFunction comparisonFunction)
     {

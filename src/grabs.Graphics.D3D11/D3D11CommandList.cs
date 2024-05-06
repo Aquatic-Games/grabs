@@ -90,6 +90,7 @@ public sealed class D3D11CommandList : CommandList
         Context.PSSetShader(d3dPipeline.PixelShader);
         Context.IASetInputLayout(d3dPipeline.InputLayout);
         Context.OMSetDepthStencilState(d3dPipeline.DepthStencilState);
+        Context.RSSetState(d3dPipeline.RasterizerState);
         Context.IASetPrimitiveTopology(d3dPipeline.PrimitiveTopology);
     }
 
