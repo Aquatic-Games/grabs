@@ -9,12 +9,15 @@ public struct PipelineDescription
     public InputLayoutDescription[] InputLayout;
 
     public DepthStencilDescription DepthStencilDescription;
+    
+    public PrimitiveType PrimitiveType;
 
-    public PipelineDescription(ShaderModule vertexShader, ShaderModule pixelShader, InputLayoutDescription[] inputLayout, DepthStencilDescription depthStencilDescription)
+    public PipelineDescription(ShaderModule vertexShader, ShaderModule pixelShader, InputLayoutDescription[] inputLayout, DepthStencilDescription depthStencilDescription, PrimitiveType primitiveType = PrimitiveType.TriangleList)
     {
         VertexShader = vertexShader;
         PixelShader = pixelShader;
         InputLayout = inputLayout;
         DepthStencilDescription = depthStencilDescription;
+        PrimitiveType = primitiveType;
     }
 }

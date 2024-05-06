@@ -1,4 +1,5 @@
 ﻿using System;
+using Vortice.Direct3D;
 using DXGIFormat = Vortice.DXGI.Format;
 
 namespace grabs.Graphics.D3D11;
@@ -91,6 +92,24 @@ public static class D3D11Utils
             ComparisonFunction.GreaterEqual => Vortice.Direct3D11.ComparisonFunction.GreaterEqual,
             ComparisonFunction.Always => Vortice.Direct3D11.ComparisonFunction.Always,
             _ => throw new ArgumentOutOfRangeException(nameof(func), func, null)
+        };
+    }
+
+    public static PrimitiveTopology ToPrimitiveTopology(this PrimitiveType type)
+    {
+        return type switch
+        {
+            PrimitiveType.PointList => PrimitiveTopology.PointList,
+            PrimitiveType.LineList => PrimitiveTopology.LineList,
+            PrimitiveType.LineStrip => PrimitiveTopology.LineStrip,
+            PrimitiveType.LineListAdjacent => PrimitiveTopology.LineListAdjacency,
+            PrimitiveType.LineStripAdjacent => PrimitiveTopology.LineStripAdjacency,
+            PrimitiveType.TriangleList => PrimitiveTopology.TriangleList,
+            PrimitiveType.TriangleStrip => PrimitiveTopology.TriangleStrip,
+            PrimitiveType.TriangleFan => PrimitiveTopology.TriangleFan,
+            PrimitiveType.TriangleListAdjacent => PrimitiveTopology.TriangleListAdjacency,
+            PrimitiveType.TriangleStripAdjacent => PrimitiveTopology.TriangleStripAdjacency,
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
     }
 }

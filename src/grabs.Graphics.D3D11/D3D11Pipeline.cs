@@ -1,4 +1,5 @@
 ﻿using System;
+using Vortice.Direct3D;
 using Vortice.Direct3D11;
 
 namespace grabs.Graphics.D3D11;
@@ -11,6 +12,8 @@ public sealed class D3D11Pipeline : Pipeline
     public readonly ID3D11InputLayout InputLayout;
 
     public readonly ID3D11DepthStencilState DepthStencilState;
+
+    public readonly PrimitiveTopology PrimitiveTopology;
     
     public D3D11Pipeline(ID3D11Device device, in PipelineDescription description)
     {
@@ -47,6 +50,10 @@ public sealed class D3D11Pipeline : Pipeline
             DepthFunc = depthDesc.ComparisonFunction.ToComparisonFunc(),
             StencilEnable = false
         };
+
+        DepthStencilState = device.CreateDepthStencilState(dsDesc);
+
+        PrimitiveTopology = description.PrimitiveType.ToPrimitiveTopology();
     }
     
     public override void Dispose()

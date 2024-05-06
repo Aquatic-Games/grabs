@@ -100,7 +100,7 @@ public sealed class GL43Swapchain : Swapchain
         _gl.ActiveTexture(TextureUnit.Texture0);
         _gl.BindTexture(TextureTarget.Texture2D, _swapchainTexture.Texture);
         
-        _gl.DrawArrays(PrimitiveType.Triangles, 0, 6);
+        _gl.DrawArrays(Silk.NET.OpenGL.PrimitiveType.Triangles, 0, 6);
         
         _surface.PresentFunc(_swapInterval);
     }

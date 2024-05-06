@@ -48,7 +48,7 @@ public class BasicTest : TestBase
         {
             new InputLayoutDescription(Format.R32G32_Float, 0, 0, InputType.PerVertex), // Position
             new InputLayoutDescription(Format.R32G32B32_Float, 8, 0, InputType.PerVertex) // Color
-        }, DepthStencilDescription.Disabled));
+        }, DepthStencilDescription.Disabled, PrimitiveType.TriangleList));
     }
 
     protected override void Draw()

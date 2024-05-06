@@ -66,7 +66,7 @@ public sealed class D3D11Texture : Texture
 
         if (pData != null)
         {
-            uint pitch = GrabsUtils.CalculatePitch(description.Format, description.Width);
+            uint pitch = GraphicsUtils.CalculatePitch(description.Format, description.Width);
             context.UpdateSubresource(Texture, 0, null, (nint) pData, (int) pitch, 0);
         }
 

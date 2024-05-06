@@ -174,7 +174,7 @@ public class GL43Device : Device
 
                 case CommandListActionType.DrawIndexed:
                 {
-                    _gl.DrawElements(PrimitiveType.Triangles, action.Slot, _currentDrawElementsType, null);
+                    _gl.DrawElements(Silk.NET.OpenGL.PrimitiveType.Triangles, action.Slot, _currentDrawElementsType, null);
                     break;
                 }
                 

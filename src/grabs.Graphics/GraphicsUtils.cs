@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace grabs.Graphics;
 
-public static class GrabsUtils
+public static class GraphicsUtils
 {
     public static uint BitsPerPixel(this Format format)
     {

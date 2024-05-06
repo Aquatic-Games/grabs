@@ -90,9 +90,7 @@ public sealed class D3D11CommandList : CommandList
         Context.PSSetShader(d3dPipeline.PixelShader);
         Context.IASetInputLayout(d3dPipeline.InputLayout);
         Context.OMSetDepthStencilState(d3dPipeline.DepthStencilState);
-        
-        // TODO: Add these to pipelines.
-        Context.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
+        Context.IASetPrimitiveTopology(d3dPipeline.PrimitiveTopology);
     }
 
     public override void SetVertexBuffer(uint slot, Buffer buffer, uint stride, uint offset)

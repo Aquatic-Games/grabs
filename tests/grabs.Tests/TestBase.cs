@@ -9,7 +9,7 @@ using Texture = grabs.Graphics.Texture;
 
 namespace grabs.Tests;
 
-public unsafe abstract class TestBase : IDisposable
+public abstract unsafe class TestBase : IDisposable
 {
     private string _title;
     private Sdl _sdl;

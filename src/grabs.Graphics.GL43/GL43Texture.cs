@@ -137,7 +137,7 @@ public sealed class GL43Texture : Texture
                     if (isCompressed)
                     {
                         _gl.CompressedTexSubImage2D(Target, 0, 0, 0, width, height, (InternalFormat) iFmt,
-                            GrabsUtils.CalculateTextureSizeInBytes(format, width, height), pData);
+                            GraphicsUtils.CalculateTextureSizeInBytes(format, width, height), pData);
                     }
                     else
                         _gl.TexSubImage2D(Target, 0, 0, 0, description.Width, description.Height, fmt, pType, pData);
