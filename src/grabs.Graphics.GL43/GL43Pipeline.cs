@@ -1,4 +1,5 @@
-﻿using Silk.NET.OpenGL;
+﻿using System;
+using Silk.NET.OpenGL;
 
 namespace grabs.Graphics.GL43;
 
@@ -9,6 +10,8 @@ public class GL43Pipeline : Pipeline
     public uint ShaderProgram;
     
     public uint Vao;
+
+    public Silk.NET.OpenGL.PrimitiveType PrimitiveType;
 
     public GL43Pipeline(GL gl, in PipelineDescription description)
     {
@@ -62,6 +65,21 @@ public class GL43Pipeline : Pipeline
             _gl.VertexBindingDivisor(i, (uint) desc.Type);
             _gl.VertexAttribBinding(i, 0);
         }
+
+        PrimitiveType = description.PrimitiveType switch
+        {
+            Graphics.PrimitiveType.PointList => Silk.NET.OpenGL.PrimitiveType.Points,
+            Graphics.PrimitiveType.LineList => Silk.NET.OpenGL.PrimitiveType.Lines,
+            Graphics.PrimitiveType.LineStrip => Silk.NET.OpenGL.PrimitiveType.LineStrip,
+            Graphics.PrimitiveType.LineListAdjacency => Silk.NET.OpenGL.PrimitiveType.LinesAdjacency,
+            Graphics.PrimitiveType.LineStripAdjacency => Silk.NET.OpenGL.PrimitiveType.LineStripAdjacency,
+            Graphics.PrimitiveType.TriangleList => Silk.NET.OpenGL.PrimitiveType.Triangles,
+            Graphics.PrimitiveType.TriangleStrip => Silk.NET.OpenGL.PrimitiveType.TriangleStrip,
+            Graphics.PrimitiveType.TriangleFan => Silk.NET.OpenGL.PrimitiveType.TriangleFan,
+            Graphics.PrimitiveType.TriangleListAdjacency => Silk.NET.OpenGL.PrimitiveType.TrianglesAdjacency,
+            Graphics.PrimitiveType.TriangleStripAdjacency => Silk.NET.OpenGL.PrimitiveType.TriangleStripAdjacency,
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
     
     public override void Dispose()

@@ -7,13 +7,13 @@ public enum PrimitiveType
     LineList,
     LineStrip,
     
-    LineListAdjacent,
-    LineStripAdjacent,
+    LineListAdjacency,
+    LineStripAdjacency,
     
     TriangleList,
     TriangleStrip,
     TriangleFan,
     
-    TriangleListAdjacent,
-    TriangleStripAdjacent
+    TriangleListAdjacency,
+    TriangleStripAdjacency
 }

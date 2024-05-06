@@ -1,4 +1,6 @@
-﻿namespace grabs.Graphics.GL43;
+﻿using System;
+
+namespace grabs.Graphics.GL43;
 
 public class GL43Surface : Surface
 {

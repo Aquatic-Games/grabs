@@ -102,13 +102,13 @@ public static class D3D11Utils
             PrimitiveType.PointList => PrimitiveTopology.PointList,
             PrimitiveType.LineList => PrimitiveTopology.LineList,
             PrimitiveType.LineStrip => PrimitiveTopology.LineStrip,
-            PrimitiveType.LineListAdjacent => PrimitiveTopology.LineListAdjacency,
-            PrimitiveType.LineStripAdjacent => PrimitiveTopology.LineStripAdjacency,
+            PrimitiveType.LineListAdjacency => PrimitiveTopology.LineListAdjacency,
+            PrimitiveType.LineStripAdjacency => PrimitiveTopology.LineStripAdjacency,
             PrimitiveType.TriangleList => PrimitiveTopology.TriangleList,
             PrimitiveType.TriangleStrip => PrimitiveTopology.TriangleStrip,
             PrimitiveType.TriangleFan => PrimitiveTopology.TriangleFan,
-            PrimitiveType.TriangleListAdjacent => PrimitiveTopology.TriangleListAdjacency,
-            PrimitiveType.TriangleStripAdjacent => PrimitiveTopology.TriangleStripAdjacency,
+            PrimitiveType.TriangleListAdjacency => PrimitiveTopology.TriangleListAdjacency,
+            PrimitiveType.TriangleStripAdjacency => PrimitiveTopology.TriangleStripAdjacency,
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
     }

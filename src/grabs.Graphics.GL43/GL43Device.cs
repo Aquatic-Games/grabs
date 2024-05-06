@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 using Silk.NET.OpenGL;
 
 namespace grabs.Graphics.GL43;
@@ -9,6 +10,7 @@ public class GL43Device : Device
     private GL43Swapchain _swapchain;
 
     private DrawElementsType _currentDrawElementsType;
+    private Silk.NET.OpenGL.PrimitiveType _currentPrimitiveType;
     
     public GL43Device(GL gl)
     {
@@ -133,6 +135,8 @@ public class GL43Device : Device
                     
                     _gl.BindVertexArray(pipeline.Vao);
                     _gl.UseProgram(pipeline.ShaderProgram);
+
+                    _currentPrimitiveType = pipeline.PrimitiveType;
                     break;
                 }
                 
@@ -174,7 +178,7 @@ public class GL43Device : Device
 
                 case CommandListActionType.DrawIndexed:
                 {
-                    _gl.DrawElements(Silk.NET.OpenGL.PrimitiveType.Triangles, action.Slot, _currentDrawElementsType, null);
+                    _gl.DrawElements(_currentPrimitiveType, action.Slot, _currentDrawElementsType, null);
                     break;
                 }
                 
