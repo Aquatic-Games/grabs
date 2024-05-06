@@ -13,6 +13,8 @@ public class GL43Pipeline : Pipeline
 
     public Silk.NET.OpenGL.PrimitiveType PrimitiveType;
 
+    public DepthStencilDescription DepthStencilDescription;
+
     public GL43Pipeline(GL gl, in PipelineDescription description)
     {
         _gl = gl;

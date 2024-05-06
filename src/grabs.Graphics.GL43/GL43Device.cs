@@ -126,6 +126,7 @@ public class GL43Device : Device
                     Viewport viewport = action.Viewport;
                     
                     _gl.Viewport(viewport.X, (int) _swapchain.Height - viewport.Y - (int) viewport.Height, viewport.Width, viewport.Height);
+                    _gl.DepthRange(viewport.MinDepth, viewport.MaxDepth);
                     break;
                 }
 
@@ -135,6 +136,30 @@ public class GL43Device : Device
                     
                     _gl.BindVertexArray(pipeline.Vao);
                     _gl.UseProgram(pipeline.ShaderProgram);
+
+                    DepthStencilDescription depthDesc = pipeline.DepthStencilDescription;
+
+                    if (depthDesc.DepthEnabled)
+                    {
+                        _gl.Enable(EnableCap.DepthTest);
+                        _gl.DepthMask(depthDesc.DepthWrite);
+
+                        DepthFunction depthFunc = depthDesc.ComparisonFunction switch
+                        {
+                            ComparisonFunction.Never => DepthFunction.Never,
+                            ComparisonFunction.Less => DepthFunction.Less,
+                            ComparisonFunction.Equal => DepthFunction.Equal,
+                            ComparisonFunction.LessEqual => DepthFunction.Lequal,
+                            ComparisonFunction.Greater => DepthFunction.Greater,
+                            ComparisonFunction.NotEqual => DepthFunction.Notequal,
+                            ComparisonFunction.GreaterEqual => DepthFunction.Gequal,
+                            ComparisonFunction.Always => DepthFunction.Always,
+                            _ => throw new ArgumentOutOfRangeException()
+                        };
+                        _gl.DepthFunc(depthFunc);
+                    }
+                    else
+                        _gl.Disable(EnableCap.DepthTest);
 
                     _currentPrimitiveType = pipeline.PrimitiveType;
                     break;
