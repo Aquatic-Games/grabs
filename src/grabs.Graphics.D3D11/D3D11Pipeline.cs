@@ -9,6 +9,8 @@ public sealed class D3D11Pipeline : Pipeline
     public readonly ID3D11PixelShader PixelShader;
 
     public readonly ID3D11InputLayout InputLayout;
+
+    public readonly ID3D11DepthStencilState DepthStencilState;
     
     public D3D11Pipeline(ID3D11Device device, in PipelineDescription description)
     {
@@ -35,6 +37,16 @@ public sealed class D3D11Pipeline : Pipeline
         }
 
         InputLayout = device.CreateInputLayout(elementDescs, vShaderModule.Blob);
+
+        DepthStencilDescription depthDesc = description.DepthStencilDescription;
+        
+        Vortice.Direct3D11.DepthStencilDescription dsDesc = new Vortice.Direct3D11.DepthStencilDescription()
+        {
+            DepthEnable = depthDesc.DepthEnabled,
+            DepthWriteMask = depthDesc.DepthWrite ? DepthWriteMask.All : DepthWriteMask.Zero,
+            DepthFunc = depthDesc.ComparisonFunction.ToComparisonFunc(),
+            StencilEnable = false
+        };
     }
     
     public override void Dispose()

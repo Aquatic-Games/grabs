@@ -8,10 +8,13 @@ public struct PipelineDescription
 
     public InputLayoutDescription[] InputLayout;
 
-    public PipelineDescription(ShaderModule vertexShader, ShaderModule pixelShader, InputLayoutDescription[] inputLayout)
+    public DepthStencilDescription DepthStencilDescription;
+
+    public PipelineDescription(ShaderModule vertexShader, ShaderModule pixelShader, InputLayoutDescription[] inputLayout, DepthStencilDescription depthStencilDescription)
     {
         VertexShader = vertexShader;
         PixelShader = pixelShader;
         InputLayout = inputLayout;
+        DepthStencilDescription = depthStencilDescription;
     }
 }

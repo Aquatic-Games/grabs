@@ -173,12 +173,12 @@ unsafe
         {
             new InputLayoutDescription(Format.R32G32_Float, 0, 0, InputType.PerVertex),
             new InputLayoutDescription(Format.R32G32_Float, 8, 0, InputType.PerVertex)
-        }));
+        }, DepthStencilDescription.Disabled));
     
     pixelModule.Dispose();
     vertexModule.Dispose();
     
-    ImageResult result = ImageResult.FromMemory(File.ReadAllBytes("/home/aqua/Pictures/awesomeface.png"));
+    ImageResult result = ImageResult.FromMemory(File.ReadAllBytes(@"C:\Users\ollie\Pictures\awesomeface.png"));
     Texture texture = device.CreateTexture(TextureDescription.Texture2D((uint) result.Width, (uint) result.Height, 0,
         Format.R8G8B8A8_UNorm, TextureUsage.ShaderResource | TextureUsage.GenerateMips), new ReadOnlySpan<byte>(result.Data));
     

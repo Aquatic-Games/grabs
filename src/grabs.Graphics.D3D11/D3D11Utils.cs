@@ -77,4 +77,20 @@ public static class D3D11Utils
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
         };
     }
+
+    public static Vortice.Direct3D11.ComparisonFunction ToComparisonFunc(this ComparisonFunction func)
+    {
+        return func switch
+        {
+            ComparisonFunction.Never => Vortice.Direct3D11.ComparisonFunction.Never,
+            ComparisonFunction.Less => Vortice.Direct3D11.ComparisonFunction.Less,
+            ComparisonFunction.Equal => Vortice.Direct3D11.ComparisonFunction.Equal,
+            ComparisonFunction.LessEqual => Vortice.Direct3D11.ComparisonFunction.LessEqual,
+            ComparisonFunction.Greater => Vortice.Direct3D11.ComparisonFunction.Greater,
+            ComparisonFunction.NotEqual => Vortice.Direct3D11.ComparisonFunction.NotEqual,
+            ComparisonFunction.GreaterEqual => Vortice.Direct3D11.ComparisonFunction.GreaterEqual,
+            ComparisonFunction.Always => Vortice.Direct3D11.ComparisonFunction.Always,
+            _ => throw new ArgumentOutOfRangeException(nameof(func), func, null)
+        };
+    }
 }
