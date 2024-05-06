@@ -6,8 +6,9 @@ namespace grabs.Graphics.GL43;
 public class GL43Device : Device
 {
     private readonly GL _gl;
-
     private GL43Swapchain _swapchain;
+
+    private DrawElementsType _currentDrawElementsType;
     
     public GL43Device(GL gl)
     {
@@ -145,6 +146,14 @@ public class GL43Device : Device
                 case CommandListActionType.SetIndexBuffer:
                 {
                     _gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, ((GL43Buffer) action.Buffer).Buffer);
+
+                    _currentDrawElementsType = action.Format switch
+                    {
+                        Format.R8_UInt => DrawElementsType.UnsignedByte,
+                        Format.R16_UInt => DrawElementsType.UnsignedShort,
+                        Format.R32_UInt => DrawElementsType.UnsignedInt,
+                        _ => throw new NotSupportedException()
+                    };
                     break;
                 }
 
@@ -165,7 +174,7 @@ public class GL43Device : Device
 
                 case CommandListActionType.DrawIndexed:
                 {
-                    _gl.DrawElements(PrimitiveType.Triangles, action.Slot, DrawElementsType.UnsignedInt, null);
+                    _gl.DrawElements(PrimitiveType.Triangles, action.Slot, _currentDrawElementsType, null);
                     break;
                 }
                 

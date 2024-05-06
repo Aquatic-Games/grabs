@@ -105,6 +105,8 @@ public unsafe abstract class TestBase : IDisposable
             default:
                 throw new ArgumentOutOfRangeException(nameof(api), api, null);
         }
+        
+        _sdl.SetWindowTitle(_window, _title + " - " + Instance.Api);
 
         Adapter[] adapters = Instance.EnumerateAdapters();
         Console.WriteLine($"Adapters:\n{string.Join('\n', adapters)}");
