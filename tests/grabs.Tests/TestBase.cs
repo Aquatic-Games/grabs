@@ -142,12 +142,12 @@ public abstract unsafe class TestBase : IDisposable
 
                         break;
                 }
-                
-                Update(1 / 60f);
-                Draw();
-                
-                Swapchain.Present();
             }
+            
+            Update(1 / 60f);
+            Draw();
+                
+            Swapchain.Present();
         }
     }
     
