@@ -138,6 +138,7 @@ public class GL43Device : Device
                     _gl.UseProgram(pipeline.ShaderProgram);
 
                     DepthStencilDescription depthDesc = pipeline.DepthStencilDescription;
+                    RasterizerDescription rasterizerDesc = pipeline.RasterizerDescription;
 
                     if (depthDesc.DepthEnabled)
                     {
@@ -160,6 +161,19 @@ public class GL43Device : Device
                     }
                     else
                         _gl.Disable(EnableCap.DepthTest);
+                    
+                    if (rasterizerDesc.CullFace == CullFace.None)
+                        _gl.Disable(EnableCap.CullFace);
+                    else
+                    {
+                        _gl.Enable(EnableCap.CullFace);
+                        _gl.CullFace(rasterizerDesc.CullFace == CullFace.Front
+                            ? TriangleFace.Front
+                            : TriangleFace.Back);
+                        _gl.FrontFace(rasterizerDesc.FrontFace == CullDirection.Clockwise
+                            ? FrontFaceDirection.CW
+                            : FrontFaceDirection.Ccw);
+                    }
 
                     _currentPrimitiveType = pipeline.PrimitiveType;
                     break;

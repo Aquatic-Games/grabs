@@ -5,15 +5,17 @@ namespace grabs.Graphics.GL43;
 
 public class GL43Pipeline : Pipeline
 {
-    private GL _gl;
+    private readonly GL _gl;
 
-    public uint ShaderProgram;
+    public readonly uint ShaderProgram;
     
-    public uint Vao;
+    public readonly uint Vao;
 
-    public Silk.NET.OpenGL.PrimitiveType PrimitiveType;
+    public readonly Silk.NET.OpenGL.PrimitiveType PrimitiveType;
 
-    public DepthStencilDescription DepthStencilDescription;
+    public readonly DepthStencilDescription DepthStencilDescription;
+
+    public readonly RasterizerDescription RasterizerDescription;
 
     public GL43Pipeline(GL gl, in PipelineDescription description)
     {
@@ -67,6 +69,9 @@ public class GL43Pipeline : Pipeline
             _gl.VertexBindingDivisor(i, (uint) desc.Type);
             _gl.VertexAttribBinding(i, 0);
         }
+
+        DepthStencilDescription = description.DepthStencilState;
+        RasterizerDescription = description.RasterizerState;
 
         PrimitiveType = description.PrimitiveType switch
         {

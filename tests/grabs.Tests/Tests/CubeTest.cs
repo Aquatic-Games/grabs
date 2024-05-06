@@ -56,7 +56,7 @@ public class CubeTest : TestBase
         {
             new InputLayoutDescription(Format.R32G32B32_Float, 0, 0, InputType.PerVertex), // Position
             new InputLayoutDescription(Format.R32G32_Float, 12, 0, InputType.PerVertex) // TexCoord
-        }, DepthStencilDescription.DepthLessEqual, RasterizerDescription.CullCounterClockwise));
+        }, DepthStencilDescription.DepthLessEqual, RasterizerDescription.CullClockwise));
 
         using FileStream stream = File.OpenRead(@"C:\Users\ollie\Pictures\awesomeface.png");
         ImageResult result = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
