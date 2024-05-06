@@ -40,6 +40,8 @@ public unsafe abstract class TestBase : IDisposable
 
     protected virtual void Draw() { }
 
+    protected virtual void Unload() { }
+
     public void Run(GraphicsApi api, Size size)
     {
         if (_sdl.Init(Sdl.InitVideo | Sdl.InitEvents) < 0)
@@ -147,7 +149,7 @@ public unsafe abstract class TestBase : IDisposable
         }
     }
     
-    public void Dispose()
+    public virtual void Dispose()
     {
         Framebuffer.Dispose();
         DepthTexture.Dispose();
