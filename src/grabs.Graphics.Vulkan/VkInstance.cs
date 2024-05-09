@@ -60,7 +60,7 @@ public unsafe class VkInstance : Instance
         pExtensions.Dispose();
     }
     
-    public override Device CreateDevice(Adapter? adapter = null)
+    public override Device CreateDevice(Surface surface, Adapter? adapter = null)
     {
         uint numDevices;
         Vk.EnumeratePhysicalDevices(Instance, &numDevices, null);

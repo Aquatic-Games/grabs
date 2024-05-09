@@ -4,7 +4,7 @@ namespace grabs.Graphics;
 
 public abstract class Device : IDisposable
 {
-    public abstract Swapchain CreateSwapchain(Surface surface, in SwapchainDescription description);
+    public abstract Swapchain CreateSwapchain(in SwapchainDescription description);
 
     public abstract CommandList CreateCommandList();
 

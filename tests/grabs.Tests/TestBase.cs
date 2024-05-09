@@ -111,9 +111,9 @@ public abstract unsafe class TestBase : IDisposable
         Adapter[] adapters = Instance.EnumerateAdapters();
         Console.WriteLine($"Adapters:\n{string.Join('\n', adapters)}");
 
-        Device = Instance.CreateDevice();
-        Swapchain = Device.CreateSwapchain(Surface,
-            new SwapchainDescription((uint) size.Width, (uint) size.Height, presentMode: PresentMode.VerticalSync));
+        Device = Instance.CreateDevice(Surface);
+        Swapchain = Device.CreateSwapchain(new SwapchainDescription((uint) size.Width, (uint) size.Height,
+            presentMode: PresentMode.VerticalSync));
         ColorTexture = Swapchain.GetSwapchainTexture();
         DepthTexture = Device.CreateTexture(new TextureDescription(TextureType.Texture2D, (uint) size.Width,
             (uint) size.Height, 1, Format.D32_Float, TextureUsage.None));

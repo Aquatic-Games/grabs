@@ -63,7 +63,7 @@ public unsafe class VkDevice : Device
         throw new NotImplementedException();
     }
     
-    public override Swapchain CreateSwapchain(Surface surface, in SwapchainDescription description)
+    public override Swapchain CreateSwapchain(in SwapchainDescription description)
     {
         throw new NotImplementedException();
     }

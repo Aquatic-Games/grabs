@@ -14,9 +14,9 @@ public sealed class GL43Instance : Instance
         GL = GL.GetApi(getProcAddressFunc);
     }
     
-    public override Device CreateDevice(Adapter? adapter = null)
+    public override Device CreateDevice(Surface surface, Adapter? adapter = null)
     {
-        return new GL43Device(GL);
+        return new GL43Device(GL, (GL43Surface) surface);
     }
 
     public override Adapter[] EnumerateAdapters()

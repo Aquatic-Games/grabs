@@ -7,21 +7,23 @@ namespace grabs.Graphics.GL43;
 public class GL43Device : Device
 {
     private readonly GL _gl;
+    private GL43Surface _surface;
     private GL43Swapchain _swapchain;
 
     private DrawElementsType _currentDrawElementsType;
     private Silk.NET.OpenGL.PrimitiveType _currentPrimitiveType;
     
-    public GL43Device(GL gl)
+    public GL43Device(GL gl, GL43Surface surface)
     {
         _gl = gl;
+        _surface = surface;
     }
     
-    public override Swapchain CreateSwapchain(Surface surface, in SwapchainDescription description)
+    public override Swapchain CreateSwapchain(in SwapchainDescription description)
     {
         // Unfortunately we have to store a reference to the swapchain, so we can get its size, which are used in the
         // viewport and scissor commands.
-        _swapchain = new GL43Swapchain(_gl, (GL43Surface) surface, description);
+        _swapchain = new GL43Swapchain(_gl, _surface, description);
         return _swapchain;
     }
 

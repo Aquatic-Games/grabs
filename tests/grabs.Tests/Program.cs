@@ -5,7 +5,11 @@ using grabs.Graphics;
 using grabs.Graphics.Vulkan;
 using grabs.Tests;
 using grabs.Tests.Tests;
+using Silk.NET.Core.Native;
 using Silk.NET.SDL;
+using Silk.NET.Vulkan;
+using Device = grabs.Graphics.Device;
+using Instance = grabs.Graphics.Instance;
 
 GrabsLog.LogMessage += (type, message) => Console.WriteLine($"[{type}] {message}"); 
 
@@ -38,7 +42,10 @@ unsafe
     Adapter[] adapters = instance.EnumerateAdapters();
     Console.WriteLine(string.Join("\n", adapters));
 
-    Device device = instance.CreateDevice();
+    VkNonDispatchableHandle surface;
+    sdl.VulkanCreateSurface(window, new VkHandle(((VkInstance) instance).Instance.Handle), &surface);
+
+    Device device = instance.CreateDevice(new VkSurface(new SurfaceKHR(surface.Handle)));
     
     device.Dispose();
     instance.Dispose();
