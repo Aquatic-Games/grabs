@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace grabs.Core;
 
-public struct WidePinnedString : IPinnedObject
+public class WidePinnedString : IPinnedObject
 {
     private GCHandle _handle;
 

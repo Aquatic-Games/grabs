@@ -4,17 +4,17 @@ using System.Runtime.InteropServices;
 
 namespace grabs.Core;
 
-public unsafe struct WidePinnedStringArray : IPinnedObject
+public unsafe class WidePinnedStringArray : IPinnedObject
 {
     private void** _stringPtrs;
     
     public nint Handle => (nint) _stringPtrs;
 
-    public readonly int Length;
+    public readonly uint Length;
 
     public WidePinnedStringArray(params string[] strings)
     {
-        Length = strings.Length;
+        Length = (uint) strings.Length;
 
         uint charSize = (uint) (OperatingSystem.IsWindows() ? sizeof(char) : sizeof(int));
 

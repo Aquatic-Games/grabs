@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.ShaderCompiler.Spirv"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Core", "src\grabs.Core\grabs.Core.csproj", "{6D67AF15-F72F-4B6A-AB59-EEC0CE33D1EF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Graphics.Vulkan", "src\grabs.Graphics.Vulkan\grabs.Graphics.Vulkan.csproj", "{80597A66-3E5E-4788-8E11-1053D4328EDB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{6D67AF15-F72F-4B6A-AB59-EEC0CE33D1EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D67AF15-F72F-4B6A-AB59-EEC0CE33D1EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D67AF15-F72F-4B6A-AB59-EEC0CE33D1EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80597A66-3E5E-4788-8E11-1053D4328EDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80597A66-3E5E-4788-8E11-1053D4328EDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80597A66-3E5E-4788-8E11-1053D4328EDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80597A66-3E5E-4788-8E11-1053D4328EDB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{79E326C9-3930-4BD6-B6FD-FB9BACA9E1F7} = {059B98D7-A112-4088-AAF4-A86B83F3A09A}

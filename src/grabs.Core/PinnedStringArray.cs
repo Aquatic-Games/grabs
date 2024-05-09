@@ -4,19 +4,19 @@ using System.Text;
 
 namespace grabs.Core;
 
-public unsafe struct PinnedStringArray : IPinnedObject
+public unsafe class PinnedStringArray : IPinnedObject
 {
     private byte** _stringPtrs;
 
     public nint Handle => (nint) _stringPtrs;
 
-    public readonly int Length;
+    public readonly uint Length;
 
     public PinnedStringArray(params string[] strings) : this(strings, Encoding.UTF8) { }
 
     public PinnedStringArray(string[] strings, Encoding encoding)
     {
-        Length = strings.Length;
+        Length = (uint) strings.Length;
         
         _stringPtrs = (byte**) NativeMemory.Alloc((nuint) (strings.Length * sizeof(byte)));
 
@@ -49,7 +49,9 @@ public unsafe struct PinnedStringArray : IPinnedObject
         for (int i = 0; i < Length; i++)
         {
             builder.Append(new string((sbyte*) _stringPtrs[i]));
-            builder.Append(", ");
+
+            if (i < Length - 1)
+                builder.Append(", ");
         }
 
         builder.Append(']');

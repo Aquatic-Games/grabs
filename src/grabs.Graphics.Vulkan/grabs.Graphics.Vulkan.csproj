@@ -8,7 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Silk.NET.Vulkan" Version="2.21.0" />
+      <PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.21.0" />
+      <PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.21.0" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\grabs.Core\grabs.Core.csproj" />
+      <ProjectReference Include="..\grabs.Graphics\grabs.Graphics.csproj" />
     </ItemGroup>
 
 </Project>
