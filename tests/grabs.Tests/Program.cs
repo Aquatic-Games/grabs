@@ -34,6 +34,9 @@ unsafe
     sdl.VulkanGetInstanceExtensions(window, &numInstanceExtensions, extensions);
 
     Instance instance = new VkInstance(extensions, true);
+
+    Adapter[] adapters = instance.EnumerateAdapters();
+    Console.WriteLine(string.Join("\n", adapters));
     
     instance.Dispose();
 }

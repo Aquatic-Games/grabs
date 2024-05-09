@@ -67,7 +67,42 @@ public unsafe class VkInstance : Instance
 
     public override Adapter[] EnumerateAdapters()
     {
-        throw new System.NotImplementedException();
+        uint deviceCount;
+        Vk.EnumeratePhysicalDevices(Instance, &deviceCount, null);
+        PhysicalDevice[] devices = new PhysicalDevice[deviceCount];
+        fixed (PhysicalDevice* pDevices = devices)
+            Vk.EnumeratePhysicalDevices(Instance, &deviceCount, pDevices);
+        
+        GrabsLog.Log(GrabsLog.LogType.Verbose, $"EnumerateAdapters: deviceCount: {deviceCount}");
+
+        Adapter[] adapters = new Adapter[deviceCount];
+
+        for (uint i = 0; i < deviceCount; i++)
+        {
+            PhysicalDevice device = devices[i];
+            
+            PhysicalDeviceProperties deviceProps;
+            Vk.GetPhysicalDeviceProperties(device, &deviceProps);
+
+            AdapterType type = deviceProps.DeviceType switch
+            {
+                PhysicalDeviceType.Other => AdapterType.Other,
+                PhysicalDeviceType.IntegratedGpu => AdapterType.Integrated,
+                PhysicalDeviceType.DiscreteGpu => AdapterType.Discrete,
+                PhysicalDeviceType.VirtualGpu => AdapterType.Other,
+                PhysicalDeviceType.Cpu => AdapterType.Software,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            PhysicalDeviceMemoryProperties memProps;
+            Vk.GetPhysicalDeviceMemoryProperties(device, &memProps);
+
+            ulong dedicatedMemory = memProps.MemoryHeaps[0].Size;
+
+            adapters[i] = new Adapter(i, new string((sbyte*) deviceProps.DeviceName), dedicatedMemory, type);
+        }
+        
+        return adapters;
     }
 
     public override void Dispose()
