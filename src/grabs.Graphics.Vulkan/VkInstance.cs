@@ -62,14 +62,21 @@ public unsafe class VkInstance : Instance
     
     public override Device CreateDevice(Adapter? adapter = null)
     {
-        throw new System.NotImplementedException();
+        uint numDevices;
+        Vk.EnumeratePhysicalDevices(Instance, &numDevices, null);
+        Span<PhysicalDevice> devices = stackalloc PhysicalDevice[(int) numDevices];
+        fixed (PhysicalDevice* pDevices = devices)
+            Vk.EnumeratePhysicalDevices(Instance, &numDevices, pDevices);
+
+        uint index = adapter?.Index ?? 0;
+        return new VkDevice(Vk, Instance, devices[(int) index]);
     }
 
     public override Adapter[] EnumerateAdapters()
     {
         uint deviceCount;
         Vk.EnumeratePhysicalDevices(Instance, &deviceCount, null);
-        PhysicalDevice[] devices = new PhysicalDevice[deviceCount];
+        Span<PhysicalDevice> devices = stackalloc PhysicalDevice[(int) deviceCount];
         fixed (PhysicalDevice* pDevices = devices)
             Vk.EnumeratePhysicalDevices(Instance, &deviceCount, pDevices);
         
@@ -79,7 +86,7 @@ public unsafe class VkInstance : Instance
 
         for (uint i = 0; i < deviceCount; i++)
         {
-            PhysicalDevice device = devices[i];
+            PhysicalDevice device = devices[(int) i];
             
             PhysicalDeviceProperties deviceProps;
             Vk.GetPhysicalDeviceProperties(device, &deviceProps);

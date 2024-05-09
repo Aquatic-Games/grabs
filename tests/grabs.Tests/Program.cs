@@ -37,6 +37,9 @@ unsafe
 
     Adapter[] adapters = instance.EnumerateAdapters();
     Console.WriteLine(string.Join("\n", adapters));
+
+    Device device = instance.CreateDevice();
     
+    device.Dispose();
     instance.Dispose();
 }
