@@ -1,4 +1,5 @@
 using System;
+using Silk.NET.Core;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.KHR;
 
@@ -14,7 +15,7 @@ public unsafe class VkDevice : Device
     public uint PresentFamily;
     public uint? ComputeFamily;
     
-    public VkDevice(Vk vk, Silk.NET.Vulkan.Instance instance, PhysicalDevice device)
+    public VkDevice(Vk vk, Silk.NET.Vulkan.Instance instance, PhysicalDevice device, VkSurface surface)
     {
         _vk = vk;
 
@@ -41,6 +42,10 @@ public unsafe class VkDevice : Device
             if ((props.QueueFlags & QueueFlags.ComputeBit) == QueueFlags.ComputeBit)
                 computeFamily = i;
 
+            KhrSurface.GetPhysicalDeviceSurfaceSupport(device, i, surface.Surface, out Bool32 supported);
+            if (supported)
+                presentFamily = i;
+
             if (graphicsFamily.HasValue && presentFamily.HasValue && computeFamily.HasValue)
                 break;
         }
@@ -48,7 +53,7 @@ public unsafe class VkDevice : Device
         if (!graphicsFamily.HasValue || !presentFamily.HasValue)
         {
             throw new Exception(
-                $"Given device did not support graphics or presentation: (Values: graphics: {graphicsFamily}, present: {presentFamily})");
+                $"Given device did not support graphics or presentation: (Values: graphics: {graphicsFamily?.ToString() ?? "null"}, present: {presentFamily?.ToString() ?? "null"})");
         }
 
         GraphicsFamily = graphicsFamily.Value;

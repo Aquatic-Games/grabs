@@ -11,6 +11,9 @@ public unsafe class VkInstance : Instance
     public readonly Vk Vk;
 
     public readonly Silk.NET.Vulkan.Instance Instance;
+
+    public readonly ExtDebugUtils ExtDebugUtils;
+    public readonly DebugUtilsMessengerEXT DebugMessenger;
     
     public override GraphicsApi Api => GraphicsApi.Vulkan;
 
@@ -58,8 +61,31 @@ public unsafe class VkInstance : Instance
         
         pLayers?.Dispose();
         pExtensions.Dispose();
+
+        if (debug)
+        {
+            GrabsLog.Log(GrabsLog.LogType.Verbose, "Creating debug utils.");
+            Vk.TryGetInstanceExtension(Instance, out ExtDebugUtils);
+
+            DebugUtilsMessengerCreateInfoEXT debugCreateInfo = new DebugUtilsMessengerCreateInfoEXT()
+            {
+                SType = StructureType.DebugUtilsMessengerCreateInfoExt,
+                MessageSeverity = DebugUtilsMessageSeverityFlagsEXT.VerboseBitExt |
+                                  DebugUtilsMessageSeverityFlagsEXT.InfoBitExt |
+                                  DebugUtilsMessageSeverityFlagsEXT.WarningBitExt |
+                                  DebugUtilsMessageSeverityFlagsEXT.ErrorBitExt,
+                MessageType = DebugUtilsMessageTypeFlagsEXT.GeneralBitExt |
+                              DebugUtilsMessageTypeFlagsEXT.PerformanceBitExt |
+                              DebugUtilsMessageTypeFlagsEXT.ValidationBitExt |
+                              DebugUtilsMessageTypeFlagsEXT.DeviceAddressBindingBitExt,
+                PfnUserCallback = new PfnDebugUtilsMessengerCallbackEXT(DebugCallback)
+            };
+            
+            if ((result = ExtDebugUtils.CreateDebugUtilsMessenger(Instance, &debugCreateInfo, null, out DebugMessenger)) != Result.Success)
+                throw new Exception($"Failed to create debug messenger: {result}");
+        }
     }
-    
+
     public override Device CreateDevice(Surface surface, Adapter? adapter = null)
     {
         uint numDevices;
@@ -69,7 +95,7 @@ public unsafe class VkInstance : Instance
             Vk.EnumeratePhysicalDevices(Instance, &numDevices, pDevices);
 
         uint index = adapter?.Index ?? 0;
-        return new VkDevice(Vk, Instance, devices[(int) index]);
+        return new VkDevice(Vk, Instance, devices[(int) index], (VkSurface) surface);
     }
 
     public override Adapter[] EnumerateAdapters()
@@ -118,5 +144,24 @@ public unsafe class VkInstance : Instance
         Vk.DestroyInstance(Instance, null);
         
         Vk.Dispose();
+    }
+    
+    private uint DebugCallback(DebugUtilsMessageSeverityFlagsEXT messageSeverity, DebugUtilsMessageTypeFlagsEXT messageType, DebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
+    {
+        if (messageSeverity == DebugUtilsMessageSeverityFlagsEXT.ErrorBitExt)
+            throw new Exception($"DEBUG ERROR: {new string((sbyte*) pCallbackData->PMessage)}");
+
+        GrabsLog.LogType type = messageSeverity switch
+        {
+            DebugUtilsMessageSeverityFlagsEXT.None => GrabsLog.LogType.Verbose,
+            DebugUtilsMessageSeverityFlagsEXT.VerboseBitExt => GrabsLog.LogType.Verbose,
+            DebugUtilsMessageSeverityFlagsEXT.InfoBitExt => GrabsLog.LogType.Debug,
+            DebugUtilsMessageSeverityFlagsEXT.WarningBitExt => GrabsLog.LogType.Warning,
+            _ => throw new ArgumentOutOfRangeException(nameof(messageSeverity), messageSeverity, null)
+        };
+        
+        GrabsLog.Log(type, $"{messageType.ToString()[..^("BitExt".Length)]}: {new string((sbyte*) pCallbackData->PMessage)}");
+        
+        return Vk.True;
     }
 }
