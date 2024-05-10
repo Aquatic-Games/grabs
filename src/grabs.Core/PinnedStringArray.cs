@@ -18,7 +18,7 @@ public unsafe class PinnedStringArray : IPinnedObject
     {
         Length = (uint) strings.Length;
         
-        _stringPtrs = (byte**) NativeMemory.Alloc((nuint) (strings.Length * sizeof(byte)));
+        _stringPtrs = (byte**) NativeMemory.Alloc((nuint) (strings.Length * sizeof(byte*)));
 
         for (int i = 0; i < Length; i++)
         {

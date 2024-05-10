@@ -140,6 +140,12 @@ public unsafe class VkInstance : Instance
 
     public override void Dispose()
     {
+        if (ExtDebugUtils != null)
+        {
+            ExtDebugUtils.DestroyDebugUtilsMessenger(Instance, DebugMessenger, null);
+            ExtDebugUtils.Dispose();
+        }
+        
         GrabsLog.Log(GrabsLog.LogType.Verbose, "Destroying instance.");
         Vk.DestroyInstance(Instance, null);
         
