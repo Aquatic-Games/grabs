@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using grabs.Core;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.EXT;
+using Silk.NET.Vulkan.Extensions.KHR;
 
 namespace grabs.Graphics.Vulkan;
 
@@ -14,6 +15,8 @@ public unsafe class VkInstance : Instance
 
     public readonly ExtDebugUtils ExtDebugUtils;
     public readonly DebugUtilsMessengerEXT DebugMessenger;
+    
+    public readonly KhrSurface KhrSurface;
     
     public override GraphicsApi Api => GraphicsApi.Vulkan;
 
@@ -84,6 +87,9 @@ public unsafe class VkInstance : Instance
             if ((result = ExtDebugUtils.CreateDebugUtilsMessenger(Instance, &debugCreateInfo, null, out DebugMessenger)) != Result.Success)
                 throw new Exception($"Failed to create debug messenger: {result}");
         }
+        
+        if (!Vk.TryGetInstanceExtension(Instance, out KhrSurface))
+            throw new Exception("Could not get VK_KHR_surface extension. Is it supported?");
     }
 
     public override Device CreateDevice(Surface surface, Adapter? adapter = null)
@@ -95,7 +101,7 @@ public unsafe class VkInstance : Instance
             Vk.EnumeratePhysicalDevices(Instance, &numDevices, pDevices);
 
         uint index = adapter?.Index ?? 0;
-        return new VkDevice(Vk, Instance, devices[(int) index], (VkSurface) surface);
+        return new VkDevice(Vk, KhrSurface, devices[(int) index], (VkSurface) surface);
     }
 
     public override Adapter[] EnumerateAdapters()
@@ -140,6 +146,8 @@ public unsafe class VkInstance : Instance
 
     public override void Dispose()
     {
+        KhrSurface.Dispose();
+        
         if (ExtDebugUtils != null)
         {
             ExtDebugUtils.DestroyDebugUtilsMessenger(Instance, DebugMessenger, null);

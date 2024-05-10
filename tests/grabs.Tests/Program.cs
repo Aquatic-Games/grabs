@@ -9,7 +9,9 @@ using Silk.NET.Core.Native;
 using Silk.NET.SDL;
 using Silk.NET.Vulkan;
 using Device = grabs.Graphics.Device;
+using Event = Silk.NET.SDL.Event;
 using Instance = grabs.Graphics.Instance;
+using Surface = grabs.Graphics.Surface;
 
 GrabsLog.LogMessage += (type, message) => Console.WriteLine($"[{type}] {message}"); 
 
@@ -42,11 +44,39 @@ unsafe
     Adapter[] adapters = instance.EnumerateAdapters();
     Console.WriteLine(string.Join("\n", adapters));
 
-    VkNonDispatchableHandle surface;
-    sdl.VulkanCreateSurface(window, new VkHandle(((VkInstance) instance).Instance.Handle), &surface);
+    VkNonDispatchableHandle surfaceHandle;
+    sdl.VulkanCreateSurface(window, new VkHandle(((VkInstance) instance).Instance.Handle), &surfaceHandle);
 
-    Device device = instance.CreateDevice(new VkSurface(new SurfaceKHR(surface.Handle)));
+    Surface surface = new VkSurface(new SurfaceKHR(surfaceHandle.Handle), (VkInstance) instance);
+    Device device = instance.CreateDevice(surface);
+
+    Swapchain swapchain = device.CreateSwapchain(new SwapchainDescription(width, height));
+
+    bool isAlive = true;
+    while (isAlive)
+    {
+        Event winEvent;
+        while (sdl.PollEvent(&winEvent) != 0)
+        {
+            switch ((EventType) winEvent.Type)
+            {
+                case EventType.Windowevent:
+                {
+                    switch ((WindowEventID) winEvent.Window.Event)
+                    {
+                        case WindowEventID.Close:
+                            isAlive = false;
+                            break;
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
     
+    swapchain.Dispose();
     device.Dispose();
+    surface.Dispose();
     instance.Dispose();
 }

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using grabs.Core;
 using Silk.NET.Core;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.KHR;
@@ -7,20 +9,17 @@ namespace grabs.Graphics.Vulkan;
 
 public unsafe class VkDevice : Device
 {
-    private Vk _vk;
+    private readonly Vk _vk;
 
-    public KhrSurface KhrSurface;
+    public readonly uint GraphicsFamily;
+    public readonly uint PresentFamily;
+    public readonly uint? ComputeFamily;
 
-    public uint GraphicsFamily;
-    public uint PresentFamily;
-    public uint? ComputeFamily;
+    public readonly Silk.NET.Vulkan.Device Device;
     
-    public VkDevice(Vk vk, Silk.NET.Vulkan.Instance instance, PhysicalDevice device, VkSurface surface)
+    public VkDevice(Vk vk, KhrSurface khrSurface, PhysicalDevice device, VkSurface surface)
     {
         _vk = vk;
-
-        if (!_vk.TryGetInstanceExtension(instance, out KhrSurface))
-            throw new Exception("Could not get VK_KHR_surface extension. Is it supported?");
 
         uint? graphicsFamily = null;
         uint? presentFamily = null;
@@ -42,7 +41,7 @@ public unsafe class VkDevice : Device
             if ((props.QueueFlags & QueueFlags.ComputeBit) == QueueFlags.ComputeBit)
                 computeFamily = i;
 
-            KhrSurface.GetPhysicalDeviceSurfaceSupport(device, i, surface.Surface, out Bool32 supported);
+            khrSurface.GetPhysicalDeviceSurfaceSupport(device, i, surface.Surface, out Bool32 supported);
             if (supported)
                 presentFamily = i;
 
@@ -60,12 +59,43 @@ public unsafe class VkDevice : Device
         PresentFamily = presentFamily.Value;
         ComputeFamily = computeFamily;
 
+        HashSet<uint> uniqueQueueFamilies = new HashSet<uint>() { GraphicsFamily, PresentFamily };
+        if (ComputeFamily.HasValue)
+            uniqueQueueFamilies.Add(ComputeFamily.Value);
+
+        int numQueues = uniqueQueueFamilies.Count;
+        DeviceQueueCreateInfo* queueCreateInfos = stackalloc DeviceQueueCreateInfo[numQueues];
+
+        float queuePriority = 1.0f;
+        int qI = 0;
+        foreach (uint queueFamily in uniqueQueueFamilies)
+        {
+            queueCreateInfos[qI++] = new DeviceQueueCreateInfo()
+            {
+                SType = StructureType.DeviceQueueCreateInfo,
+                QueueFamilyIndex = queueFamily,
+                QueueCount = 1,
+                PQueuePriorities = &queuePriority
+            };
+        }
+
+        PhysicalDeviceFeatures features = new PhysicalDeviceFeatures();
+
         DeviceCreateInfo deviceCreateInfo = new DeviceCreateInfo()
         {
-            SType = StructureType.DeviceCreateInfo
+            SType = StructureType.DeviceCreateInfo,
+            
+            QueueCreateInfoCount = (uint) numQueues,
+            PQueueCreateInfos = queueCreateInfos,
+            
+            PEnabledFeatures = &features
         };
 
-        throw new NotImplementedException();
+        GrabsLog.Log(GrabsLog.LogType.Debug, "Creating device.");
+        
+        Result result;
+        if ((result = _vk.CreateDevice(device, &deviceCreateInfo, null, out Device)) != Result.Success)
+            throw new Exception($"Failed to create device: {result}");
     }
     
     public override Swapchain CreateSwapchain(in SwapchainDescription description)
@@ -110,6 +140,7 @@ public unsafe class VkDevice : Device
 
     public override void Dispose()
     {
-        throw new NotImplementedException();
+        GrabsLog.Log(GrabsLog.LogType.Verbose, "Destroying device.");
+        _vk.DestroyDevice(Device, null);
     }
 }
