@@ -21,8 +21,17 @@ public abstract class Device : IDisposable
 
     public unsafe Buffer CreateBuffer<T>(BufferType type, in ReadOnlySpan<T> data, bool dynamic = false) where T : unmanaged
         => CreateBuffer(new BufferDescription(type, (uint) (data.Length * sizeof(T)), dynamic), data);
+
+    public unsafe Buffer CreateBuffer<T>(BufferType type, T[] data, bool dynamic = false) where T : unmanaged
+        => CreateBuffer(new BufferDescription(type, (uint) (data.Length * sizeof(T))), data);
     
     public unsafe Buffer CreateBuffer<T>(in BufferDescription description, in ReadOnlySpan<T> data) where T : unmanaged
+    {
+        fixed (void* pData = data)
+            return CreateBuffer(description, pData);
+    }
+
+    public unsafe Buffer CreateBuffer<T>(in BufferDescription description, T[] data) where T : unmanaged
     {
         fixed (void* pData = data)
             return CreateBuffer(description, pData);
