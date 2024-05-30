@@ -38,7 +38,7 @@ public sealed class D3D11Instance : Instance
             if ((desc.Flags & AdapterFlags.Software) != 0)
                 type = AdapterType.Software;
                 
-            adapters.Add(new Adapter(i, desc.Description, (uint) desc.DedicatedVideoMemory, type));
+            adapters.Add(new Adapter(i, desc.Description, (ulong) (long) desc.DedicatedVideoMemory, type));
         }
 
         return adapters.ToArray();
