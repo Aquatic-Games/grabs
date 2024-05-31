@@ -116,14 +116,30 @@ public sealed class D3D11CommandList : CommandList
             switch (binding.Type)
             {
                 case DescriptorType.ConstantBuffer:
+                    D3D11Buffer buffer = (D3D11Buffer) desc.Buffer;
+                    
                     if ((binding.Stages & ShaderStage.Vertex) == ShaderStage.Vertex)
-                        Context.VSSetConstantBuffer((int) binding.Binding, ((D3D11Buffer) desc.Buffer).Buffer);
+                        Context.VSSetConstantBuffer((int) binding.Binding, buffer.Buffer);
                     if ((binding.Stages & ShaderStage.Pixel) == ShaderStage.Pixel)
-                        Context.PSSetConstantBuffer((int) binding.Binding, ((D3D11Buffer) desc.Buffer).Buffer);
+                        Context.PSSetConstantBuffer((int) binding.Binding, buffer.Buffer);
                     if ((binding.Stages & ShaderStage.Compute) == ShaderStage.Compute)
                         throw new NotImplementedException();
                         
                     break;
+                
+                case DescriptorType.Texture:
+                    D3D11Texture texture = (D3D11Texture) desc.Texture;
+                    
+                    if ((binding.Stages & ShaderStage.Vertex) == ShaderStage.Vertex)
+                        Context.VSSetShaderResource((int) binding.Binding, texture.ResourceView);
+                    if ((binding.Stages & ShaderStage.Pixel) == ShaderStage.Pixel)
+                        Context.PSSetShaderResource((int) binding.Binding, texture.ResourceView);
+                    if ((binding.Stages & ShaderStage.Compute) == ShaderStage.Compute)
+                        throw new NotImplementedException();
+                    
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
     }

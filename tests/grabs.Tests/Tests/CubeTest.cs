@@ -49,7 +49,8 @@ public class CubeTest : TestBase
 
         DescriptorLayoutDescription layoutDesc = new DescriptorLayoutDescription(
             new DescriptorBindingDescription(0, DescriptorType.ConstantBuffer, ShaderStage.Vertex),
-            new DescriptorBindingDescription(1, DescriptorType.ConstantBuffer, ShaderStage.Vertex));
+            new DescriptorBindingDescription(1, DescriptorType.ConstantBuffer, ShaderStage.Vertex),
+            new DescriptorBindingDescription(2, DescriptorType.Texture, ShaderStage.Pixel));
 
         DescriptorLayout layout = Device.CreateDescriptorLayout(layoutDesc);
 
@@ -78,7 +79,7 @@ public class CubeTest : TestBase
         Device.ExecuteCommandList(CommandList);
 
         _descriptorSet = Device.CreateDescriptorSet(layout, new DescriptorSetDescription(buffer: _cameraBuffer),
-            new DescriptorSetDescription(buffer: _transformBuffer));
+            new DescriptorSetDescription(buffer: _transformBuffer), new DescriptorSetDescription(texture: _texture));
         
         layout.Dispose();
     }
@@ -105,10 +106,6 @@ public class CubeTest : TestBase
         CommandList.SetPipeline(_pipeline);
         CommandList.SetVertexBuffer(0, _vertexBuffer, Vertex.SizeInBytes, 0);
         CommandList.SetIndexBuffer(_indexBuffer, Format.R16_UInt);
-        
-        //CommandList.SetConstantBuffer(0, _cameraBuffer);
-        //CommandList.SetConstantBuffer(1, _transformBuffer);
-        //CommandList.SetTexture(2, _texture);
         
         CommandList.SetDescriptorSet(_descriptorSet);
         
