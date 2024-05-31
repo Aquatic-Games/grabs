@@ -57,6 +57,11 @@ public abstract class Device : IDisposable
 
     public abstract DescriptorLayout CreateDescriptorLayout(in DescriptorLayoutDescription description);
 
+    public DescriptorSet CreateDescriptorSet(DescriptorLayout layout, params DescriptorSetDescription[] descriptions)
+        => CreateDescriptorSet(layout, descriptions.AsSpan());
+
+    public abstract DescriptorSet CreateDescriptorSet(DescriptorLayout layout, in ReadOnlySpan<DescriptorSetDescription> descriptions);
+
     public abstract void ExecuteCommandList(CommandList list);
     
     public abstract void Dispose();

@@ -62,6 +62,11 @@ public class GL43Device : Device
         throw new NotImplementedException();
     }
 
+    public override DescriptorSet CreateDescriptorSet(DescriptorLayout layout, in ReadOnlySpan<DescriptorSetDescription> descriptions)
+    {
+        throw new NotImplementedException();
+    }
+
     public override unsafe void ExecuteCommandList(CommandList list)
     {
         GL43CommandList cl = (GL43CommandList) list;

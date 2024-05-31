@@ -138,6 +138,11 @@ public unsafe class VkDevice : Device
         throw new NotImplementedException();
     }
 
+    public override DescriptorSet CreateDescriptorSet(DescriptorLayout layout, in ReadOnlySpan<DescriptorSetDescription> descriptions)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void ExecuteCommandList(CommandList list)
     {
         throw new NotImplementedException();

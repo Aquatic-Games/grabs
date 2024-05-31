@@ -104,6 +104,30 @@ public sealed class D3D11CommandList : CommandList
         Context.IASetIndexBuffer(((D3D11Buffer) buffer).Buffer, format.ToDXGIFormat(), 0);
     }
 
+    public override void SetDescriptorSet(DescriptorSet set)
+    {
+        D3D11DescriptorSet d3dSet = (D3D11DescriptorSet) set;
+
+        for (int i = 0; i < d3dSet.Bindings.Length; i++)
+        {
+            ref DescriptorBindingDescription binding = ref d3dSet.Bindings[i];
+            ref DescriptorSetDescription desc = ref d3dSet.Descriptions[i];
+
+            switch (binding.Type)
+            {
+                case DescriptorType.ConstantBuffer:
+                    if ((binding.Stages & ShaderStage.Vertex) == ShaderStage.Vertex)
+                        Context.VSSetConstantBuffer((int) binding.Binding, ((D3D11Buffer) desc.Buffer).Buffer);
+                    if ((binding.Stages & ShaderStage.Pixel) == ShaderStage.Pixel)
+                        Context.PSSetConstantBuffer((int) binding.Binding, ((D3D11Buffer) desc.Buffer).Buffer);
+                    if ((binding.Stages & ShaderStage.Compute) == ShaderStage.Compute)
+                        throw new NotImplementedException();
+                        
+                    break;
+            }
+        }
+    }
+
     public override void DrawIndexed(uint numIndices)
     {
         Context.DrawIndexed((int) numIndices, 0, 0);

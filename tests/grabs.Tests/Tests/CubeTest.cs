@@ -21,6 +21,8 @@ public class CubeTest : TestBase
 
     private Texture _texture;
 
+    private DescriptorSet _descriptorSet;
+
     private Matrix4x4 _transformMatrix;
     
     public CubeTest() : base("Cube Test") { }
@@ -62,7 +64,7 @@ public class CubeTest : TestBase
         {
             new InputLayoutDescription(Format.R32G32B32_Float, 0, 0, InputType.PerVertex), // Position
             new InputLayoutDescription(Format.R32G32_Float, 12, 0, InputType.PerVertex) // TexCoord
-        }, DepthStencilDescription.DepthLessEqual, RasterizerDescription.CullClockwise));
+        }, DepthStencilDescription.DepthLessEqual, RasterizerDescription.CullClockwise, [layout]));
 
         using FileStream stream = File.OpenRead("Assets/awesomeface.png");
         ImageResult result = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
@@ -74,6 +76,11 @@ public class CubeTest : TestBase
         CommandList.GenerateMipmaps(_texture);
         CommandList.End();
         Device.ExecuteCommandList(CommandList);
+
+        _descriptorSet = Device.CreateDescriptorSet(layout, new DescriptorSetDescription(buffer: _cameraBuffer),
+            new DescriptorSetDescription(buffer: _transformBuffer));
+        
+        layout.Dispose();
     }
 
     protected override void Update(float dt)
@@ -103,6 +110,8 @@ public class CubeTest : TestBase
         //CommandList.SetConstantBuffer(1, _transformBuffer);
         //CommandList.SetTexture(2, _texture);
         
+        CommandList.SetDescriptorSet(_descriptorSet);
+        
         CommandList.DrawIndexed(36);
         
         CommandList.EndRenderPass();
@@ -114,6 +123,10 @@ public class CubeTest : TestBase
 
     public override void Dispose()
     {
+        _descriptorSet.Dispose();
+        
+        _texture.Dispose();
+        
         _pipeline.Dispose();
         
         _transformBuffer.Dispose();

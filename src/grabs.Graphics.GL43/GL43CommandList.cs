@@ -94,6 +94,11 @@ public class GL43CommandList : CommandList
         });
     }
 
+    public override void SetDescriptorSet(DescriptorSet set)
+    {
+        throw new System.NotImplementedException();
+    }
+
     public override void DrawIndexed(uint numIndices)
     {
         Actions.Add(new CommandListAction(CommandListActionType.DrawIndexed)
