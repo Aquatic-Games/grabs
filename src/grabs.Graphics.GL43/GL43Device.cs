@@ -57,6 +57,11 @@ public class GL43Device : Device
         return new GL43Framebuffer(_gl, colorTextures, depthTexture);
     }
 
+    public override DescriptorLayout CreateDescriptorLayout(in DescriptorLayoutDescription description)
+    {
+        throw new NotImplementedException();
+    }
+
     public override unsafe void ExecuteCommandList(CommandList list)
     {
         GL43CommandList cl = (GL43CommandList) list;

@@ -55,6 +55,8 @@ public abstract class Device : IDisposable
 
     public abstract Framebuffer CreateFramebuffer(in ReadOnlySpan<Texture> colorTextures, Texture depthTexture = null);
 
+    public abstract DescriptorLayout CreateDescriptorLayout(in DescriptorLayoutDescription description);
+
     public abstract void ExecuteCommandList(CommandList list);
     
     public abstract void Dispose();

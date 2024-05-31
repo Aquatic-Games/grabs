@@ -133,6 +133,11 @@ public unsafe class VkDevice : Device
         throw new NotImplementedException();
     }
 
+    public override DescriptorLayout CreateDescriptorLayout(in DescriptorLayoutDescription description)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void ExecuteCommandList(CommandList list)
     {
         throw new NotImplementedException();

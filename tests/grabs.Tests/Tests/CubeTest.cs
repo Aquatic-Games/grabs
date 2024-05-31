@@ -45,6 +45,12 @@ public class CubeTest : TestBase
         _transformMatrix = Matrix4x4.Identity;
         _transformBuffer = Device.CreateBuffer(BufferType.Constant, _transformMatrix, true);
 
+        DescriptorLayoutDescription layoutDesc = new DescriptorLayoutDescription(
+            new DescriptorBindingDescription(0, DescriptorType.ConstantBuffer, ShaderStage.Vertex),
+            new DescriptorBindingDescription(1, DescriptorType.ConstantBuffer, ShaderStage.Vertex));
+
+        DescriptorLayout layout = Device.CreateDescriptorLayout(layoutDesc);
+
         string hlsl = File.ReadAllText("Shaders/Basic3D.hlsl");
         byte[] vSpv = Compiler.CompileToSpirV(hlsl, "Vertex", ShaderStage.Vertex, true);
         byte[] pSpv = Compiler.CompileToSpirV(hlsl, "Pixel", ShaderStage.Pixel, true);

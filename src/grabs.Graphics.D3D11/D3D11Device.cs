@@ -67,6 +67,11 @@ public sealed class D3D11Device : Device
         return new D3D11Framebuffer(Device, colorTextures, depthTexture);
     }
 
+    public override DescriptorLayout CreateDescriptorLayout(in DescriptorLayoutDescription description)
+    {
+        return new D3D11DescriptorLayout(description);
+    }
+
     public override void ExecuteCommandList(CommandList list)
     { 
         Context.ExecuteCommandList(((D3D11CommandList) list).CommandList, false); 
