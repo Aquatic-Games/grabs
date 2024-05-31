@@ -1,6 +1,8 @@
-﻿namespace grabs.Graphics;
+﻿using System;
 
-public class DescriptorSet
+namespace grabs.Graphics;
+
+public abstract class DescriptorSet : IDisposable
 {
-    
+    public abstract void Dispose();
 }
