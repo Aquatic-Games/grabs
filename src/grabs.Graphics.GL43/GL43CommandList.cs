@@ -94,24 +94,6 @@ public class GL43CommandList : CommandList
         });
     }
 
-    public override void SetConstantBuffer(uint slot, Buffer buffer)
-    {
-        Actions.Add(new CommandListAction(CommandListActionType.SetConstantBuffer)
-        {
-            Slot = slot,
-            Buffer = buffer
-        });
-    }
-
-    public override void SetTexture(uint slot, Texture texture)
-    {
-        Actions.Add(new CommandListAction(CommandListActionType.SetTexture)
-        {
-            Slot = slot,
-            Texture = texture
-        });
-    }
-
     public override void DrawIndexed(uint numIndices)
     {
         Actions.Add(new CommandListAction(CommandListActionType.DrawIndexed)

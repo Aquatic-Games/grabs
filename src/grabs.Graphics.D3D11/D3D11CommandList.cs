@@ -104,16 +104,6 @@ public sealed class D3D11CommandList : CommandList
         Context.IASetIndexBuffer(((D3D11Buffer) buffer).Buffer, format.ToDXGIFormat(), 0);
     }
 
-    public override void SetConstantBuffer(uint slot, Buffer buffer)
-    {
-        Context.VSSetConstantBuffer((int) slot, ((D3D11Buffer) buffer).Buffer);
-    }
-
-    public override void SetTexture(uint slot, Texture texture)
-    {
-        Context.PSSetShaderResource((int) slot, ((D3D11Texture) texture).ResourceView);
-    }
-
     public override void DrawIndexed(uint numIndices)
     {
         Context.DrawIndexed((int) numIndices, 0, 0);

@@ -93,9 +93,9 @@ public class CubeTest : TestBase
         CommandList.SetVertexBuffer(0, _vertexBuffer, Vertex.SizeInBytes, 0);
         CommandList.SetIndexBuffer(_indexBuffer, Format.R16_UInt);
         
-        CommandList.SetConstantBuffer(0, _cameraBuffer);
-        CommandList.SetConstantBuffer(1, _transformBuffer);
-        CommandList.SetTexture(2, _texture);
+        //CommandList.SetConstantBuffer(0, _cameraBuffer);
+        //CommandList.SetConstantBuffer(1, _transformBuffer);
+        //CommandList.SetTexture(2, _texture);
         
         CommandList.DrawIndexed(36);
         

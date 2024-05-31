@@ -40,10 +40,6 @@ public abstract class CommandList : IDisposable
 
     public abstract void SetIndexBuffer(Buffer buffer, Format format);
 
-    public abstract void SetConstantBuffer(uint slot, Buffer buffer);
-
-    public abstract void SetTexture(uint slot, Texture texture);
-
     public abstract void DrawIndexed(uint numIndices);
     
     public abstract void Dispose();

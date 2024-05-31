@@ -1,9 +1,14 @@
-﻿namespace grabs.Graphics;
+﻿using System;
 
+namespace grabs.Graphics;
+
+[Flags]
 public enum ShaderStage
 {
     Vertex,
     Pixel,
-    Compute
+    Compute,
     // TODO: Tessellation shaders
+    
+    All = Vertex | Pixel | Compute
 }

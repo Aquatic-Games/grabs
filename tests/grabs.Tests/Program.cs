@@ -15,7 +15,7 @@ using Surface = grabs.Graphics.Surface;
 
 GrabsLog.LogMessage += (type, message) => Console.WriteLine($"[{type}] {message}"); 
 
-using TestBase test = new CubeTest();
+using TestBase test = new BasicTest();
 test.Run(GraphicsApi.D3D11, new Size(1280, 720));
 
 /*unsafe
