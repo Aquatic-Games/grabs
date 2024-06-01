@@ -10,7 +10,6 @@ public enum CommandListActionType
     SetPipeline,
     SetVertexBuffer,
     SetIndexBuffer,
-    SetConstantBuffer,
-    SetTexture,
+    SetDescriptor,
     DrawIndexed
 }

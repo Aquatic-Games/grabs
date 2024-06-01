@@ -8,6 +8,7 @@ public struct CommandListAction
     public RenderPassDescription RenderPassDescription;
     
     public Pipeline Pipeline;
+    public GL43DescriptorSet DescriptorSet;
     
     public uint Slot;
     public uint Stride;

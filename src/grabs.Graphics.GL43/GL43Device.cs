@@ -59,12 +59,12 @@ public class GL43Device : Device
 
     public override DescriptorLayout CreateDescriptorLayout(in DescriptorLayoutDescription description)
     {
-        throw new NotImplementedException();
+        return new GL43DescriptorLayout(description);
     }
 
     public override DescriptorSet CreateDescriptorSet(DescriptorLayout layout, in ReadOnlySpan<DescriptorSetDescription> descriptions)
     {
-        throw new NotImplementedException();
+        return new GL43DescriptorSet(((GL43DescriptorLayout) layout).Bindings, descriptions.ToArray());
     }
 
     public override unsafe void ExecuteCommandList(CommandList list)
@@ -212,17 +212,30 @@ public class GL43Device : Device
                     break;
                 }
 
-                case CommandListActionType.SetConstantBuffer:
+                case CommandListActionType.SetDescriptor:
                 {
-                    _gl.BindBufferBase(BufferTargetARB.UniformBuffer, action.Slot, ((GL43Buffer) action.Buffer).Buffer);
-                    break;
-                }
+                    GL43DescriptorSet set = action.DescriptorSet;
 
-                case CommandListActionType.SetTexture:
-                {
-                    GL43Texture texture = (GL43Texture) action.Texture;
-                    _gl.ActiveTexture(TextureUnit.Texture0 + (int) action.Slot);
-                    _gl.BindTexture(texture.Target, texture.Texture);
+                    for (int i = 0; i < set.Bindings.Length; i++)
+                    {
+                        ref DescriptorBindingDescription binding = ref set.Bindings[i];
+                        ref DescriptorSetDescription desc = ref set.Descriptions[i];
+
+                        switch (binding.Type)
+                        {
+                            case DescriptorType.ConstantBuffer:
+                                _gl.BindBufferBase(BufferTargetARB.UniformBuffer, binding.Binding, ((GL43Buffer) desc.Buffer).Buffer);
+                                break;
+                            case DescriptorType.Texture:
+                                GL43Texture texture = (GL43Texture) desc.Texture;
+                                
+                                _gl.ActiveTexture(TextureUnit.Texture0 + (int) binding.Binding);
+                                _gl.BindTexture(texture.Target, texture.Texture);
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
                     
                     break;
                 }
