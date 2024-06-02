@@ -1,3 +1,5 @@
+global using VulkanDevice = Silk.NET.Vulkan.Device;
+
 using System;
 using System.Collections.Generic;
 using grabs.Core;
@@ -10,16 +12,20 @@ namespace grabs.Graphics.Vulkan;
 public unsafe class VkDevice : Device
 {
     private readonly Vk _vk;
+    private readonly VulkanInstance _instance;
+    
+    private readonly KhrSwapchain _khrSwapchain;
 
     public readonly uint GraphicsFamily;
     public readonly uint PresentFamily;
     public readonly uint? ComputeFamily;
 
-    public readonly Silk.NET.Vulkan.Device Device;
+    public readonly VulkanDevice Device;
     
-    public VkDevice(Vk vk, KhrSurface khrSurface, PhysicalDevice device, VkSurface surface)
+    public VkDevice(Vk vk, VulkanInstance instance, KhrSurface khrSurface, PhysicalDevice device, VkSurface surface)
     {
         _vk = vk;
+        _instance = instance;
 
         uint? graphicsFamily = null;
         uint? presentFamily = null;
@@ -59,6 +65,9 @@ public unsafe class VkDevice : Device
         PresentFamily = presentFamily.Value;
         ComputeFamily = computeFamily;
 
+        using PinnedStringArray extensions = new PinnedStringArray(KhrSwapchain.ExtensionName);
+        GrabsLog.Log(GrabsLog.LogType.Debug, $"extensions: {extensions}");
+
         HashSet<uint> uniqueQueueFamilies = new HashSet<uint>() { GraphicsFamily, PresentFamily };
         if (ComputeFamily.HasValue)
             uniqueQueueFamilies.Add(ComputeFamily.Value);
@@ -85,6 +94,9 @@ public unsafe class VkDevice : Device
         {
             SType = StructureType.DeviceCreateInfo,
             
+            PpEnabledExtensionNames = extensions,
+            EnabledExtensionCount = extensions.Length,
+            
             QueueCreateInfoCount = (uint) numQueues,
             PQueueCreateInfos = queueCreateInfos,
             
@@ -96,11 +108,15 @@ public unsafe class VkDevice : Device
         Result result;
         if ((result = _vk.CreateDevice(device, &deviceCreateInfo, null, out Device)) != Result.Success)
             throw new Exception($"Failed to create device: {result}");
+        
+        GrabsLog.Log(GrabsLog.LogType.Verbose, "Requesting KHRSwapchain extension.");
+        if (!_vk.TryGetDeviceExtension(_instance, Device, out _khrSwapchain))
+            throw new Exception("Failed to get KHRSwapchain extension.");
     }
     
     public override Swapchain CreateSwapchain(in SwapchainDescription description)
     {
-        throw new NotImplementedException();
+        return new VkSwapchain(_vk, _khrSwapchain, Device, description);
     }
 
     public override CommandList CreateCommandList()

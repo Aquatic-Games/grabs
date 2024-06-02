@@ -15,7 +15,7 @@ using Surface = grabs.Graphics.Surface;
 
 GrabsLog.LogMessage += (type, message) => Console.WriteLine($"[{type}] {message}");
 
-GraphicsApi api = 0;
+/*GraphicsApi api = 0;
 
 unsafe
 {
@@ -82,9 +82,9 @@ unsafe
 }
 
 using TestBase test = new CubeTest();
-test.Run(api, new Size(1280, 720));
+test.Run(api, new Size(1280, 720));*/
 
-/*unsafe
+unsafe
 {
     Sdl sdl = Sdl.GetApi();
 
@@ -145,4 +145,4 @@ test.Run(api, new Size(1280, 720));
     device.Dispose();
     surface.Dispose();
     instance.Dispose();
-}*/
+}

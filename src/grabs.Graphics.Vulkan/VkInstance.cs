@@ -1,5 +1,8 @@
-﻿using System;
+﻿global using VulkanInstance = Silk.NET.Vulkan.Instance;
+
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 using grabs.Core;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.EXT;
@@ -11,7 +14,7 @@ public unsafe class VkInstance : Instance
 {
     public readonly Vk Vk;
 
-    public readonly Silk.NET.Vulkan.Instance Instance;
+    public readonly VulkanInstance Instance;
 
     public readonly ExtDebugUtils ExtDebugUtils;
     public readonly DebugUtilsMessengerEXT DebugMessenger;
@@ -23,11 +26,23 @@ public unsafe class VkInstance : Instance
     public VkInstance(string[] instanceExtensions, bool debug = false)
     {
         Vk = Vk.GetApi();
+
+        using PinnedString appName = new PinnedString(Assembly.GetEntryAssembly()?.GetName().Name ?? "GRABS Vulkan Application");
+        using PinnedString engineName = new PinnedString("GRABSvk");
+        
+        Console.WriteLine($"appName: {appName}");
+        Console.WriteLine($"engineName: {engineName}");
         
         ApplicationInfo appInfo = new ApplicationInfo()
         {
             SType = StructureType.ApplicationInfo,
             ApiVersion = Vk.Version13,
+            
+            PApplicationName = appName,
+            ApplicationVersion = Vk.Version10,
+            
+            PEngineName = engineName,
+            EngineVersion = Vk.Version10
         };
         
         GrabsLog.Log(GrabsLog.LogType.Debug, $"debug: {debug}");
@@ -101,7 +116,7 @@ public unsafe class VkInstance : Instance
             Vk.EnumeratePhysicalDevices(Instance, &numDevices, pDevices);
 
         uint index = adapter?.Index ?? 0;
-        return new VkDevice(Vk, KhrSurface, devices[(int) index], (VkSurface) surface);
+        return new VkDevice(Vk, Instance, KhrSurface, devices[(int) index], (VkSurface) surface);
     }
 
     public override Adapter[] EnumerateAdapters()

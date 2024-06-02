@@ -6,7 +6,7 @@ namespace grabs.Graphics.Vulkan;
 public class VkSurface : Surface
 {
     private KhrSurface _khrSurface;
-    private Silk.NET.Vulkan.Instance _instance;
+    private VulkanInstance _instance;
     
     public SurfaceKHR Surface;
 
