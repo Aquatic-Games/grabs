@@ -84,6 +84,13 @@ public class SpirvCompiler
             Spirv.CompilerSetDecoration(compiler, samplers[i].CombinedId, Decoration.Binding, decoration);
         }
 
+        Resources* resources;
+        Spirv.CompilerCreateShaderResources(compiler, &resources);
+
+        uint bindIndex = 0;
+        ChangeDescriptorBindingsForType(compiler, resources, ResourceType.UniformBuffer, ref bindIndex);
+        ChangeDescriptorBindingsForType(compiler, resources, ResourceType.SampledImage, ref bindIndex);
+
         byte* pStrResult;
         if ((result = Spirv.CompilerCompile(compiler, &pStrResult)) != Result.Success)
             throw new Exception($"Failed to compile SPIRV shader: {result} - {Spirv.ContextGetLastErrorStringS(context)}");
@@ -94,5 +101,28 @@ public class SpirvCompiler
         Spirv.ContextDestroy(context);
 
         return strResult;
+    }
+
+    private static unsafe void ChangeDescriptorBindingsForType(Compiler* compiler, Resources* resources, ResourceType type, ref uint currentIndex)
+    {
+        nuint numResources;
+        ReflectedResource* resourceList;
+        Spirv.ResourcesGetResourceListForType(resources, type, &resourceList, &numResources);
+
+        for (int i = 0; i < (int) numResources; i++)
+        {
+            /*Console.WriteLine(new string((sbyte*) resourceList[i].Name));
+            Console.WriteLine(resourceList[i].Id);
+            Console.WriteLine(resourceList[i].TypeId);
+            Console.WriteLine(resourceList[i].BaseTypeId);
+
+            Console.WriteLine("Set:" + Spirv.CompilerGetDecoration(compiler, resourceList[i].Id, Decoration.DescriptorSet));
+            Console.WriteLine("Binding:" + Spirv.CompilerGetDecoration(compiler, resourceList[i].Id, Decoration.Binding));
+            
+            Console.WriteLine();*/
+            
+            Spirv.CompilerUnsetDecoration(compiler, resourceList[i].Id, Decoration.DescriptorSet);
+            Spirv.CompilerSetDecoration(compiler, resourceList[i].Id, Decoration.Binding, currentIndex++);
+        }
     }
 }
