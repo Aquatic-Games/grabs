@@ -84,6 +84,9 @@ public class SpirvCompiler
             Spirv.CompilerSetDecoration(compiler, samplers[i].CombinedId, Decoration.Binding, decoration);
         }
 
+        // DX and GL don't support descriptor sets - so we need to fake it.
+        // We "flatten" the descriptor sets, i.e. if set 0 has bindings 0 and 1, and set 1 has binding 0, then we instead
+        // make set 1 have a binding of 2, etc.
         Resources* resources;
         Spirv.CompilerCreateShaderResources(compiler, &resources);
 

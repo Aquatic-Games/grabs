@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace grabs.Graphics.GL43;
@@ -94,8 +95,9 @@ public class GL43CommandList : CommandList
         });
     }
 
-    public override void SetDescriptorSet(DescriptorSet set)
+    public override void SetDescriptorSet(uint index, DescriptorSet set)
     {
+        throw new NotImplementedException();
         Actions.Add(new CommandListAction(CommandListActionType.SetDescriptor)
         {
             DescriptorSet = (GL43DescriptorSet) set

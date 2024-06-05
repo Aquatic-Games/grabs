@@ -107,7 +107,7 @@ public class CubeTest : TestBase
         CommandList.SetVertexBuffer(0, _vertexBuffer, Vertex.SizeInBytes, 0);
         CommandList.SetIndexBuffer(_indexBuffer, Format.R16_UInt);
         
-        CommandList.SetDescriptorSet(_descriptorSet);
+        CommandList.SetDescriptorSet(0, _descriptorSet);
         
         CommandList.DrawIndexed(36);
         

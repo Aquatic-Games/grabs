@@ -40,7 +40,7 @@ public abstract class CommandList : IDisposable
 
     public abstract void SetIndexBuffer(Buffer buffer, Format format);
 
-    public abstract void SetDescriptorSet(/*uint binding, */DescriptorSet set);
+    public abstract void SetDescriptorSet(uint index, DescriptorSet set);
 
     public abstract void DrawIndexed(uint numIndices);
     
