@@ -1,4 +1,5 @@
 ﻿using System;
+using Buffer = grabs.Audio.Internal.Buffer;
 
 namespace grabs.Audio;
 
@@ -24,7 +25,7 @@ public sealed class Context
         MasterVolume = 1.0f;
     }
 
-    public AudioBuffer CreateBuffer()
+    public AudioBuffer CreateBuffer<T>(in AudioFormat format, in ReadOnlySpan<T> data) where T : unmanaged
     {
         if (_numBuffers + 1 >= (ulong) _buffers.Length)
             Array.Resize(ref _buffers, _buffers.Length << 1);
