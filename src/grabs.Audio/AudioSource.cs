@@ -4,13 +4,18 @@ namespace grabs.Audio;
 
 public struct AudioSource : IDisposable
 {
-    private ulong _id;
+    internal ulong Id;
     private Context _context;
 
-    public AudioSource(ulong id, Context context)
+    public AudioSource(Context context, ulong id)
     {
-        _id = id;
         _context = context;
+        Id = id;
+    }
+
+    public void SubmitBuffer(AudioBuffer buffer)
+    {
+        _context.SubmitBufferToSource(buffer.Id, Id);
     }
 
     public void Dispose()

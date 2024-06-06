@@ -3,14 +3,15 @@
 namespace grabs.Audio;
 
 public struct AudioBuffer : IDisposable
-{
-    private ulong _id;
+{ 
     private Context _context;
+    
+    internal ulong Id;
 
-    internal AudioBuffer(ulong id, Context context)
+    internal AudioBuffer(Context context, ulong id)
     {
-        _id = id;
         _context = context;
+        Id = id;
     }
     
     public void Dispose()

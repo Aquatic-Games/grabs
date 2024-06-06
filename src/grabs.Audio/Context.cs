@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using grabs.Audio.Internal;
 using Buffer = grabs.Audio.Internal.Buffer;
 
 namespace grabs.Audio;
@@ -41,7 +42,7 @@ public sealed class Context : IDisposable
         ulong bufferIndex = _numBuffers++;
         _buffers[bufferIndex] = new Buffer(byteData, format);
 
-        return new AudioBuffer(bufferIndex, this);
+        return new AudioBuffer(this, bufferIndex);
     }
 
     public unsafe AudioSource CreateSource()
@@ -52,7 +53,12 @@ public sealed class Context : IDisposable
         ulong sourceIndex = _numSources++;
         _sources[sourceIndex] = new Source();
 
-        return new AudioSource(sourceIndex, this);
+        return new AudioSource(this, sourceIndex);
+    }
+
+    internal void SubmitBufferToSource(ulong bufferId, ulong sourceId)
+    {
+        _sources[sourceId].QueuedBuffers.Enqueue(bufferId);
     }
 
     public void Dispose()

@@ -9,3 +9,4 @@ Context context = new Context(48000);
 AudioBuffer buffer = context.CreateBuffer(format, new ReadOnlySpan<byte>(data));
 
 AudioSource source = context.CreateSource();
+source.SubmitBuffer(buffer);
