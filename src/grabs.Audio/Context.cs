@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Buffer = grabs.Audio.Internal.Buffer;
 
 namespace grabs.Audio;
 
-public sealed class Context
+public sealed class Context : IDisposable
 {
     private uint _sampleRate;
 
@@ -25,14 +27,26 @@ public sealed class Context
         MasterVolume = 1.0f;
     }
 
-    public AudioBuffer CreateBuffer<T>(in AudioFormat format, in ReadOnlySpan<T> data) where T : unmanaged
+    public unsafe AudioBuffer CreateBuffer<T>(in AudioFormat format, in ReadOnlySpan<T> data) where T : unmanaged
     {
         if (_numBuffers + 1 >= (ulong) _buffers.Length)
             Array.Resize(ref _buffers, _buffers.Length << 1);
 
+        uint dataLength = (uint) (data.Length * sizeof(T));
+        byte* byteData = (byte*) NativeMemory.Alloc(dataLength);
+        
+        fixed (void* pData = data)
+            Unsafe.CopyBlock(byteData, pData, dataLength);
+
         ulong bufferIndex = _numBuffers++;
-        _buffers[bufferIndex] = new Buffer();
+        _buffers[bufferIndex] = new Buffer(byteData, format);
 
         return new AudioBuffer(bufferIndex, this);
+    }
+
+    public void Dispose()
+    {
+        for (ulong i = 0; i < _numBuffers; i++)
+            _buffers[i].Dispose();
     }
 }
