@@ -44,6 +44,17 @@ public sealed class Context : IDisposable
         return new AudioBuffer(bufferIndex, this);
     }
 
+    public unsafe AudioSource CreateSource()
+    {
+        if (_numSources + 1 >= (ulong) _buffers.Length)
+            Array.Resize(ref _sources, _sources.Length << 1);
+
+        ulong sourceIndex = _numSources++;
+        _sources[sourceIndex] = new Source();
+
+        return new AudioSource(sourceIndex, this);
+    }
+
     public void Dispose()
     {
         for (ulong i = 0; i < _numBuffers; i++)

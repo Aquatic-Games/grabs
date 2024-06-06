@@ -7,3 +7,5 @@ byte[] data = File.ReadAllBytes(@"C:\Users\ollie\Music\TESTFILES\nixonspace-16bi
 
 Context context = new Context(48000);
 AudioBuffer buffer = context.CreateBuffer(format, new ReadOnlySpan<byte>(data));
+
+AudioSource source = context.CreateSource();
