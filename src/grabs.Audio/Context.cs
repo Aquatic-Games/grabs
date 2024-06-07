@@ -6,7 +6,7 @@ using Buffer = grabs.Audio.Internal.Buffer;
 
 namespace grabs.Audio;
 
-public sealed class Context : IDisposable
+public sealed class Context
 {
     private uint _sampleRate;
 
@@ -34,10 +34,11 @@ public sealed class Context : IDisposable
             Array.Resize(ref _buffers, _buffers.Length << 1);
 
         uint dataLength = (uint) (data.Length * sizeof(T));
-        byte* byteData = (byte*) NativeMemory.Alloc(dataLength);
+        byte[] byteData = new byte[dataLength];
         
+        fixed (void* pByteData = byteData)
         fixed (void* pData = data)
-            Unsafe.CopyBlock(byteData, pData, dataLength);
+            Unsafe.CopyBlock(pByteData, pData, dataLength);
 
         ulong bufferIndex = _numBuffers++;
         _buffers[bufferIndex] = new Buffer(byteData, format);
@@ -45,7 +46,7 @@ public sealed class Context : IDisposable
         return new AudioBuffer(this, bufferIndex);
     }
 
-    public unsafe AudioSource CreateSource()
+    public AudioSource CreateSource()
     {
         if (_numSources + 1 >= (ulong) _buffers.Length)
             Array.Resize(ref _sources, _sources.Length << 1);
@@ -59,11 +60,5 @@ public sealed class Context : IDisposable
     internal void SubmitBufferToSource(ulong bufferId, ulong sourceId)
     {
         _sources[sourceId].QueuedBuffers.Enqueue(bufferId);
-    }
-
-    public void Dispose()
-    {
-        for (ulong i = 0; i < _numBuffers; i++)
-            _buffers[i].Dispose();
     }
 }
