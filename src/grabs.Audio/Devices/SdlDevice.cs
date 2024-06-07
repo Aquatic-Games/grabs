@@ -33,7 +33,8 @@ public class SdlDevice : AudioDevice
 
     private unsafe void AudioCallback(void* _, byte* buffer, int length)
     {
-        GetBuffer(new Span<byte>(buffer, length));
+        Span<byte> buf = new Span<byte>(buffer, length);
+        GetBuffer(buf);
     }
 
     public override void Dispose()

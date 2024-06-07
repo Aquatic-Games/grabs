@@ -18,6 +18,11 @@ public struct AudioSource : IDisposable
         _context.SubmitBufferToSource(buffer.Id, Id);
     }
 
+    public void Play()
+    {
+        _context.SourcePlay(Id);
+    }
+
     public void Dispose()
     {
         
