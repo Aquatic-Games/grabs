@@ -8,6 +8,8 @@ internal struct Source
 
     public bool Playing;
 
+    public double Speed;
+    
     public ulong Position;
     public double FinePosition;
 

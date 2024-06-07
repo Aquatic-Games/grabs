@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using grabs.Audio.Internal;
 using Buffer = grabs.Audio.Internal.Buffer;
 
@@ -48,7 +47,7 @@ public sealed class Context
 
     public AudioSource CreateSource()
     {
-        if (_numSources + 1 >= (ulong) _buffers.Length)
+        if (_numSources + 1 >= (ulong) _sources.Length)
             Array.Resize(ref _sources, _sources.Length << 1);
 
         ulong sourceIndex = _numSources++;
@@ -64,7 +63,12 @@ public sealed class Context
 
     internal void SourcePlay(ulong sourceId)
     {
-        _sources[sourceId].Playing = true;
+        ref Source source = ref _sources[sourceId];
+        ref Buffer buffer = ref _buffers[source.QueuedBuffers.Peek()];
+
+        source.Speed = buffer.Format.SampleRate / (float) _sampleRate;
+        
+        source.Playing = true;
     }
 
     internal void MixIntoBufferStereoF32(Span<float> buffer)
@@ -91,14 +95,22 @@ public sealed class Context
                 float sampleL = GetSample(buf.Data, bytePosition, format.DataType);
                 float sampleR = GetSample(buf.Data, bytePosition + buf.ByteAlign, format.DataType);
 
-                buffer[i + 0] = sampleL;
-                buffer[i + 1] = sampleR;
+                buffer[i + 0] += float.Clamp(sampleL, -1.0f, 1.0f);
+                buffer[i + 1] += float.Clamp(sampleR, -1.0f, 1.0f);
 
-                source.Position++;
+                source.FinePosition += source.Speed;
+
+                ulong intFine = (ulong) source.FinePosition;
+                source.Position += intFine;
+                source.FinePosition -= intFine;
             }
+
+            buffer[i + 0] *= MasterVolume;
+            buffer[i + 1] *= MasterVolume;
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private unsafe float GetSample(byte[] data, ulong index, DataType type)
     {
         switch (type)
