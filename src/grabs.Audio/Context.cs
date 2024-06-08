@@ -8,7 +8,7 @@ namespace grabs.Audio;
 
 public sealed class Context
 {
-    private uint _sampleRate;
+    public readonly uint SampleRate;
 
     private ulong _numBuffers;
     private Buffer[] _buffers;
@@ -20,13 +20,16 @@ public sealed class Context
     
     public Context(uint sampleRate)
     {
-        _sampleRate = sampleRate;
+        SampleRate = sampleRate;
 
         _buffers = new Buffer[1];
         _sources = new Source[1];
 
         MasterVolume = 1.0f;
     }
+
+    public AudioBuffer CreateBuffer<T>(in BufferDescription description, T[] data) where T : unmanaged
+        => CreateBuffer(description, new ReadOnlySpan<T>(data));
 
     public unsafe AudioBuffer CreateBuffer<T>(in BufferDescription description, in ReadOnlySpan<T> data) where T : unmanaged
     {
@@ -63,7 +66,7 @@ public sealed class Context
             StereoAlign = (ulong) format.DataType.Bytes() * (channels - 1),
             Channels = channels,
             
-            SpeedCorrection = format.SampleRate / (float) _sampleRate
+            SpeedCorrection = format.SampleRate / (float) SampleRate
         };
 
         return new AudioBuffer(this, bufferIndex);
@@ -80,6 +83,8 @@ public sealed class Context
             QueuedBuffers = new Queue<ulong>(),
             Playing = false,
             Speed = 1,
+            Volume = 1,
+            Looping = false,
             Position = 0,
             FinePosition = 0
         };
@@ -101,6 +106,21 @@ public sealed class Context
         source.LastPosition = 0;
         source.LerpPosition = 0;
         source.Playing = true;
+    }
+
+    internal void SourceSetSpeed(ulong sourceId, double speed)
+    {
+        _sources[sourceId].Speed = speed;
+    }
+
+    internal void SourceSetVolume(ulong sourceId, float volume)
+    {
+        _sources[sourceId].Volume = volume;
+    }
+
+    internal void SourceSetLooping(ulong sourceId, bool looping)
+    {
+        _sources[sourceId].Looping = looping;
     }
 
     internal void MixIntoBufferStereoF32(Span<float> buffer)
@@ -134,8 +154,8 @@ public sealed class Context
                 sampleL = float.Lerp(lastSampleL, sampleL, (float) source.FinePosition);
                 sampleR = float.Lerp(lastSampleR, sampleR, (float) source.FinePosition);
 
-                buffer[i + 0] += float.Clamp(sampleL, -1.0f, 1.0f);
-                buffer[i + 1] += float.Clamp(sampleR, -1.0f, 1.0f);
+                buffer[i + 0] += float.Clamp(sampleL * source.Volume, -1.0f, 1.0f);
+                buffer[i + 1] += float.Clamp(sampleR * source.Volume, -1.0f, 1.0f);
 
                 source.FinePosition += buf.SpeedCorrection * source.Speed;
 
@@ -151,8 +171,19 @@ public sealed class Context
 
                 if (source.Position >= buf.LengthInSamples)
                 {
-                    source.Playing = false;
-                    //source.Position = 0;
+                    // To ensure that looped samples play perfectly
+                    if (source.Looping)
+                    {
+                        // Not actually yet implemented
+                        /*source.Position -= buf.LengthInSamples;
+                        source.LastPosition -= buf.LengthInSamples;
+                        source.LerpPosition -= buf.LengthInSamples;*/
+                        source.Position = 0;
+                        source.LastPosition = 0;
+                        source.FinePosition = 0;
+                    }
+                    else
+                        source.Playing = false;
                 }
             }
 

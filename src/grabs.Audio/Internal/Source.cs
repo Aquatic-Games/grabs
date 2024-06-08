@@ -9,6 +9,8 @@ internal struct Source
     public bool Playing;
 
     public double Speed;
+    public float Volume;
+    public bool Looping;
     
     public ulong Position;
     public double FinePosition;
