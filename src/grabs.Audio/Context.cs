@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using grabs.Audio.Internal;
 using Buffer = grabs.Audio.Internal.Buffer;
@@ -40,7 +41,26 @@ public sealed class Context
             Unsafe.CopyBlock(pByteData, pData, dataLength);
 
         ulong bufferIndex = _numBuffers++;
-        _buffers[bufferIndex] = new Buffer(byteData, format);
+
+        ulong channels = format.Channels switch
+        {
+            Channels.Mono => 1,
+            Channels.Stereo => 2,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+        
+        _buffers[bufferIndex] = new Buffer
+        {
+            Data = byteData,
+            Format = format,
+            
+            LengthInSamples = (ulong) (byteData.Length / (format.DataType.Bytes() * (int) channels)),
+
+            ByteAlign = (ulong) format.DataType.Bytes(),
+            Channels = channels,
+            
+            SpeedCorrection = format.SampleRate / (float) _sampleRate
+        };
 
         return new AudioBuffer(this, bufferIndex);
     }
@@ -51,7 +71,14 @@ public sealed class Context
             Array.Resize(ref _sources, _sources.Length << 1);
 
         ulong sourceIndex = _numSources++;
-        _sources[sourceIndex] = new Source();
+        _sources[sourceIndex] = new Source()
+        {
+            QueuedBuffers = new Queue<ulong>(),
+            Playing = false,
+            Speed = 1,
+            Position = 0,
+            FinePosition = 0
+        };
 
         return new AudioSource(this, sourceIndex);
     }
@@ -64,10 +91,9 @@ public sealed class Context
     internal void SourcePlay(ulong sourceId)
     {
         ref Source source = ref _sources[sourceId];
-        ref Buffer buffer = ref _buffers[source.QueuedBuffers.Peek()];
 
-        source.Speed = buffer.Format.SampleRate / (float) _sampleRate;
-        
+        source.Position = 0;
+        source.FinePosition = 0;
         source.Playing = true;
     }
 
@@ -98,15 +124,21 @@ public sealed class Context
                 buffer[i + 0] += float.Clamp(sampleL, -1.0f, 1.0f);
                 buffer[i + 1] += float.Clamp(sampleR, -1.0f, 1.0f);
 
-                source.FinePosition += source.Speed;
+                source.FinePosition += buf.SpeedCorrection * source.Speed;
 
                 ulong intFine = (ulong) source.FinePosition;
                 source.Position += intFine;
                 source.FinePosition -= intFine;
+
+                if (source.Position >= buf.LengthInSamples)
+                {
+                    source.Playing = false;
+                    //source.Position = 0;
+                }
             }
 
-            buffer[i + 0] *= MasterVolume;
-            buffer[i + 1] *= MasterVolume;
+            buffer[i + 0] = float.Clamp(buffer[i + 0] * MasterVolume, -1.0f, 1.0f);
+            buffer[i + 1] = float.Clamp(buffer[i + 1] * MasterVolume, -1.0f, 1.0f);
         }
     }
 

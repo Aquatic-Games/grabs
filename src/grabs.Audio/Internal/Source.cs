@@ -12,10 +12,4 @@ internal struct Source
     
     public ulong Position;
     public double FinePosition;
-
-    public Source()
-    {
-        QueuedBuffers = new Queue<ulong>();
-        Playing = false;
-    }
 }
