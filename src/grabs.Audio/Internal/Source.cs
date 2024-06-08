@@ -12,4 +12,7 @@ internal struct Source
     
     public ulong Position;
     public double FinePosition;
+
+    public ulong LerpPosition;
+    public ulong LastPosition;
 }

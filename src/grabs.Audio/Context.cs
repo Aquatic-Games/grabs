@@ -94,6 +94,8 @@ public sealed class Context
 
         source.Position = 0;
         source.FinePosition = 0;
+        source.LastPosition = 0;
+        source.LerpPosition = 0;
         source.Playing = true;
     }
 
@@ -121,6 +123,13 @@ public sealed class Context
                 float sampleL = GetSample(buf.Data, bytePosition, format.DataType);
                 float sampleR = GetSample(buf.Data, bytePosition + buf.ByteAlign, format.DataType);
 
+                ulong lastPosition = source.LerpPosition * buf.ByteAlign * buf.Channels;
+                float lastSampleL = GetSample(buf.Data, lastPosition, format.DataType);
+                float lastSampleR = GetSample(buf.Data, lastPosition + buf.ByteAlign, format.DataType);
+
+                sampleL = float.Lerp(lastSampleL, sampleL, (float) source.FinePosition);
+                sampleR = float.Lerp(lastSampleR, sampleR, (float) source.FinePosition);
+
                 buffer[i + 0] += float.Clamp(sampleL, -1.0f, 1.0f);
                 buffer[i + 1] += float.Clamp(sampleR, -1.0f, 1.0f);
 
@@ -129,6 +138,12 @@ public sealed class Context
                 ulong intFine = (ulong) source.FinePosition;
                 source.Position += intFine;
                 source.FinePosition -= intFine;
+
+                if (source.Position != source.LastPosition)
+                {
+                    source.LerpPosition = source.LastPosition;
+                    source.LastPosition = source.Position;
+                }
 
                 if (source.Position >= buf.LengthInSamples)
                 {
