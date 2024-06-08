@@ -28,8 +28,10 @@ public sealed class Context
         MasterVolume = 1.0f;
     }
 
-    public unsafe AudioBuffer CreateBuffer<T>(in AudioFormat format, in ReadOnlySpan<T> data) where T : unmanaged
+    public unsafe AudioBuffer CreateBuffer<T>(in BufferDescription description, in ReadOnlySpan<T> data) where T : unmanaged
     {
+        AudioFormat format = description.Format;
+        
         if (_numBuffers + 1 >= (ulong) _buffers.Length)
             Array.Resize(ref _buffers, _buffers.Length << 1);
 
@@ -53,6 +55,7 @@ public sealed class Context
         {
             Data = byteData,
             Format = format,
+            PcmType = description.PcmType,
             
             LengthInSamples = (ulong) (byteData.Length / (format.DataType.Bytes() * (int) channels)),
 

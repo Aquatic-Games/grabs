@@ -6,6 +6,7 @@ internal struct Buffer
 {
     public byte[] Data;
     public AudioFormat Format;
+    public PcmType PcmType;
 
     public ulong LengthInSamples;
     
