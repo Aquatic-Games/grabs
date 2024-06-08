@@ -57,6 +57,7 @@ public sealed class Context
             LengthInSamples = (ulong) (byteData.Length / (format.DataType.Bytes() * (int) channels)),
 
             ByteAlign = (ulong) format.DataType.Bytes(),
+            StereoAlign = (ulong) format.DataType.Bytes() * (channels - 1),
             Channels = channels,
             
             SpeedCorrection = format.SampleRate / (float) _sampleRate
@@ -118,14 +119,14 @@ public sealed class Context
 
                 ref AudioFormat format = ref buf.Format;
 
-                ulong bytePosition = source.Position * buf.ByteAlign * buf.Channels;
+                ulong bytePosition = source.Position * (buf.ByteAlign + buf.StereoAlign);
 
                 float sampleL = GetSample(buf.Data, bytePosition, format.DataType);
-                float sampleR = GetSample(buf.Data, bytePosition + buf.ByteAlign, format.DataType);
+                float sampleR = GetSample(buf.Data, bytePosition + buf.StereoAlign, format.DataType);
 
                 ulong lastPosition = source.LerpPosition * buf.ByteAlign * buf.Channels;
                 float lastSampleL = GetSample(buf.Data, lastPosition, format.DataType);
-                float lastSampleR = GetSample(buf.Data, lastPosition + buf.ByteAlign, format.DataType);
+                float lastSampleR = GetSample(buf.Data, lastPosition + buf.StereoAlign, format.DataType);
 
                 sampleL = float.Lerp(lastSampleL, sampleL, (float) source.FinePosition);
                 sampleR = float.Lerp(lastSampleR, sampleR, (float) source.FinePosition);

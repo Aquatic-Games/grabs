@@ -10,6 +10,7 @@ internal struct Buffer
     public ulong LengthInSamples;
     
     public ulong ByteAlign;
+    public ulong StereoAlign;
     public ulong Channels;
 
     public double SpeedCorrection;
