@@ -17,6 +17,8 @@ public class GL43Pipeline : Pipeline
 
     public readonly RasterizerDescription RasterizerDescription;
 
+    public readonly GL43DescriptorLayout[] Layouts;
+
     public GL43Pipeline(GL gl, in PipelineDescription description)
     {
         _gl = gl;
@@ -87,6 +89,23 @@ public class GL43Pipeline : Pipeline
             Graphics.PrimitiveType.TriangleStripAdjacency => Silk.NET.OpenGL.PrimitiveType.TriangleStripAdjacency,
             _ => throw new ArgumentOutOfRangeException()
         };
+
+        Layouts = new GL43DescriptorLayout[description.DescriptorLayouts.Length];
+        uint currentBindIndex = 0;
+        for (int i = 0; i < Layouts.Length; i++)
+        {
+            GL43DescriptorLayout layout = (GL43DescriptorLayout) description.DescriptorLayouts[i];
+            DescriptorBindingDescription[] bindings = new DescriptorBindingDescription[layout.Bindings.Length];
+
+            for (int j = 0; j < bindings.Length; j++)
+            {
+                DescriptorBindingDescription desc = layout.Bindings[j];
+                desc.Binding = currentBindIndex++;
+                bindings[j] = desc;
+            }
+
+            Layouts[i] = new GL43DescriptorLayout(bindings);
+        }
     }
     
     public override void Dispose()

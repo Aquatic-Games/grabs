@@ -8,6 +8,11 @@ public sealed class GL43DescriptorLayout : DescriptorLayout
     {
         Bindings = description.Bindings.ToArray();
     }
-    
+
+    public GL43DescriptorLayout(DescriptorBindingDescription[] bindings)
+    {
+        Bindings = bindings;
+    }
+
     public override void Dispose() { }
 }

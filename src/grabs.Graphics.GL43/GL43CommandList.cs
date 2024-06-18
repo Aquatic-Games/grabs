@@ -97,9 +97,9 @@ public class GL43CommandList : CommandList
 
     public override void SetDescriptorSet(uint index, DescriptorSet set)
     {
-        throw new NotImplementedException();
         Actions.Add(new CommandListAction(CommandListActionType.SetDescriptor)
         {
+            Slot = index,
             DescriptorSet = (GL43DescriptorSet) set
         });
     }

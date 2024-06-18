@@ -2,13 +2,10 @@
 
 public sealed class GL43DescriptorSet : DescriptorSet
 {
-    public readonly DescriptorBindingDescription[] Bindings;
-
     public readonly DescriptorSetDescription[] Descriptions;
 
-    public GL43DescriptorSet(DescriptorBindingDescription[] bindings, DescriptorSetDescription[] descriptions)
+    public GL43DescriptorSet(DescriptorSetDescription[] descriptions)
     {
-        Bindings = bindings;
         Descriptions = descriptions;
     }
     
