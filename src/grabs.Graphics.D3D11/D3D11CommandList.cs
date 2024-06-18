@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using Vortice.Direct3D;
 using Vortice.Direct3D11;
 using Vortice.Mathematics;
 
@@ -8,11 +7,17 @@ namespace grabs.Graphics.D3D11;
 
 public sealed class D3D11CommandList : CommandList
 {
+    private D3D11Pipeline _currentPipeline;
+    private D3D11DescriptorSet[] _setSets; // Lol
+    
     public ID3D11DeviceContext Context;
     public ID3D11CommandList CommandList;
 
     public D3D11CommandList(ID3D11Device device)
     {
+        // TODO: This is temporary, set to an arbitrary value. This should auto expand to support thousands of sets if needed.
+        _setSets = new D3D11DescriptorSet[16];
+        
         Context = device.CreateDeferredContext();
     }
 
@@ -85,6 +90,7 @@ public sealed class D3D11CommandList : CommandList
     public override void SetPipeline(Pipeline pipeline)
     {
         D3D11Pipeline d3dPipeline = (D3D11Pipeline) pipeline;
+        _currentPipeline = d3dPipeline;
         
         Context.VSSetShader(d3dPipeline.VertexShader);
         Context.PSSetShader(d3dPipeline.PixelShader);
@@ -107,46 +113,56 @@ public sealed class D3D11CommandList : CommandList
     public override void SetDescriptorSet(uint index, DescriptorSet set)
     {
         D3D11DescriptorSet d3dSet = (D3D11DescriptorSet) set;
-
-        for (int i = 0; i < d3dSet.Bindings.Length; i++)
-        {
-            ref DescriptorBindingDescription binding = ref d3dSet.Bindings[i];
-            ref DescriptorSetDescription desc = ref d3dSet.Descriptions[i];
-
-            switch (binding.Type)
-            {
-                case DescriptorType.ConstantBuffer:
-                    D3D11Buffer buffer = (D3D11Buffer) desc.Buffer;
-                    
-                    if ((binding.Stages & ShaderStage.Vertex) == ShaderStage.Vertex)
-                        Context.VSSetConstantBuffer((int) binding.Binding, buffer.Buffer);
-                    if ((binding.Stages & ShaderStage.Pixel) == ShaderStage.Pixel)
-                        Context.PSSetConstantBuffer((int) binding.Binding, buffer.Buffer);
-                    if ((binding.Stages & ShaderStage.Compute) == ShaderStage.Compute)
-                        throw new NotImplementedException();
-                        
-                    break;
-                
-                case DescriptorType.Texture:
-                    D3D11Texture texture = (D3D11Texture) desc.Texture;
-                    
-                    if ((binding.Stages & ShaderStage.Vertex) == ShaderStage.Vertex)
-                        Context.VSSetShaderResource((int) binding.Binding, texture.ResourceView);
-                    if ((binding.Stages & ShaderStage.Pixel) == ShaderStage.Pixel)
-                        Context.PSSetShaderResource((int) binding.Binding, texture.ResourceView);
-                    if ((binding.Stages & ShaderStage.Compute) == ShaderStage.Compute)
-                        throw new NotImplementedException();
-                    
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
+        _setSets[index] = d3dSet;
     }
 
     public override void DrawIndexed(uint numIndices)
     {
+        SetPreDrawParameters();
         Context.DrawIndexed((int) numIndices, 0, 0);
+    }
+
+    private void SetPreDrawParameters()
+    {
+        for (int i = 0; i < _currentPipeline.Layouts.Length; i++)
+        {
+            D3D11DescriptorLayout layout = _currentPipeline.Layouts[i];
+
+            for (int j = 0; j < layout.Bindings.Length; j++)
+            {
+                ref DescriptorBindingDescription binding = ref layout.Bindings[j];
+                ref DescriptorSetDescription desc = ref _setSets[i].Descriptions[j];
+
+                switch (binding.Type)
+                {
+                    case DescriptorType.ConstantBuffer:
+                        D3D11Buffer buffer = (D3D11Buffer) desc.Buffer;
+                    
+                        if ((binding.Stages & ShaderStage.Vertex) == ShaderStage.Vertex)
+                            Context.VSSetConstantBuffer((int) binding.Binding, buffer.Buffer);
+                        if ((binding.Stages & ShaderStage.Pixel) == ShaderStage.Pixel)
+                            Context.PSSetConstantBuffer((int) binding.Binding, buffer.Buffer);
+                        if ((binding.Stages & ShaderStage.Compute) == ShaderStage.Compute)
+                            throw new NotImplementedException();
+                        
+                        break;
+                
+                    case DescriptorType.Texture:
+                        D3D11Texture texture = (D3D11Texture) desc.Texture;
+                    
+                        if ((binding.Stages & ShaderStage.Vertex) == ShaderStage.Vertex)
+                            Context.VSSetShaderResource((int) binding.Binding, texture.ResourceView);
+                        if ((binding.Stages & ShaderStage.Pixel) == ShaderStage.Pixel)
+                            Context.PSSetShaderResource((int) binding.Binding, texture.ResourceView);
+                        if ((binding.Stages & ShaderStage.Compute) == ShaderStage.Compute)
+                            throw new NotImplementedException();
+                    
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
     }
 
     public override void Dispose()

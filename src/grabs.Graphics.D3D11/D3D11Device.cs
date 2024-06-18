@@ -74,7 +74,7 @@ public sealed class D3D11Device : Device
 
     public override DescriptorSet CreateDescriptorSet(DescriptorLayout layout, in ReadOnlySpan<DescriptorSetDescription> descriptions)
     {
-        return new D3D11DescriptorSet(((D3D11DescriptorLayout) layout).Bindings, descriptions.ToArray());
+        return new D3D11DescriptorSet(descriptions.ToArray());
     }
 
     public override void ExecuteCommandList(CommandList list)

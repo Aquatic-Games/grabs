@@ -21,7 +21,8 @@ public class CubeTest : TestBase
 
     private Texture _texture;
 
-    private DescriptorSet _descriptorSet;
+    private DescriptorSet _transformSet;
+    private DescriptorSet _textureSet;
 
     private Matrix4x4 _transformMatrix;
     
@@ -47,12 +48,16 @@ public class CubeTest : TestBase
         _transformMatrix = Matrix4x4.Identity;
         _transformBuffer = Device.CreateBuffer(BufferType.Constant, _transformMatrix, true);
 
-        DescriptorLayoutDescription layoutDesc = new DescriptorLayoutDescription(
+        DescriptorLayoutDescription transformLayoutDesc = new DescriptorLayoutDescription(
             new DescriptorBindingDescription(0, DescriptorType.ConstantBuffer, ShaderStage.Vertex),
-            new DescriptorBindingDescription(1, DescriptorType.ConstantBuffer, ShaderStage.Vertex),
-            new DescriptorBindingDescription(2, DescriptorType.Texture, ShaderStage.Pixel));
+            new DescriptorBindingDescription(1, DescriptorType.ConstantBuffer, ShaderStage.Vertex));
 
-        DescriptorLayout layout = Device.CreateDescriptorLayout(layoutDesc);
+        DescriptorLayoutDescription textureLayoutDesc =
+            new DescriptorLayoutDescription(new DescriptorBindingDescription(0, DescriptorType.Texture,
+                ShaderStage.Pixel));
+
+        DescriptorLayout transformLayout = Device.CreateDescriptorLayout(transformLayoutDesc);
+        DescriptorLayout textureLayout = Device.CreateDescriptorLayout(textureLayoutDesc);
 
         string hlsl = File.ReadAllText("Shaders/Basic3D.hlsl");
         byte[] vSpv = Compiler.CompileToSpirV(hlsl, "Vertex", ShaderStage.Vertex, true);
@@ -65,7 +70,7 @@ public class CubeTest : TestBase
         {
             new InputLayoutDescription(Format.R32G32B32_Float, 0, 0, InputType.PerVertex), // Position
             new InputLayoutDescription(Format.R32G32_Float, 12, 0, InputType.PerVertex) // TexCoord
-        }, DepthStencilDescription.DepthLessEqual, RasterizerDescription.CullClockwise, [layout]));
+        }, DepthStencilDescription.DepthLessEqual, RasterizerDescription.CullClockwise, [transformLayout, textureLayout]));
 
         using FileStream stream = File.OpenRead("Assets/awesomeface.png");
         ImageResult result = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
@@ -78,10 +83,13 @@ public class CubeTest : TestBase
         CommandList.End();
         Device.ExecuteCommandList(CommandList);
 
-        _descriptorSet = Device.CreateDescriptorSet(layout, new DescriptorSetDescription(buffer: _cameraBuffer),
-            new DescriptorSetDescription(buffer: _transformBuffer), new DescriptorSetDescription(texture: _texture));
+        _transformSet = Device.CreateDescriptorSet(transformLayout, new DescriptorSetDescription(buffer: _cameraBuffer),
+            new DescriptorSetDescription(buffer: _transformBuffer));
+
+        _textureSet = Device.CreateDescriptorSet(textureLayout, new DescriptorSetDescription(texture: _texture));
         
-        layout.Dispose();
+        transformLayout.Dispose();
+        textureLayout.Dispose();
     }
 
     protected override void Update(float dt)
@@ -107,7 +115,8 @@ public class CubeTest : TestBase
         CommandList.SetVertexBuffer(0, _vertexBuffer, Vertex.SizeInBytes, 0);
         CommandList.SetIndexBuffer(_indexBuffer, Format.R16_UInt);
         
-        CommandList.SetDescriptorSet(0, _descriptorSet);
+        CommandList.SetDescriptorSet(0, _transformSet);
+        CommandList.SetDescriptorSet(1, _textureSet);
         
         CommandList.DrawIndexed(36);
         
@@ -120,7 +129,8 @@ public class CubeTest : TestBase
 
     public override void Dispose()
     {
-        _descriptorSet.Dispose();
+        _transformSet.Dispose();
+        _textureSet.Dispose();
         
         _texture.Dispose();
         
