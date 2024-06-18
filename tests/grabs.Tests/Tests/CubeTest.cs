@@ -4,8 +4,11 @@ using System.Numerics;
 using grabs.Graphics;
 using grabs.ShaderCompiler.DXC;
 using grabs.Tests.Utils;
+using Silk.NET.SDL;
 using StbImageSharp;
 using Buffer = grabs.Graphics.Buffer;
+using Texture = grabs.Graphics.Texture;
+using Vertex = grabs.Tests.Utils.Vertex;
 
 namespace grabs.Tests.Tests;
 
@@ -19,7 +22,8 @@ public class CubeTest : TestBase
 
     private Pipeline _pipeline;
 
-    private Texture _texture;
+    private Texture _texture1;
+    private Texture _texture2;
 
     private DescriptorSet _transformSet;
     private DescriptorSet _textureSet;
@@ -71,22 +75,26 @@ public class CubeTest : TestBase
             new InputLayoutDescription(Format.R32G32B32_Float, 0, 0, InputType.PerVertex), // Position
             new InputLayoutDescription(Format.R32G32_Float, 12, 0, InputType.PerVertex) // TexCoord
         }, DepthStencilDescription.DepthLessEqual, RasterizerDescription.CullClockwise, [transformLayout, textureLayout]));
-
-        using FileStream stream = File.OpenRead("Assets/awesomeface.png");
-        ImageResult result = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
         
-        _texture = Device.CreateTexture(TextureDescription.Texture2D((uint) result.Width, (uint) result.Height, 0,
-            Format.R8G8B8A8_UNorm, TextureUsage.ShaderResource | TextureUsage.GenerateMips), new ReadOnlySpan<byte>(result.Data));
+        ImageResult result1 = ImageResult.FromMemory(File.ReadAllBytes("Assets/awesomeface.png"), ColorComponents.RedGreenBlueAlpha);
+        ImageResult result2 = ImageResult.FromMemory(File.ReadAllBytes("Assets/BAGELMIP.png"), ColorComponents.RedGreenBlueAlpha);
+        
+        _texture1 = Device.CreateTexture(TextureDescription.Texture2D((uint) result1.Width, (uint) result1.Height, 0,
+            Format.R8G8B8A8_UNorm, TextureUsage.ShaderResource | TextureUsage.GenerateMips), new ReadOnlySpan<byte>(result1.Data));
+        
+        _texture2 = Device.CreateTexture(TextureDescription.Texture2D((uint) result2.Width, (uint) result2.Height, 0,
+            Format.R8G8B8A8_UNorm, TextureUsage.ShaderResource | TextureUsage.GenerateMips), new ReadOnlySpan<byte>(result2.Data));
         
         CommandList.Begin();
-        CommandList.GenerateMipmaps(_texture);
+        CommandList.GenerateMipmaps(_texture1);
+        CommandList.GenerateMipmaps(_texture2);
         CommandList.End();
         Device.ExecuteCommandList(CommandList);
 
         _transformSet = Device.CreateDescriptorSet(transformLayout, new DescriptorSetDescription(buffer: _cameraBuffer),
             new DescriptorSetDescription(buffer: _transformBuffer));
 
-        _textureSet = Device.CreateDescriptorSet(textureLayout, new DescriptorSetDescription(texture: _texture));
+        _textureSet = Device.CreateDescriptorSet(textureLayout, new DescriptorSetDescription(texture: _texture1));
         
         transformLayout.Dispose();
         textureLayout.Dispose();
@@ -98,6 +106,11 @@ public class CubeTest : TestBase
 
         _transformMatrix *= Matrix4x4.CreateFromAxisAngle(Vector3.UnitY, dt) *
                             Matrix4x4.CreateFromAxisAngle(Vector3.UnitX, dt);
+
+        if (IsKeyDown(KeyCode.K1))
+            Device.UpdateDescriptorSet(_textureSet, new DescriptorSetDescription(texture: _texture1));
+        if (IsKeyDown(KeyCode.K2))
+            Device.UpdateDescriptorSet(_textureSet, new DescriptorSetDescription(texture: _texture2));
     }
 
     protected override void Draw()
@@ -132,7 +145,8 @@ public class CubeTest : TestBase
         _transformSet.Dispose();
         _textureSet.Dispose();
         
-        _texture.Dispose();
+        _texture2.Dispose();
+        _texture1.Dispose();
         
         _pipeline.Dispose();
         

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using grabs.Graphics;
 using grabs.Graphics.D3D11;
@@ -16,6 +17,8 @@ public abstract unsafe class TestBase : IDisposable
     private Window* _window;
     private void* _glContext;
 
+    private HashSet<KeyCode> _keysDown;
+
     public Instance Instance;
     public Device Device;
 
@@ -32,6 +35,8 @@ public abstract unsafe class TestBase : IDisposable
     {
         _title = title;
         _sdl = Sdl.GetApi();
+        
+        _keysDown = new HashSet<KeyCode>();
     }
 
     protected virtual void Initialize() { }
@@ -41,6 +46,9 @@ public abstract unsafe class TestBase : IDisposable
     protected virtual void Draw() { }
 
     protected virtual void Unload() { }
+
+    protected bool IsKeyDown(KeyCode key)
+        => _keysDown.Contains(key);
 
     public void Run(GraphicsApi api, Size size)
     {
@@ -140,6 +148,14 @@ public abstract unsafe class TestBase : IDisposable
                                 break;
                         }
 
+                        break;
+                    
+                    case EventType.Keydown:
+                        _keysDown.Add((KeyCode) winEvent.Key.Keysym.Sym);
+                        break;
+                    
+                    case EventType.Keyup:
+                        _keysDown.Remove((KeyCode) winEvent.Key.Keysym.Sym);
                         break;
                 }
             }

@@ -2,7 +2,7 @@
 
 public sealed class GL43DescriptorSet : DescriptorSet
 {
-    public readonly DescriptorSetDescription[] Descriptions;
+    public DescriptorSetDescription[] Descriptions;
 
     public GL43DescriptorSet(DescriptorSetDescription[] descriptions)
     {

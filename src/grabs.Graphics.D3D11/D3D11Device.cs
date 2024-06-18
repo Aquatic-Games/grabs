@@ -77,6 +77,13 @@ public sealed class D3D11Device : Device
         return new D3D11DescriptorSet(descriptions.ToArray());
     }
 
+    public override void UpdateDescriptorSet(DescriptorSet set, in ReadOnlySpan<DescriptorSetDescription> descriptions)
+    {
+        D3D11DescriptorSet d3dSet = (D3D11DescriptorSet) set;
+
+        d3dSet.Descriptions = descriptions.ToArray();
+    }
+
     public override void ExecuteCommandList(CommandList list)
     { 
         Context.ExecuteCommandList(((D3D11CommandList) list).CommandList, false); 

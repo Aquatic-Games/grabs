@@ -72,6 +72,12 @@ public class GL43Device : Device
         return new GL43DescriptorSet(descriptions.ToArray());
     }
 
+    public override void UpdateDescriptorSet(DescriptorSet set, in ReadOnlySpan<DescriptorSetDescription> descriptions)
+    {
+        GL43DescriptorSet glSet = (GL43DescriptorSet) set;
+        glSet.Descriptions = descriptions.ToArray();
+    }
+
     public override unsafe void ExecuteCommandList(CommandList list)
     {
         GL43CommandList cl = (GL43CommandList) list;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace grabs.Graphics;
 
@@ -61,6 +62,11 @@ public abstract class Device : IDisposable
         => CreateDescriptorSet(layout, descriptions.AsSpan());
 
     public abstract DescriptorSet CreateDescriptorSet(DescriptorLayout layout, in ReadOnlySpan<DescriptorSetDescription> descriptions);
+
+    public void UpdateDescriptorSet(DescriptorSet set, params DescriptorSetDescription[] descriptions)
+        => UpdateDescriptorSet(set, descriptions.AsSpan());
+    
+    public abstract void UpdateDescriptorSet(DescriptorSet set, in ReadOnlySpan<DescriptorSetDescription> descriptions);
 
     public abstract void ExecuteCommandList(CommandList list);
     
