@@ -9,5 +9,10 @@ public sealed class D3D11DescriptorLayout : DescriptorLayout
         Bindings = description.Bindings.ToArray();
     }
 
+    public D3D11DescriptorLayout(DescriptorBindingDescription[] bindings)
+    {
+        Bindings = bindings;
+    }
+
     public override void Dispose() { }
 }
