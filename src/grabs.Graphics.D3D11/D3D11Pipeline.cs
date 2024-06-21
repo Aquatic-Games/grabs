@@ -26,23 +26,28 @@ public sealed class D3D11Pipeline : Pipeline
         D3D11ShaderModule pShaderModule = (D3D11ShaderModule) description.PixelShader;
         PixelShader = device.CreatePixelShader(pShaderModule.Blob);
 
-        InputElementDescription[] elementDescs = new InputElementDescription[description.InputLayout.Length];
-        for (int i = 0; i < description.InputLayout.Length; i++)
+        // Some things don't need an input layout, for example, if the drawing occurs entirely within the shader.
+        // If so, ignore and do not create the input layout.
+        if (description.InputLayout?.Length > 0)
         {
-            ref InputLayoutDescription desc = ref description.InputLayout[i];
-
-            (InputClassification classification, int step) = desc.Type switch
+            InputElementDescription[] elementDescs = new InputElementDescription[description.InputLayout.Length];
+            for (int i = 0; i < description.InputLayout.Length; i++)
             {
-                InputType.PerVertex => (InputClassification.PerVertexData, 0),
-                InputType.PerInstance => (InputClassification.PerInstanceData, 1),
-                _ => throw new ArgumentOutOfRangeException()
-            };
+                ref InputLayoutDescription desc = ref description.InputLayout[i];
 
-            elementDescs[i] = new InputElementDescription("TEXCOORD", i, desc.Format.ToDXGIFormat(), (int) desc.Offset,
-                (int) desc.Slot, classification, step);
+                (InputClassification classification, int step) = desc.Type switch
+                {
+                    InputType.PerVertex => (InputClassification.PerVertexData, 0),
+                    InputType.PerInstance => (InputClassification.PerInstanceData, 1),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
+                elementDescs[i] = new InputElementDescription("TEXCOORD", i, desc.Format.ToDXGIFormat(),
+                    (int) desc.Offset, (int) desc.Slot, classification, step);
+            }
+
+            InputLayout = device.CreateInputLayout(elementDescs, vShaderModule.Blob);
         }
-
-        InputLayout = device.CreateInputLayout(elementDescs, vShaderModule.Blob);
 
         DepthStencilDescription depthDesc = description.DepthStencilState;
         Vortice.Direct3D11.DepthStencilDescription dsDesc = new Vortice.Direct3D11.DepthStencilDescription()
@@ -97,7 +102,7 @@ public sealed class D3D11Pipeline : Pipeline
     {
         RasterizerState.Dispose();
         DepthStencilState.Dispose();
-        InputLayout.Dispose();
+        InputLayout?.Dispose();
         PixelShader.Dispose();
         VertexShader.Dispose();
     }

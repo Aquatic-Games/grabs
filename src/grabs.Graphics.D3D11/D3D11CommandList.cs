@@ -94,7 +94,8 @@ public sealed class D3D11CommandList : CommandList
         
         Context.VSSetShader(d3dPipeline.VertexShader);
         Context.PSSetShader(d3dPipeline.PixelShader);
-        Context.IASetInputLayout(d3dPipeline.InputLayout);
+        if (d3dPipeline.InputLayout != null)
+            Context.IASetInputLayout(d3dPipeline.InputLayout);
         Context.OMSetDepthStencilState(d3dPipeline.DepthStencilState);
         Context.RSSetState(d3dPipeline.RasterizerState);
         Context.IASetPrimitiveTopology(d3dPipeline.PrimitiveTopology);
