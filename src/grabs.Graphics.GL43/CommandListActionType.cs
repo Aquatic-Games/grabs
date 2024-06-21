@@ -11,5 +11,6 @@ public enum CommandListActionType
     SetVertexBuffer,
     SetIndexBuffer,
     SetDescriptor,
+    Draw,
     DrawIndexed
 }

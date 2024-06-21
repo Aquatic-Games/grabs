@@ -104,6 +104,14 @@ public class GL43CommandList : CommandList
         });
     }
 
+    public override void Draw(uint numVertices)
+    {
+        Actions.Add(new CommandListAction(CommandListActionType.Draw)
+        {
+            Slot = numVertices
+        });
+    }
+
     public override void DrawIndexed(uint numIndices)
     {
         Actions.Add(new CommandListAction(CommandListActionType.DrawIndexed)

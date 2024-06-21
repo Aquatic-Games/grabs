@@ -117,6 +117,12 @@ public sealed class D3D11CommandList : CommandList
         _setSets[index] = d3dSet;
     }
 
+    public override void Draw(uint numVertices)
+    {
+        SetPreDrawParameters();
+        Context.Draw((int) numVertices, 0);
+    }
+
     public override void DrawIndexed(uint numIndices)
     {
         SetPreDrawParameters();

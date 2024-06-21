@@ -42,6 +42,8 @@ public abstract class CommandList : IDisposable
 
     public abstract void SetDescriptorSet(uint index, DescriptorSet set);
 
+    public abstract void Draw(uint numVertices);
+
     public abstract void DrawIndexed(uint numIndices);
     
     public abstract void Dispose();

@@ -232,6 +232,13 @@ public class GL43Device : Device
                     break;
                 }
 
+                case CommandListActionType.Draw:
+                {
+                    SetPreDrawParameters();
+                    _gl.DrawArrays(_currentPrimitiveType, 0, action.Slot);
+                    break;
+                }
+
                 case CommandListActionType.DrawIndexed:
                 {
                     SetPreDrawParameters();
