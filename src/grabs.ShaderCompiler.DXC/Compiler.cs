@@ -68,7 +68,7 @@ public static unsafe class Compiler
         };
         
         if (debug)
-            args.Add("-O0");
+            args.Add("-Od");
         
         using WidePinnedStringArray pArgs = new WidePinnedStringArray(args.ToArray());
 
