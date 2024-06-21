@@ -42,7 +42,7 @@ public class GL43Pipeline : Pipeline
         Vao = _gl.CreateVertexArray();
         _gl.BindVertexArray(Vao);
 
-        for (uint i = 0; i < description.InputLayout.Length; i++)
+        for (uint i = 0; i < description.InputLayout?.Length; i++)
         {
             _gl.EnableVertexAttribArray(i);
             
