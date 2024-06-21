@@ -29,7 +29,7 @@ public static unsafe class Compiler
         return NativeLibrary.Load(libraryname, assembly, DllImportSearchPath.AssemblyDirectory);
     }
 
-    public static byte[] CompileToSpirV(string code, string entryPoint, ShaderStage stage, bool debug = false)
+    public static byte[] CompileToSpirV(string code, string entryPoint, ShaderStage stage, bool debug = false, string[] includeDirectories = null)
     {
         HRESULT result;
         
@@ -69,7 +69,16 @@ public static unsafe class Compiler
         
         if (debug)
             args.Add("-Od");
-        
+
+        if (includeDirectories != null)
+        {
+            foreach (string directory in includeDirectories)
+            {
+                args.Add("-I");
+                args.Add(directory);
+            }
+        }
+
         using WidePinnedStringArray pArgs = new WidePinnedStringArray(args.ToArray());
 
         IDxcCompilerArgs* compilerArgs;
@@ -82,9 +91,13 @@ public static unsafe class Compiler
             Size = blobEncoding->GetBufferSize(),
             Encoding = 0
         };
+
+        IDxcIncludeHandler* includeHandler;
+        if ((result = utils->CreateDefaultIncludeHandler(&includeHandler)).FAILED)
+            throw new Exception($"Failed to create include handler: {result}");
         
         IDxcOperationResult* opResult;
-        if ((result = compiler->Compile(&buffer, compilerArgs->GetArguments(), compilerArgs->GetCount(), null, __uuidof<IDxcOperationResult>(), (void**) &opResult)).FAILED)
+        if ((result = compiler->Compile(&buffer, compilerArgs->GetArguments(), compilerArgs->GetCount(), includeHandler, __uuidof<IDxcOperationResult>(), (void**) &opResult)).FAILED)
             throw new Exception($"Failed to compile shader: {result}");
 
         HRESULT status;
