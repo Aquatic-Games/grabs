@@ -9,7 +9,7 @@ public class GL43Framebuffer : Framebuffer
 
     public uint Framebuffer;
 
-    public GL43Framebuffer(GL gl, in ReadOnlySpan<Texture> colorTextures, Texture depthTexture)
+    public unsafe GL43Framebuffer(GL gl, in ReadOnlySpan<Texture> colorTextures, Texture depthTexture)
     {
         _gl = gl;
 
@@ -48,6 +48,12 @@ public class GL43Framebuffer : Framebuffer
 
         if (_gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != (GLEnum) FramebufferStatus.Complete)
             throw new Exception("Framebuffer is not complete.");
+
+        DrawBufferMode* drawBuffers = stackalloc DrawBufferMode[colorTextures.Length];
+        for (int i = 0; i < colorTextures.Length; i++)
+            drawBuffers[i] = DrawBufferMode.ColorAttachment0 + i;
+        
+        _gl.DrawBuffers((uint) colorTextures.Length, drawBuffers);
     }
     
     public override void Dispose()
