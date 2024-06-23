@@ -54,6 +54,12 @@ public abstract class Device : IDisposable
     
     public abstract ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint);
 
+    public Framebuffer CreateFramebuffer(Texture colorTexture, Texture depthTexture = null)
+        => CreateFramebuffer(new ReadOnlySpan<Texture>(in colorTexture), depthTexture);
+    
+    public Framebuffer CreateFramebuffer(Texture[] colorTextures, Texture depthTexture = null)
+        => CreateFramebuffer(colorTextures.AsSpan(), depthTexture);
+
     public abstract Framebuffer CreateFramebuffer(in ReadOnlySpan<Texture> colorTextures, Texture depthTexture = null);
 
     public abstract DescriptorLayout CreateDescriptorLayout(in DescriptorLayoutDescription description);
