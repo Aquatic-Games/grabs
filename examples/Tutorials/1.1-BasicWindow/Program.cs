@@ -6,7 +6,13 @@ using grabs.Windowing.Events;
 
 /*
  * Basic windowing tutorial.
- * Creates a window, and renders a color to the screen.
+ * This tutorial creates a window, and renders a color to the screen.
+ * In this tutorial you will learn:
+ *   - How to create a window.
+ *   - How to create a device and bits necessary for drawing.
+ *   - How to use the window event loop.
+ *   - What a command list and render pass does.
+ *   - How to use these to clear the screen to a color of our choice.
  */
 
 const uint width = 1280;
