@@ -131,6 +131,9 @@ public sealed class D3D11CommandList : CommandList
 
     private void SetPreDrawParameters()
     {
+        if (_currentPipeline.Layouts == null)
+            return;
+        
         for (int i = 0; i < _currentPipeline.Layouts.Length; i++)
         {
             D3D11DescriptorLayout layout = _currentPipeline.Layouts[i];

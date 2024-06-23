@@ -78,21 +78,24 @@ public sealed class D3D11Pipeline : Pipeline
 
         RasterizerState = device.CreateRasterizerState(rsDesc);
 
-        Layouts = new D3D11DescriptorLayout[description.DescriptorLayouts.Length];
-        uint currentBindingIndex = 0;
-        for (int i = 0; i < Layouts.Length; i++)
+        if (description.DescriptorLayouts != null)
         {
-            D3D11DescriptorLayout layout = (D3D11DescriptorLayout) description.DescriptorLayouts[i];
-            DescriptorBindingDescription[] descriptions = new DescriptorBindingDescription[layout.Bindings.Length];
-
-            for (int j = 0; j < descriptions.Length; j++)
+            Layouts = new D3D11DescriptorLayout[description.DescriptorLayouts.Length];
+            uint currentBindingIndex = 0;
+            for (int i = 0; i < Layouts.Length; i++)
             {
-                DescriptorBindingDescription desc = layout.Bindings[j];
-                desc.Binding = currentBindingIndex++;
-                descriptions[j] = desc;
-            }
+                D3D11DescriptorLayout layout = (D3D11DescriptorLayout) description.DescriptorLayouts[i];
+                DescriptorBindingDescription[] descriptions = new DescriptorBindingDescription[layout.Bindings.Length];
 
-            Layouts[i] = new D3D11DescriptorLayout(descriptions);
+                for (int j = 0; j < descriptions.Length; j++)
+                {
+                    DescriptorBindingDescription desc = layout.Bindings[j];
+                    desc.Binding = currentBindingIndex++;
+                    descriptions[j] = desc;
+                }
+
+                Layouts[i] = new D3D11DescriptorLayout(descriptions);
+            }
         }
 
         PrimitiveTopology = description.PrimitiveType.ToPrimitiveTopology();

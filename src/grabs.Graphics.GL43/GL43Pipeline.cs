@@ -90,21 +90,24 @@ public class GL43Pipeline : Pipeline
             _ => throw new ArgumentOutOfRangeException()
         };
 
-        Layouts = new GL43DescriptorLayout[description.DescriptorLayouts.Length];
-        uint currentBindIndex = 0;
-        for (int i = 0; i < Layouts.Length; i++)
+        if (description.DescriptorLayouts != null)
         {
-            GL43DescriptorLayout layout = (GL43DescriptorLayout) description.DescriptorLayouts[i];
-            DescriptorBindingDescription[] bindings = new DescriptorBindingDescription[layout.Bindings.Length];
-
-            for (int j = 0; j < bindings.Length; j++)
+            Layouts = new GL43DescriptorLayout[description.DescriptorLayouts.Length];
+            uint currentBindIndex = 0;
+            for (int i = 0; i < Layouts.Length; i++)
             {
-                DescriptorBindingDescription desc = layout.Bindings[j];
-                desc.Binding = currentBindIndex++;
-                bindings[j] = desc;
-            }
+                GL43DescriptorLayout layout = (GL43DescriptorLayout) description.DescriptorLayouts[i];
+                DescriptorBindingDescription[] bindings = new DescriptorBindingDescription[layout.Bindings.Length];
 
-            Layouts[i] = new GL43DescriptorLayout(bindings);
+                for (int j = 0; j < bindings.Length; j++)
+                {
+                    DescriptorBindingDescription desc = layout.Bindings[j];
+                    desc.Binding = currentBindIndex++;
+                    bindings[j] = desc;
+                }
+
+                Layouts[i] = new GL43DescriptorLayout(bindings);
+            }
         }
     }
     

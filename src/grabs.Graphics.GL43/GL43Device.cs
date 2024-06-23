@@ -254,6 +254,9 @@ public class GL43Device : Device
 
     private void SetPreDrawParameters()
     {
+        if (_currentPipeline.Layouts == null)
+            return;
+        
         for (int i = 0; i < _currentPipeline.Layouts.Length; i++)
         {
             GL43DescriptorLayout layout = _currentPipeline.Layouts[i];
