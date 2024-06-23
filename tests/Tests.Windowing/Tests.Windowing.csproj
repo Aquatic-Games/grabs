@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\grabs.Windowing\grabs.Windowing.csproj" />
+      <ProjectReference Include="..\..\src\grabs.Windowing\grabs.Windowing.csproj" />
     </ItemGroup>
 
 </Project>

@@ -15,6 +15,7 @@ public sealed class GL43Swapchain : Swapchain
 
     private Format _swapchainFormat;
 
+    private uint _drawVao;
     private uint _drawProgram;
     
     public uint Width;
@@ -47,6 +48,8 @@ public sealed class GL43Swapchain : Swapchain
         Height = description.Height;
         
         PresentMode = description.PresentMode;
+
+        _drawVao = gl.GenVertexArray();
 
         uint vShader = gl.CreateShader(ShaderType.VertexShader);
         gl.ShaderSource(vShader, DrawVertex);
@@ -96,6 +99,7 @@ public sealed class GL43Swapchain : Swapchain
         _gl.FrontFace(FrontFaceDirection.CW);
         _gl.CullFace(TriangleFace.Back);
         
+        _gl.BindVertexArray(_drawVao);
         _gl.UseProgram(_drawProgram);
         
         _gl.ActiveTexture(TextureUnit.Texture0);
@@ -109,6 +113,7 @@ public sealed class GL43Swapchain : Swapchain
     public override void Dispose()
     {
         _gl.DeleteProgram(_drawProgram);
+        _gl.DeleteVertexArray(_drawVao);
     }
 
     private const string DrawVertex = """

@@ -24,7 +24,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Audio", "src\grabs.Au
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Tests.Audio", "tests\grabs.Tests.Audio\grabs.Tests.Audio.csproj", "{7F891CA1-5BEC-4E72-84D7-E4C0CFEA6D7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Windowing", "grabs.Windowing\grabs.Windowing.csproj", "{8CDF4211-986F-469A-B8C5-93B17EF514A6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Windowing", "src\grabs.Windowing\grabs.Windowing.csproj", "{8CDF4211-986F-469A-B8C5-93B17EF514A6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Windowing", "tests\Tests.Windowing\Tests.Windowing.csproj", "{6974FB92-29BA-4F90-82CC-22755D1A0DED}"
 EndProject

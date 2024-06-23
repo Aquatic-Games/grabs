@@ -12,9 +12,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\grabs.Graphics.D3D11\grabs.Graphics.D3D11.csproj" />
-      <ProjectReference Include="..\src\grabs.Graphics.GL43\grabs.Graphics.GL43.csproj" />
-      <ProjectReference Include="..\src\grabs.Graphics\grabs.Graphics.csproj" />
+      <ProjectReference Include="..\grabs.Graphics.D3D11\grabs.Graphics.D3D11.csproj" />
+      <ProjectReference Include="..\grabs.Graphics.GL43\grabs.Graphics.GL43.csproj" />
+      <ProjectReference Include="..\grabs.Graphics\grabs.Graphics.csproj" />
     </ItemGroup>
 
 </Project>

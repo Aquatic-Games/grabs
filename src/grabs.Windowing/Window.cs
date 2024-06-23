@@ -1,10 +1,13 @@
 ﻿using System;
 using grabs.Graphics;
+using grabs.Graphics.D3D11;
+using grabs.Graphics.GL43;
 using grabs.Windowing.Events;
 using Silk.NET.SDL;
 using QuitEvent = grabs.Windowing.Events.QuitEvent;
 using SdlEventType = Silk.NET.SDL.EventType;
 using SdlWindow = Silk.NET.SDL.Window;
+using Surface = grabs.Graphics.Surface;
 
 namespace grabs.Windowing;
 
@@ -63,6 +66,46 @@ public sealed unsafe class Window : IDisposable
         {
             _glContext = _sdl.GLCreateContext(_handle);
             _sdl.GLMakeCurrent(_handle, _glContext);
+        }
+    }
+
+    public Instance CreateInstance()
+    {
+        return _api switch
+        {
+            GraphicsApi.D3D11 => new D3D11Instance(),
+            GraphicsApi.OpenGL => new GL43Instance(s => (nint) _sdl.GLGetProcAddress(s)),
+            GraphicsApi.OpenGLES => new GL43Instance(s => (nint) _sdl.GLGetProcAddress(s)),
+            GraphicsApi.Vulkan => throw new NotSupportedException("Vulkan is not yet supported by the windowing framework."),
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+
+    public Surface CreateSurface()
+    {
+        switch (_api)
+        {
+            case GraphicsApi.D3D11:
+            {
+                SysWMInfo info = new SysWMInfo();
+                _sdl.GetWindowWMInfo(_handle, &info);
+
+                return new D3D11Surface(info.Info.Win.Hwnd);
+            }
+            case GraphicsApi.OpenGL:
+            case GraphicsApi.OpenGLES:
+            {
+                return new GL43Surface(i =>
+                {
+                    _sdl.GLSetSwapInterval(i);
+                    _sdl.GLSwapWindow(_handle);
+                });
+            }
+            
+            case GraphicsApi.Vulkan:
+                throw new NotSupportedException("Vulkan is not yet supported by the windowing framework.");
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 
