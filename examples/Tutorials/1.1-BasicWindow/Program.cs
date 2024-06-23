@@ -27,6 +27,12 @@ using Surface surface = window.CreateSurface();
 using Device device = instance.CreateDevice(surface);
 using CommandList commandList = device.CreateCommandList();
 
+// Create a swapchain that can be rendered to.
+// This defines the set of textures, and the framebuffer, that make up the final result.
+// Typically, a swapchain contains at least 2 buffers (in this case, textures), however you can define the number you
+// want in the Swapchain Description, although the default value is 2.
+// GRABS only exposes the first texture in the chain, and automatically switches texture depending on which buffer
+// you're rendering to.
 SwapchainDescription swapchainDesc = new SwapchainDescription(width, height, presentMode: PresentMode.VerticalSync);
 using Swapchain swapchain = device.CreateSwapchain(swapchainDesc);
 using Texture swapchainTexture = swapchain.GetSwapchainTexture();
@@ -35,6 +41,8 @@ using Framebuffer swapchainFramebuffer = device.CreateFramebuffer(swapchainTextu
 bool alive = true;
 while (alive)
 {
+    // Our main event loop. Keep polling all events until there are none left.
+    // In this case, we are just listening to the quit event.
     while (window.PollEvent(out IWindowEvent winEvent))
     {
         switch (winEvent)
@@ -45,16 +53,25 @@ while (alive)
         }
     }
     
+    // Begin our command list. This prepares it to start accepting commands.
     commandList.Begin();
 
+    // Begin a render pass. Every render command must be inside a render pass.
+    // Each render pass starts by clearing the given framebuffer (unless we tell it to preserve the contents),
+    // and since that is all we are doing in this example, we just immediately end the render pass.
     RenderPassDescription renderPassDesc =
         new RenderPassDescription(swapchainFramebuffer, new Vector4(1.0f, 0.5f, 0.25f, 1.0f));
     commandList.BeginRenderPass(renderPassDesc);
     commandList.EndRenderPass();
-        
+    
+    // End and finalize the command list for this frame.
     commandList.End();
-        
+    
+    // Tell the device to execute our command list. While in this example, we overwrite our command list each frame,
+    // you can execute the command list as many times as you want.
     device.ExecuteCommandList(commandList);
-        
+    
+    // Finally, present to the window's surface.
+    // This is also known as "swapping buffers".
     swapchain.Present();
 }

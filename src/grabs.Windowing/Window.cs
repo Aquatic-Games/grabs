@@ -22,13 +22,10 @@ public sealed unsafe class Window : IDisposable
     public Window(WindowInfo info)
     {
         _sdl = Sdl.GetApi();
-        _api = info.Api ?? GraphicsApi.OpenGL; // TODO: Temporary
+        _api = info.Api ?? ApiHelper.PickBestGraphicsApi(); // TODO: Temporary
 
         if (_sdl.Init(Sdl.InitVideo | Sdl.InitEvents) < 0)
             throw new Exception($"Failed to initialize SDL: {_sdl.GetErrorS()}");
-
-        // Wayland ftw...
-        _sdl.SetHint("SDL_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR", "0");
 
         WindowFlags flags = WindowFlags.Shown;
 
