@@ -28,7 +28,15 @@ public abstract class SampleBase : IDisposable
     {
         Size winSize = size ?? new Size(800, 600);
         
-        WindowInfo winInfo = new WindowInfo(title, winSize);
+        Console.WriteLine("Checking for \"GRABS_SAMPLE_API\".");
+        
+        string selectedApi = Environment.GetEnvironmentVariable("GRABS_SAMPLE_API");
+        if (selectedApi == null || !Enum.TryParse(selectedApi, out GraphicsApi api))
+            api = ApiHelper.PickBestGraphicsApi();
+        
+        Console.WriteLine($"Using API: {api}");
+        
+        WindowInfo winInfo = new WindowInfo(title, winSize, api: api);
         Window = new Window(winInfo);
 
         Instance = Window.CreateInstance();
