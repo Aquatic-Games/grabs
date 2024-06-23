@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Drawing;
 using System.Numerics;
 using grabs.Graphics;
 using grabs.Windowing;
 using grabs.Windowing.Events;
 
-WindowInfo info = new WindowInfo("Test Window", 1280, 720);
+WindowInfo info = new WindowInfo("Test Window", new Size(1280, 720));
 
 using Window window = new Window(info);
 using Instance instance = window.CreateInstance();

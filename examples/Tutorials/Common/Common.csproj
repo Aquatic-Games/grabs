@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\src\grabs.ShaderCompiler.DXC\grabs.ShaderCompiler.DXC.csproj" />
       <ProjectReference Include="..\..\..\src\grabs.Windowing\grabs.Windowing.csproj" />
     </ItemGroup>
 

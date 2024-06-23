@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Drawing;
+using System.Numerics;
 using grabs.Graphics;
 using grabs.Windowing;
 using grabs.Windowing.Events;
@@ -12,7 +13,7 @@ const uint width = 1280;
 const uint height = 720;
 
 // Create our window. There are some extra parameters in the constructor, but the default values are fine in this case.
-WindowInfo windowInfo = new WindowInfo("Tutorial 1.1 - Basic Window", width, height);
+WindowInfo windowInfo = new WindowInfo("Tutorial 1.1 - Basic Window", new Size((int) width, (int) height));
 using Window window = new Window(windowInfo);
 
 // Create an instance and surface.

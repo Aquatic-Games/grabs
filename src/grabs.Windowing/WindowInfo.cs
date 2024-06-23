@@ -1,3 +1,4 @@
+using System.Drawing;
 using grabs.Graphics;
 
 namespace grabs.Windowing;
@@ -6,19 +7,17 @@ public struct WindowInfo
 {
     public string Title;
 
-    public uint Width;
-    public uint Height;
+    public Size Size;
 
     public int? X;
     public int? Y;
 
     public GraphicsApi? Api;
 
-    public WindowInfo(string title, uint width, uint height, int? x = null, int? y = null, GraphicsApi? api = null)
+    public WindowInfo(string title, Size size, int? x = null, int? y = null, GraphicsApi? api = null)
     {
         Title = title;
-        Width = width;
-        Height = height;
+        Size = size;
         X = x;
         Y = y;
         Api = api;

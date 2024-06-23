@@ -26,10 +26,9 @@ public abstract class SampleBase : IDisposable
 
     public SampleBase(string title, Size? size = null)
     {
-        uint width = (uint) (size?.Width ?? 640);
-        uint height = (uint) (size?.Height ?? 640);
+        Size winSize = size ?? new Size(800, 600);
         
-        WindowInfo winInfo = new WindowInfo(title, width, height);
+        WindowInfo winInfo = new WindowInfo(title, winSize);
         Window = new Window(winInfo);
 
         Instance = Window.CreateInstance();
@@ -38,8 +37,8 @@ public abstract class SampleBase : IDisposable
         Device = Instance.CreateDevice(_surface);
         CommandList = Device.CreateCommandList();
 
-        _swapchain =
-            Device.CreateSwapchain(new SwapchainDescription(width, height, presentMode: PresentMode.VerticalSync));
+        _swapchain = Device.CreateSwapchain(new SwapchainDescription((uint) winSize.Width, (uint) winSize.Height,
+            presentMode: PresentMode.VerticalSync));
 
         _swapchainTexture = _swapchain.GetSwapchainTexture();
         SwapchainFramebuffer = Device.CreateFramebuffer(_swapchainTexture);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using grabs.Graphics;
 using grabs.Graphics.D3D11;
 using grabs.Graphics.GL43;
@@ -18,6 +19,27 @@ public sealed unsafe class Window : IDisposable
     private void* _glContext;
 
     private GraphicsApi _api;
+
+    public Size Size
+    {
+        get
+        {
+            int w, h;
+            _sdl.GetWindowSize(_handle, &w, &h);
+            return new Size(w, h);
+        }
+        set => _sdl.SetWindowSize(_handle, value.Width, value.Height);
+    }
+
+    public Size FramebufferSize
+    {
+        get
+        {
+            int w, h;
+            _sdl.GetWindowSizeInPixels(_handle, &w, &h);
+            return new Size(w, h);
+        }
+    }
     
     public Window(WindowInfo info)
     {
@@ -54,7 +76,7 @@ public sealed unsafe class Window : IDisposable
         }
 
         _handle = _sdl.CreateWindow(info.Title, info.X ?? Sdl.WindowposCentered, info.Y ?? Sdl.WindowposCentered,
-            (int) info.Width, (int) info.Height, (uint) flags);
+            info.Size.Width, info.Size.Height, (uint) flags);
 
         if (_handle == null)
             throw new Exception($"Failed to create SDL window: {_sdl.GetErrorS()}");
