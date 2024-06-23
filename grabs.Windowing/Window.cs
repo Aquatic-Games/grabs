@@ -1,6 +1,9 @@
 ﻿using System;
 using grabs.Graphics;
+using grabs.Windowing.Events;
 using Silk.NET.SDL;
+using QuitEvent = grabs.Windowing.Events.QuitEvent;
+using SdlEventType = Silk.NET.SDL.EventType;
 using SdlWindow = Silk.NET.SDL.Window;
 
 namespace grabs.Windowing;
@@ -61,6 +64,36 @@ public sealed unsafe class Window : IDisposable
             _glContext = _sdl.GLCreateContext(_handle);
             _sdl.GLMakeCurrent(_handle, _glContext);
         }
+    }
+
+    public bool PollEvent(out IWindowEvent @event)
+    {
+        @event = null;
+        
+        Event winEvent;
+        while (_sdl.PollEvent(&winEvent) != 0)
+        {
+            switch ((SdlEventType) winEvent.Type)
+            {
+                case SdlEventType.Windowevent:
+                {
+                    switch ((WindowEventID) winEvent.Window.Event)
+                    {
+                        case WindowEventID.Close:
+                            @event = new QuitEvent();
+                            return true;
+                        
+                        default:
+                            continue;
+                    }
+                }
+                
+                default:
+                    continue;
+            }
+        }
+
+        return false;
     }
     
     public void Dispose()
