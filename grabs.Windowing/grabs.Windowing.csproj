@@ -2,8 +2,19 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Silk.NET.SDL" Version="2.21.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\src\grabs.Graphics.D3D11\grabs.Graphics.D3D11.csproj" />
+      <ProjectReference Include="..\src\grabs.Graphics.GL43\grabs.Graphics.GL43.csproj" />
+      <ProjectReference Include="..\src\grabs.Graphics\grabs.Graphics.csproj" />
+    </ItemGroup>
 
 </Project>
