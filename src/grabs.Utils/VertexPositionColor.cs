@@ -14,4 +14,6 @@ public struct VertexPositionColor
         Position = position;
         Color = color;
     }
+
+    public const uint SizeInBytes = 28;
 }

@@ -49,6 +49,8 @@ public sealed unsafe class Window : IDisposable
         if (_sdl.Init(Sdl.InitVideo | Sdl.InitEvents) < 0)
             throw new Exception($"Failed to initialize SDL: {_sdl.GetErrorS()}");
 
+        _sdl.SetHint("SDL_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR", "0");
+
         WindowFlags flags = WindowFlags.Shown;
 
         switch (_api)

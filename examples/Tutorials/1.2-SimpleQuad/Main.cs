@@ -36,7 +36,7 @@ public class Main : SampleBase
         // 3 -------- 2           |          If you match them up, you'll see how this quad is made.
         //                      -1 Y
         
-        ReadOnlySpan<float> quadVertices = stackalloc float[]
+        float[] quadVertices = new float[]
         {
             // Position     Color
             -0.5f, +0.5f,   1.0f, 0.0f, 0.0f,
@@ -45,7 +45,7 @@ public class Main : SampleBase
             -0.5f, -0.5f,   0.0f, 0.0f, 0.0f,
         };
 
-        ReadOnlySpan<ushort> quadIndices = stackalloc ushort[]
+        ushort[] quadIndices = new ushort[]
         {
             0, 1, 3,
             1, 2, 3

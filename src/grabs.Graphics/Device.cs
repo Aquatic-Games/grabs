@@ -43,6 +43,12 @@ public abstract class Device : IDisposable
     public unsafe Texture CreateTexture(in TextureDescription description)
         => CreateTexture(description, null);
 
+    public unsafe Texture CreateTexture<T>(in TextureDescription description, T[] data) where T : unmanaged
+    {
+        fixed (void* pData = data)
+            return CreateTexture(description, pData);
+    }
+
     public unsafe Texture CreateTexture<T>(in TextureDescription description, in ReadOnlySpan<T> data)
         where T : unmanaged
     {

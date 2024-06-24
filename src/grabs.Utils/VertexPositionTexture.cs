@@ -14,4 +14,6 @@ public struct VertexPositionTexture
         Position = position;
         TexCoord = texCoord;
     }
+
+    public const uint SizeInBytes = 20;
 }

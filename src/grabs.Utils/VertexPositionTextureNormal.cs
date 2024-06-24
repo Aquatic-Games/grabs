@@ -16,4 +16,6 @@ public struct VertexPositionTextureNormal
         TexCoord = texCoord;
         Normal = normal;
     }
+    
+    public const uint SizeInBytes = 32;
 }
