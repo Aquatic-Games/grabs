@@ -63,6 +63,9 @@ public class GL43Pipeline : Pipeline
                 case Format.R32G32B32A32_Float:
                     _gl.VertexAttribFormat(i, 4, VertexAttribType.Float, false, desc.Offset);
                     break;
+                case Format.R8G8B8A8_UNorm:
+                    _gl.VertexAttribFormat(i, 4, VertexAttribType.UnsignedByte, true, desc.Offset);
+                    break;
                 default:
                     throw new NotImplementedException();
             }
