@@ -129,6 +129,12 @@ public sealed class D3D11CommandList : CommandList
         Context.DrawIndexed((int) numIndices, 0, 0);
     }
 
+    public override void DrawIndexed(uint numIndices, uint startIndex, int baseVertex)
+    {
+        SetPreDrawParameters();
+        Context.DrawIndexed((int) numIndices, (int) startIndex, baseVertex);
+    }
+
     private void SetPreDrawParameters()
     {
         if (_currentPipeline.Layouts == null)

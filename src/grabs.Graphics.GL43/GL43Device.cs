@@ -14,6 +14,7 @@ public class GL43Device : Device
     private GL43DescriptorSet[] _setSets;
 
     private DrawElementsType _currentDrawElementsType;
+    private uint _currentDrawElementsSizeInBytes;
     private Silk.NET.OpenGL.PrimitiveType _currentPrimitiveType;
     
     public GL43Device(GL gl, GL43Surface surface)
@@ -221,6 +222,10 @@ public class GL43Device : Device
                         Format.R32_UInt => DrawElementsType.UnsignedInt,
                         _ => throw new NotSupportedException()
                     };
+
+                    // TODO: Should this method be renamed?
+                    _currentDrawElementsSizeInBytes = action.Format.BitsPerPixel() / 8;
+                    
                     break;
                 }
 
@@ -245,7 +250,15 @@ public class GL43Device : Device
                     _gl.DrawElements(_currentPrimitiveType, action.Slot, _currentDrawElementsType, null);
                     break;
                 }
-                
+
+                case CommandListActionType.DrawIndexedBaseVertex:
+                {
+                    SetPreDrawParameters();
+                    _gl.DrawElementsBaseVertex(_currentPrimitiveType, action.Slot, _currentDrawElementsType,
+                        (void*) (action.Offset * _currentDrawElementsSizeInBytes), (int) action.Stride);
+                    break;
+                }
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }

@@ -45,6 +45,8 @@ public abstract class CommandList : IDisposable
     public abstract void Draw(uint numVertices);
 
     public abstract void DrawIndexed(uint numIndices);
+
+    public abstract void DrawIndexed(uint numIndices, uint startIndex, int baseVertex);
     
     public abstract void Dispose();
 }

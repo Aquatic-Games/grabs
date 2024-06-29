@@ -120,5 +120,15 @@ public class GL43CommandList : CommandList
         });
     }
 
+    public override void DrawIndexed(uint numIndices, uint startIndex, int baseVertex)
+    {
+        Actions.Add(new CommandListAction(CommandListActionType.DrawIndexedBaseVertex)
+        {
+            Slot = numIndices,
+            Offset = startIndex,
+            Stride = (uint) baseVertex
+        });
+    }
+
     public override void Dispose() { }
 }
