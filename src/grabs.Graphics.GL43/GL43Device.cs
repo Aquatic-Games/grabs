@@ -164,6 +164,7 @@ public class GL43Device : Device
 
                     DepthStencilDescription depthDesc = pipeline.DepthStencilDescription;
                     RasterizerDescription rasterizerDesc = pipeline.RasterizerDescription;
+                    BlendDescription blendDesc = pipeline.BlendDescription;
 
                     if (depthDesc.DepthEnabled)
                     {
@@ -198,6 +199,56 @@ public class GL43Device : Device
                         _gl.FrontFace(rasterizerDesc.FrontFace == CullDirection.Clockwise
                             ? FrontFaceDirection.CW
                             : FrontFaceDirection.Ccw);
+                    }
+                    
+                    if (blendDesc.IndependentBlending)
+                    {
+                        for (uint i = 0; i < blendDesc.Attachments.Length; i++)
+                        {
+                            ref BlendAttachmentDescription attachmentDesc = ref blendDesc.Attachments[i];
+
+                            if (!attachmentDesc.Enabled)
+                            {
+                                _gl.Disable(EnableCap.Blend, i);
+                                continue;
+                            }
+                            
+                            _gl.Enable(EnableCap.Blend, i);
+
+                            _gl.BlendFuncSeparate(i, GLUtils.BlendFactorToGL(attachmentDesc.Source),
+                                GLUtils.BlendFactorToGL(attachmentDesc.Destination),
+                                GLUtils.BlendFactorToGL(attachmentDesc.SourceAlpha),
+                                GLUtils.BlendFactorToGL(attachmentDesc.DestinationAlpha));
+
+                            _gl.BlendEquationSeparate(i, GLUtils.BlendOperationToGL(attachmentDesc.BlendOperation),
+                                GLUtils.BlendOperationToGL(attachmentDesc.AlphaBlendOperation));
+                        }
+                        
+                        // For independent blend, we always set the blend color, as its easier than checking if every
+                        // blend is disabled or not.
+                        _gl.BlendColor(blendDesc.BlendConstants.X, blendDesc.BlendConstants.Y,
+                            blendDesc.BlendConstants.Z, blendDesc.BlendConstants.W);
+                    }
+                    else
+                    {
+                        ref BlendAttachmentDescription attachmentDesc = ref blendDesc.Attachments[0];
+
+                        if (attachmentDesc.Enabled)
+                        {
+                            _gl.Enable(EnableCap.Blend);
+                            _gl.BlendColor(blendDesc.BlendConstants.X, blendDesc.BlendConstants.Y,
+                                blendDesc.BlendConstants.Z, blendDesc.BlendConstants.W);
+                            
+                            _gl.BlendFuncSeparate(GLUtils.BlendFactorToGL(attachmentDesc.Source),
+                                GLUtils.BlendFactorToGL(attachmentDesc.Destination),
+                                GLUtils.BlendFactorToGL(attachmentDesc.SourceAlpha),
+                                GLUtils.BlendFactorToGL(attachmentDesc.DestinationAlpha));
+
+                            _gl.BlendEquationSeparate(GLUtils.BlendOperationToGL(attachmentDesc.BlendOperation),
+                                GLUtils.BlendOperationToGL(attachmentDesc.AlphaBlendOperation));
+                        }
+                        else
+                            _gl.Disable(EnableCap.Blend);
                     }
 
                     _currentPrimitiveType = pipeline.PrimitiveType;

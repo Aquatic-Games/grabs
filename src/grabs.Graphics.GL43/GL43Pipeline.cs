@@ -17,6 +17,8 @@ public class GL43Pipeline : Pipeline
 
     public readonly RasterizerDescription RasterizerDescription;
 
+    public readonly BlendDescription BlendDescription;
+
     public readonly GL43DescriptorLayout[] Layouts;
 
     public GL43Pipeline(GL gl, in PipelineDescription description)
@@ -77,6 +79,7 @@ public class GL43Pipeline : Pipeline
 
         DepthStencilDescription = description.DepthStencilState;
         RasterizerDescription = description.RasterizerState;
+        BlendDescription = description.BlendState;
 
         PrimitiveType = description.PrimitiveType switch
         {

@@ -36,7 +36,7 @@ public struct BlendAttachmentDescription
     }
 
     public static BlendAttachmentDescription Disabled =>
-        new BlendAttachmentDescription(false, BlendFactor.One, BlendFactor.One);
+        new BlendAttachmentDescription(false, BlendFactor.One, BlendFactor.Zero);
 
     public static BlendAttachmentDescription NonPremultiplied =>
         new BlendAttachmentDescription(true, BlendFactor.SrcAlpha, BlendFactor.OneMinusSrcAlpha);
