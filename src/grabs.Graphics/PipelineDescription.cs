@@ -12,14 +12,16 @@ public struct PipelineDescription
 
     public RasterizerDescription RasterizerState;
 
+    public BlendDescription BlendState;
+
     public DescriptorLayout[] DescriptorLayouts;
     
     public PrimitiveType PrimitiveType;
 
     public PipelineDescription(ShaderModule vertexShader, ShaderModule pixelShader,
         InputLayoutDescription[] inputLayout, DepthStencilDescription depthStencilState,
-        RasterizerDescription rasterizerState, DescriptorLayout[] descriptorLayouts, 
-        PrimitiveType primitiveType = PrimitiveType.TriangleList)
+        RasterizerDescription rasterizerState, BlendDescription blendState,
+        DescriptorLayout[] descriptorLayouts, PrimitiveType primitiveType = PrimitiveType.TriangleList)
     {
         VertexShader = vertexShader;
         PixelShader = pixelShader;
@@ -27,6 +29,7 @@ public struct PipelineDescription
         DepthStencilState = depthStencilState;
         RasterizerState = rasterizerState;
         DescriptorLayouts = descriptorLayouts;
+        BlendState = blendState;
         PrimitiveType = primitiveType;
     }
 }

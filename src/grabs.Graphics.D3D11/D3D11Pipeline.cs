@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using Vortice.Direct3D;
 using Vortice.Direct3D11;
 
@@ -13,6 +14,8 @@ public sealed class D3D11Pipeline : Pipeline
 
     public readonly ID3D11DepthStencilState DepthStencilState;
     public readonly ID3D11RasterizerState RasterizerState;
+    public readonly ID3D11BlendState BlendState;
+    public readonly Vector4 BlendConstants;
 
     public readonly D3D11DescriptorLayout[] Layouts;
 
@@ -77,6 +80,30 @@ public sealed class D3D11Pipeline : Pipeline
         };
 
         RasterizerState = device.CreateRasterizerState(rsDesc);
+
+        BlendDescription blendDesc = description.BlendState;
+        BlendConstants = blendDesc.BlendConstants;
+        Vortice.Direct3D11.BlendDescription bDesc = new Vortice.Direct3D11.BlendDescription()
+        {
+            IndependentBlendEnable = blendDesc.IndependentBlending
+        };
+
+        for (int i = 0; i < blendDesc.Attachments.Length; i++)
+        {
+            ref BlendAttachmentDescription attachmentDesc = ref blendDesc.Attachments[i];
+            ref RenderTargetBlendDescription rtDesc = ref bDesc.RenderTarget[i];
+            
+            rtDesc.BlendEnable = attachmentDesc.Enabled;
+            rtDesc.SourceBlend = D3D11Utils.BlendFactorToD3D(attachmentDesc.Source);
+            rtDesc.DestinationBlend = D3D11Utils.BlendFactorToD3D(attachmentDesc.Destination);
+            rtDesc.BlendOperation = D3D11Utils.BlendOperationToD3D(attachmentDesc.BlendOperation);
+            rtDesc.SourceBlendAlpha = D3D11Utils.BlendFactorToD3D(attachmentDesc.SourceAlpha);
+            rtDesc.DestinationBlendAlpha = D3D11Utils.BlendFactorToD3D(attachmentDesc.DestinationAlpha);
+            rtDesc.BlendOperationAlpha = D3D11Utils.BlendOperationToD3D(attachmentDesc.AlphaBlendOperation);
+            rtDesc.RenderTargetWriteMask = (ColorWriteEnable) attachmentDesc.ColorWriteMask;
+        }
+
+        BlendState = device.CreateBlendState(bDesc);
 
         if (description.DescriptorLayouts != null)
         {

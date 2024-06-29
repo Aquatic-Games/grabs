@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using Vortice.Direct3D11;
 using Vortice.Mathematics;
@@ -87,10 +88,12 @@ public sealed class D3D11CommandList : CommandList
             viewport.MaxDepth);
     }
 
-    public override void SetPipeline(Pipeline pipeline)
+    public override unsafe void SetPipeline(Pipeline pipeline)
     {
         D3D11Pipeline d3dPipeline = (D3D11Pipeline) pipeline;
         _currentPipeline = d3dPipeline;
+
+        Vector4 blendConstants = d3dPipeline.BlendConstants;
         
         Context.VSSetShader(d3dPipeline.VertexShader);
         Context.PSSetShader(d3dPipeline.PixelShader);
@@ -98,6 +101,7 @@ public sealed class D3D11CommandList : CommandList
             Context.IASetInputLayout(d3dPipeline.InputLayout);
         Context.OMSetDepthStencilState(d3dPipeline.DepthStencilState);
         Context.RSSetState(d3dPipeline.RasterizerState);
+        Context.OMSetBlendState(d3dPipeline.BlendState, &blendConstants.X);
         Context.IASetPrimitiveTopology(d3dPipeline.PrimitiveTopology);
     }
 

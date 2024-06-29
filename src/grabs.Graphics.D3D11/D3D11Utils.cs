@@ -1,5 +1,6 @@
 ﻿using System;
 using Vortice.Direct3D;
+using Vortice.Direct3D11;
 using DXGIFormat = Vortice.DXGI.Format;
 
 namespace grabs.Graphics.D3D11;
@@ -110,6 +111,44 @@ public static class D3D11Utils
             PrimitiveType.TriangleListAdjacency => PrimitiveTopology.TriangleListAdjacency,
             PrimitiveType.TriangleStripAdjacency => PrimitiveTopology.TriangleStripAdjacency,
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+        };
+    }
+
+    public static Blend BlendFactorToD3D(BlendFactor factor)
+    {
+        return factor switch
+        {
+            BlendFactor.Zero => Blend.Zero,
+            BlendFactor.One => Blend.One,
+            BlendFactor.SrcColor => Blend.SourceColor,
+            BlendFactor.OneMinusSrcColor => Blend.InverseSourceColor,
+            BlendFactor.DestColor => Blend.DestinationColor,
+            BlendFactor.OneMinusDestColor => Blend.InverseDestinationColor,
+            BlendFactor.SrcAlpha => Blend.SourceAlpha,
+            BlendFactor.OneMinusSrcAlpha => Blend.InverseSourceAlpha,
+            BlendFactor.DestAlpha => Blend.DestinationAlpha,
+            BlendFactor.OneMinusDestAlpha => Blend.InverseDestinationAlpha,
+            BlendFactor.ConstantColor => Blend.DestinationColor,
+            BlendFactor.OneMinusConstantColor => Blend.InverseDestinationColor,
+            BlendFactor.SrcAlphaSaturate => Blend.SourceAlphaSaturate,
+            BlendFactor.Src1Color => Blend.Source1Color,
+            BlendFactor.OneMinusSrc1Color => Blend.InverseSource1Color,
+            BlendFactor.Src1Alpha => Blend.Source1Alpha,
+            BlendFactor.OneMinusSrc1Alpha => Blend.InverseSource1Alpha,
+            _ => throw new ArgumentOutOfRangeException(nameof(factor), factor, null)
+        };
+    }
+
+    public static Vortice.Direct3D11.BlendOperation BlendOperationToD3D(BlendOperation operation)
+    {
+        return operation switch
+        {
+            BlendOperation.Add => Vortice.Direct3D11.BlendOperation.Add,
+            BlendOperation.Subtract => Vortice.Direct3D11.BlendOperation.Subtract,
+            BlendOperation.ReverseSubtract => Vortice.Direct3D11.BlendOperation.ReverseSubtract,
+            BlendOperation.Min => Vortice.Direct3D11.BlendOperation.Min,
+            BlendOperation.Max => Vortice.Direct3D11.BlendOperation.Max,
+            _ => throw new ArgumentOutOfRangeException(nameof(operation), operation, null)
         };
     }
 }

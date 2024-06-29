@@ -14,8 +14,6 @@ public enum BlendFactor
     OneMinusDestAlpha,
     ConstantColor,
     OneMinusConstantColor,
-    ConstantAlpha,
-    OneMinusConstantAlpha,
     SrcAlphaSaturate,
     Src1Color,
     OneMinusSrc1Color,

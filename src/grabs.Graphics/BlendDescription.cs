@@ -1,21 +1,27 @@
-﻿namespace grabs.Graphics;
+﻿using System.Numerics;
+
+namespace grabs.Graphics;
 
 public struct BlendDescription
 {
     public bool IndependentBlending;
 
-    public BlendAttachmentDescription[] BlendAttachments;
+    public BlendAttachmentDescription[] Attachments;
+
+    public Vector4 BlendConstants;
 
     public BlendDescription(BlendAttachmentDescription blendAttachment)
     {
         IndependentBlending = false;
-        BlendAttachments = [blendAttachment];
+        Attachments = [blendAttachment];
+        BlendConstants = Vector4.Zero;
     }
 
-    public BlendDescription(bool independentBlending, params BlendAttachmentDescription[] blendAttachments)
+    public BlendDescription(bool independentBlending, params BlendAttachmentDescription[] attachments)
     {
         IndependentBlending = independentBlending;
-        BlendAttachments = blendAttachments;
+        Attachments = attachments;
+        BlendConstants = Vector4.Zero;
     }
 
     public static BlendDescription Disabled => new BlendDescription(BlendAttachmentDescription.Disabled);
