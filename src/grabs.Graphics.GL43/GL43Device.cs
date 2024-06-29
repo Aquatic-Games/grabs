@@ -23,6 +23,9 @@ public class GL43Device : Device
         _surface = surface;
 
         _setSets = new GL43DescriptorSet[16];
+        
+        // Scissor test is always enabled.
+        _gl.Enable(EnableCap.ScissorTest);
     }
     
     public override Swapchain CreateSwapchain(in SwapchainDescription description)
@@ -151,6 +154,13 @@ public class GL43Device : Device
                     
                     _gl.Viewport(viewport.X, (int) _swapchain.Height - viewport.Y - (int) viewport.Height, viewport.Width, viewport.Height);
                     _gl.DepthRange(viewport.MinDepth, viewport.MaxDepth);
+                    break;
+                }
+
+                case CommandListActionType.SetScissor:
+                {
+                    Viewport rect = action.Viewport;
+                    _gl.Scissor(rect.X, (int) _swapchain.Height - rect.Y - (int) rect.Height, rect.Width, rect.Height);
                     break;
                 }
 

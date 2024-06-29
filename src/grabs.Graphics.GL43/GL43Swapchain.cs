@@ -89,15 +89,17 @@ public sealed class GL43Swapchain : Swapchain
 
     public override void Present()
     {
+        _gl.Disable(EnableCap.ScissorTest);
+        _gl.Disable(EnableCap.DepthTest);
+        _gl.Enable(EnableCap.CullFace);
+        
+        _gl.FrontFace(FrontFaceDirection.CW);
+        _gl.CullFace(TriangleFace.Back);
+        
         _gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         _gl.Viewport(0, 0, Width, Height);
         _gl.ClearColor(0, 0, 0, 1);
         _gl.Clear(ClearBufferMask.ColorBufferBit);
-        
-        _gl.Disable(EnableCap.DepthTest);
-        _gl.Enable(EnableCap.CullFace);
-        _gl.FrontFace(FrontFaceDirection.CW);
-        _gl.CullFace(TriangleFace.Back);
         
         _gl.BindVertexArray(_drawVao);
         _gl.UseProgram(_drawProgram);
@@ -106,6 +108,9 @@ public sealed class GL43Swapchain : Swapchain
         _gl.BindTexture(TextureTarget.Texture2D, _swapchainTexture.Texture);
         
         _gl.DrawArrays(Silk.NET.OpenGL.PrimitiveType.Triangles, 0, 6);
+        
+        // Scissor test is always enabled. Except here, where it is ignored.
+        _gl.Enable(EnableCap.ScissorTest);
         
         _surface.PresentFunc(_swapInterval);
     }

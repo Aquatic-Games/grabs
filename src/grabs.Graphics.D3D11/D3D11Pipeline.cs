@@ -76,7 +76,10 @@ public sealed class D3D11Pipeline : Pipeline
                 CullFace.Back => CullMode.Back,
                 _ => throw new ArgumentOutOfRangeException()
             },
-            FrontCounterClockwise = rasterizerDesc.FrontFace == CullDirection.CounterClockwise
+            FrontCounterClockwise = rasterizerDesc.FrontFace == CullDirection.CounterClockwise,
+            
+            // In Vulkan, D3D12, scissor test is always enabled.
+            ScissorEnable = true
         };
 
         RasterizerState = device.CreateRasterizerState(rsDesc);

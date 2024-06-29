@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 
 namespace grabs.Graphics;
 
@@ -33,6 +34,9 @@ public abstract class CommandList : IDisposable
     public abstract void GenerateMipmaps(Texture texture);
 
     public abstract void SetViewport(in Viewport viewport);
+
+    // TODO: Custom GRABS rectangle type.
+    public abstract void SetScissor(in Rectangle rectangle);
 
     public abstract void SetPipeline(Pipeline pipeline);
 

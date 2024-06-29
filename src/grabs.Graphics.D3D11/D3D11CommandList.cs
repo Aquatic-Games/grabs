@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Vortice.Direct3D11;
@@ -86,6 +87,11 @@ public sealed class D3D11CommandList : CommandList
     {
         Context.RSSetViewport(viewport.X, viewport.Y, viewport.Width, viewport.Height, viewport.MinDepth,
             viewport.MaxDepth);
+    }
+
+    public override void SetScissor(in Rectangle rectangle)
+    {
+        Context.RSSetScissorRect(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
     }
 
     public override unsafe void SetPipeline(Pipeline pipeline)

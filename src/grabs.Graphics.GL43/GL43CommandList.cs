@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Runtime.CompilerServices;
 
 namespace grabs.Graphics.GL43;
@@ -64,6 +65,14 @@ public class GL43CommandList : CommandList
         Actions.Add(new CommandListAction(CommandListActionType.SetViewport)
         {
             Viewport = viewport
+        });
+    }
+
+    public override void SetScissor(in Rectangle rectangle)
+    {
+        Actions.Add(new CommandListAction(CommandListActionType.SetScissor)
+        {
+            Viewport = new Viewport(rectangle.X, rectangle.Y, (uint) rectangle.Width, (uint) rectangle.Height)
         });
     }
 

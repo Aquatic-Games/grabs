@@ -7,6 +7,7 @@ public enum CommandListActionType
     UpdateBuffer,
     GenerateMipmaps,
     SetViewport,
+    SetScissor,
     SetPipeline,
     SetVertexBuffer,
     SetIndexBuffer,
