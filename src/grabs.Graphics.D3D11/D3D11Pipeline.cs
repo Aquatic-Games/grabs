@@ -45,7 +45,7 @@ public sealed class D3D11Pipeline : Pipeline
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
-                elementDescs[i] = new InputElementDescription("TEXCOORD", i, desc.Format.ToDXGIFormat(),
+                elementDescs[i] = new InputElementDescription("TEXCOORD", i, D3D11Utils.FormatToD3D(desc.Format),
                     (int) desc.Offset, (int) desc.Slot, classification, step);
             }
 
@@ -57,7 +57,7 @@ public sealed class D3D11Pipeline : Pipeline
         {
             DepthEnable = depthDesc.DepthEnabled,
             DepthWriteMask = depthDesc.DepthWrite ? DepthWriteMask.All : DepthWriteMask.Zero,
-            DepthFunc = depthDesc.ComparisonFunction.ToComparisonFunc(),
+            DepthFunc = D3D11Utils.ComparisonFunctionToD3D(depthDesc.ComparisonFunction),
             StencilEnable = false
         };
 
@@ -125,7 +125,7 @@ public sealed class D3D11Pipeline : Pipeline
             }
         }
 
-        PrimitiveTopology = description.PrimitiveType.ToPrimitiveTopology();
+        PrimitiveTopology = D3D11Utils.PrimitiveTypeToD3D(description.PrimitiveType);
     }
     
     public override void Dispose()

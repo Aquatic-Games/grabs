@@ -7,7 +7,7 @@ namespace grabs.Graphics.D3D11;
 
 public static class D3D11Utils
 {
-    public static DXGIFormat ToDXGIFormat(this Format format)
+    public static DXGIFormat FormatToD3D(Format format)
     {
         return format switch
         {
@@ -80,7 +80,7 @@ public static class D3D11Utils
         };
     }
 
-    public static Vortice.Direct3D11.ComparisonFunction ToComparisonFunc(this ComparisonFunction func)
+    public static Vortice.Direct3D11.ComparisonFunction ComparisonFunctionToD3D(ComparisonFunction func)
     {
         return func switch
         {
@@ -96,7 +96,7 @@ public static class D3D11Utils
         };
     }
 
-    public static PrimitiveTopology ToPrimitiveTopology(this PrimitiveType type)
+    public static PrimitiveTopology PrimitiveTypeToD3D(PrimitiveType type)
     {
         return type switch
         {

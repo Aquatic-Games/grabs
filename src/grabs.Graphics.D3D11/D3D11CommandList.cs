@@ -112,7 +112,7 @@ public sealed class D3D11CommandList : CommandList
 
     public override void SetIndexBuffer(Buffer buffer, Format format)
     {
-        Context.IASetIndexBuffer(((D3D11Buffer) buffer).Buffer, format.ToDXGIFormat(), 0);
+        Context.IASetIndexBuffer(((D3D11Buffer) buffer).Buffer, D3D11Utils.FormatToD3D(format), 0);
     }
 
     public override void SetDescriptorSet(uint index, DescriptorSet set)

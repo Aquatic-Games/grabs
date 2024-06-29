@@ -34,7 +34,7 @@ public sealed class D3D11Swapchain : Swapchain
         SwapChainDescription desc = new SwapChainDescription()
         {
             Windowed = true,
-            BufferDescription = new ModeDescription((int) description.Width, (int) description.Height, description.Format.ToDXGIFormat()),
+            BufferDescription = new ModeDescription((int) description.Width, (int) description.Height, D3D11Utils.FormatToD3D(description.Format)),
             BufferCount = (int) description.BufferCount,
             OutputWindow = surface.Hwnd,
             SampleDescription = new SampleDescription(1, 0),

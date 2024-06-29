@@ -26,7 +26,7 @@ public sealed class D3D11Texture : Texture
         
         ShaderResourceViewDescription srvDesc = new ShaderResourceViewDescription()
         {
-            Format = description.Format.ToDXGIFormat()
+            Format = D3D11Utils.FormatToD3D(description.Format)
         };
 
         switch (description.Type)
