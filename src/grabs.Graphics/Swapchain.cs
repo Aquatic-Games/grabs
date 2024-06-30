@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 
 namespace grabs.Graphics;
 
@@ -9,7 +8,7 @@ public abstract class Swapchain : IDisposable
 
     public abstract Texture GetSwapchainTexture();
 
-    public abstract void Resize(Size size);
+    public abstract void Resize(uint width, uint height);
     
     public abstract void Present();
     

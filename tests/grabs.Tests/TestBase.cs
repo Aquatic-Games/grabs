@@ -162,12 +162,12 @@ public abstract unsafe class TestBase : IDisposable
                                 Framebuffer.Dispose();
                                 DepthTexture.Dispose();
                                 ColorTexture.Dispose();
-                                Size newSize = new Size(winEvent.Window.Data1, winEvent.Window.Data2);
-                                Console.WriteLine(newSize);
-                                Swapchain.Resize(newSize);
+                                uint width = (uint) winEvent.Window.Data1;
+                                uint height = (uint) winEvent.Window.Data2;
+                                Swapchain.Resize(width, height);
                                 ColorTexture = Swapchain.GetSwapchainTexture();
-                                DepthTexture = Device.CreateTexture(TextureDescription.Texture2D((uint) newSize.Width,
-                                    (uint) newSize.Height, 1, Format.D32_Float, TextureUsage.None));
+                                DepthTexture = Device.CreateTexture(TextureDescription.Texture2D(width, height, 1,
+                                    Format.D32_Float, TextureUsage.None));
                                 Framebuffer = Device.CreateFramebuffer(ColorTexture, DepthTexture);
                                 break;
                             }

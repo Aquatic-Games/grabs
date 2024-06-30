@@ -22,7 +22,7 @@ public class VkSwapchain : Swapchain
         throw new System.NotImplementedException();
     }
 
-    public override void Resize(Size size)
+    public override void Resize(uint width, uint height)
     {
         throw new System.NotImplementedException();
     }

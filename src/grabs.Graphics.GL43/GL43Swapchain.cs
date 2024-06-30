@@ -88,10 +88,10 @@ public sealed class GL43Swapchain : Swapchain
         return _swapchainTexture;
     }
 
-    public override unsafe void Resize(Size size)
+    public override unsafe void Resize(uint width, uint height)
     {
-        Width = (uint) size.Width;
-        Height = (uint) size.Height;
+        Width = width;
+        Height = height;
         
         _swapchainTexture.Dispose();
         

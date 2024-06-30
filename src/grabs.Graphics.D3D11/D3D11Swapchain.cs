@@ -63,7 +63,7 @@ public sealed class D3D11Swapchain : Swapchain
         return new D3D11Texture(SwapChain.GetBuffer<ID3D11Texture2D>(0), null);
     }
 
-    public override void Resize(Size size)
+    public override void Resize(uint width, uint height)
     {
         _context.Flush();
         
@@ -75,7 +75,7 @@ public sealed class D3D11Swapchain : Swapchain
         _context.ClearState();
         _context.Flush();
         
-        SwapChain.ResizeBuffers(0, size.Width, size.Height, Vortice.DXGI.Format.Unknown,
+        SwapChain.ResizeBuffers(0, (int) width, (int) height, Vortice.DXGI.Format.Unknown,
             SwapChainFlags.AllowTearing | SwapChainFlags.AllowModeSwitch).CheckError();
     }
 
