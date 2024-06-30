@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using SharpGen.Runtime;
 using Vortice.Direct3D11;
+using Vortice.Direct3D11.Debug;
 using Vortice.DXGI;
 
 namespace grabs.Graphics.D3D11;
@@ -8,10 +12,12 @@ public sealed class D3D11Swapchain : Swapchain
 {
     private PresentMode _presentMode;
     private int _swapInterval;
+
+    private ID3D11DeviceContext _context;
+    
+    internal List<D3D11CommandList> CommandLists;
     
     public readonly IDXGISwapChain SwapChain;
-    
-    public readonly ID3D11Texture2D SwapChainTexture;
 
     public override PresentMode PresentMode
     {
@@ -29,8 +35,12 @@ public sealed class D3D11Swapchain : Swapchain
         }
     }
 
-    public D3D11Swapchain(IDXGIFactory factory, ID3D11Device device, D3D11Surface surface, SwapchainDescription description)
+    public D3D11Swapchain(IDXGIFactory factory, ID3D11Device device, ID3D11DeviceContext context, D3D11Surface surface, SwapchainDescription description)
     {
+        _context = context;
+
+        CommandLists = new List<D3D11CommandList>();
+        
         SwapChainDescription desc = new SwapChainDescription()
         {
             Windowed = true,
@@ -46,13 +56,27 @@ public sealed class D3D11Swapchain : Swapchain
         PresentMode = description.PresentMode;
 
         SwapChain = factory.CreateSwapChain(device, desc);
-
-        SwapChainTexture = SwapChain.GetBuffer<ID3D11Texture2D>(0);
     }
 
     public override Texture GetSwapchainTexture()
     {
-        return new D3D11Texture(SwapChainTexture, null);
+        return new D3D11Texture(SwapChain.GetBuffer<ID3D11Texture2D>(0), null);
+    }
+
+    public override void Resize(Size size)
+    {
+        _context.Flush();
+        
+        foreach (D3D11CommandList list in CommandLists)
+        {
+            list.CommandList?.Dispose();
+        }
+        
+        _context.ClearState();
+        _context.Flush();
+        
+        SwapChain.ResizeBuffers(0, size.Width, size.Height, Vortice.DXGI.Format.Unknown,
+            SwapChainFlags.AllowTearing | SwapChainFlags.AllowModeSwitch).CheckError();
     }
 
     public override void Present()
@@ -62,7 +86,6 @@ public sealed class D3D11Swapchain : Swapchain
 
     public override void Dispose()
     {
-        SwapChainTexture.Dispose();
         SwapChain.Dispose();
     }
 }

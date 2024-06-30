@@ -1,4 +1,5 @@
-﻿using Silk.NET.Vulkan;
+﻿using System.Drawing;
+using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.KHR;
 
 namespace grabs.Graphics.Vulkan;
@@ -17,6 +18,11 @@ public class VkSwapchain : Swapchain
     }
     
     public override Texture GetSwapchainTexture()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void Resize(Size size)
     {
         throw new System.NotImplementedException();
     }

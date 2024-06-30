@@ -47,7 +47,17 @@ public abstract unsafe class TestBase : IDisposable
 
     protected virtual void Unload() { }
 
-    protected bool IsKeyDown(KeyCode key)
+    public Size SizeInPixels
+    {
+        get
+        {
+            int w, h;
+            _sdl.GetWindowSizeInPixels(_window, &w, &h);
+            return new Size(w, h);
+        }
+    }
+
+    public bool IsKeyDown(KeyCode key)
         => _keysDown.Contains(key);
 
     public void Run(GraphicsApi api, Size size)
@@ -55,7 +65,7 @@ public abstract unsafe class TestBase : IDisposable
         if (_sdl.Init(Sdl.InitVideo | Sdl.InitEvents) < 0)
             throw new Exception("Failed to initialize SDL.");
 
-        WindowFlags flags = WindowFlags.Shown;
+        WindowFlags flags = WindowFlags.Resizable;
         
         switch (api)
         {
@@ -146,6 +156,21 @@ public abstract unsafe class TestBase : IDisposable
                             case WindowEventID.Close:
                                 isOpen = false;
                                 break;
+
+                            case WindowEventID.Resized:
+                            {
+                                Framebuffer.Dispose();
+                                DepthTexture.Dispose();
+                                ColorTexture.Dispose();
+                                Size newSize = new Size(winEvent.Window.Data1, winEvent.Window.Data2);
+                                Console.WriteLine(newSize);
+                                Swapchain.Resize(newSize);
+                                ColorTexture = Swapchain.GetSwapchainTexture();
+                                DepthTexture = Device.CreateTexture(TextureDescription.Texture2D((uint) newSize.Width,
+                                    (uint) newSize.Height, 1, Format.D32_Float, TextureUsage.None));
+                                Framebuffer = Device.CreateFramebuffer(ColorTexture, DepthTexture);
+                                break;
+                            }
                         }
 
                         break;

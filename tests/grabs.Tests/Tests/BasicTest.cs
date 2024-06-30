@@ -45,10 +45,11 @@ public class BasicTest : TestBase
         using ShaderModule pModule = Device.CreateShaderModule(ShaderStage.Pixel, pSpv, "Pixel");
 
         _pipeline = Device.CreatePipeline(new PipelineDescription(vModule, pModule, new[]
-        {
-            new InputLayoutDescription(Format.R32G32_Float, 0, 0, InputType.PerVertex), // Position
-            new InputLayoutDescription(Format.R32G32B32_Float, 8, 0, InputType.PerVertex) // Color
-        }, DepthStencilDescription.Disabled, RasterizerDescription.CullNone, null, PrimitiveType.TriangleList));
+            {
+                new InputLayoutDescription(Format.R32G32_Float, 0, 0, InputType.PerVertex), // Position
+                new InputLayoutDescription(Format.R32G32B32_Float, 8, 0, InputType.PerVertex) // Color
+            }, DepthStencilDescription.Disabled, RasterizerDescription.CullNone, BlendDescription.Disabled, null,
+            PrimitiveType.TriangleList));
     }
 
     protected override void Draw()

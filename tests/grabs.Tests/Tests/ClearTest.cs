@@ -1,5 +1,7 @@
 ﻿using System.Numerics;
 using grabs.Graphics;
+using grabs.Graphics.D3D11;
+using Vortice.Mathematics;
 
 namespace grabs.Tests.Tests;
 
@@ -17,7 +19,7 @@ public class ClearTest : TestBase
         CommandList.EndRenderPass();
         
         CommandList.End();
-        
+
         Device.ExecuteCommandList(CommandList);
     }
 }

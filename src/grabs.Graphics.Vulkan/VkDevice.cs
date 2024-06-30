@@ -164,6 +164,16 @@ public unsafe class VkDevice : Device
         throw new NotImplementedException();
     }
 
+    public override IntPtr MapBuffer(Buffer buffer, MapMode mapMode)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void UnmapBuffer(Buffer buffer)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void ExecuteCommandList(CommandList list)
     {
         throw new NotImplementedException();

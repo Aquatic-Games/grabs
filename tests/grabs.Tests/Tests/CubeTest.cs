@@ -47,7 +47,7 @@ public class CubeTest : TestBase
             View = Matrix4x4.CreateLookAt(new Vector3(0, 0, -3), Vector3.Zero, Vector3.UnitY)
         };
         
-        _cameraBuffer = Device.CreateBuffer(BufferType.Constant, matrices);
+        _cameraBuffer = Device.CreateBuffer(BufferType.Constant, matrices, true);
         
         _transformMatrix = Matrix4x4.Identity;
         _transformBuffer = Device.CreateBuffer(BufferType.Constant, _transformMatrix, true);
@@ -71,10 +71,11 @@ public class CubeTest : TestBase
         using ShaderModule pModule = Device.CreateShaderModule(ShaderStage.Pixel, pSpv, "Pixel");
 
         _pipeline = Device.CreatePipeline(new PipelineDescription(vModule, pModule, new[]
-        {
-            new InputLayoutDescription(Format.R32G32B32_Float, 0, 0, InputType.PerVertex), // Position
-            new InputLayoutDescription(Format.R32G32_Float, 12, 0, InputType.PerVertex) // TexCoord
-        }, DepthStencilDescription.DepthLessEqual, RasterizerDescription.CullClockwise, [transformLayout, textureLayout]));
+            {
+                new InputLayoutDescription(Format.R32G32B32_Float, 0, 0, InputType.PerVertex), // Position
+                new InputLayoutDescription(Format.R32G32_Float, 12, 0, InputType.PerVertex) // TexCoord
+            }, DepthStencilDescription.DepthLessEqual, RasterizerDescription.CullClockwise, BlendDescription.Disabled,
+            [transformLayout, textureLayout]));
         
         ImageResult result1 = ImageResult.FromMemory(File.ReadAllBytes("Assets/awesomeface.png"), ColorComponents.RedGreenBlueAlpha);
         ImageResult result2 = ImageResult.FromMemory(File.ReadAllBytes("Assets/BAGELMIP.png"), ColorComponents.RedGreenBlueAlpha);
@@ -119,10 +120,18 @@ public class CubeTest : TestBase
         
         CommandList.Begin();
         
+        CameraMatrices matrices = new CameraMatrices()
+        {
+            Projection = Matrix4x4.CreatePerspectiveFieldOfView(45 * float.Pi / 180, SizeInPixels.Width / (float) SizeInPixels.Height, 0.1f, 100f),
+            View = Matrix4x4.CreateLookAt(new Vector3(0, 0, -3), Vector3.Zero, Vector3.UnitY)
+        };
+        
+        CommandList.UpdateBuffer(_cameraBuffer, 0, matrices);
+        
         CommandList.UpdateBuffer(_transformBuffer, 0, _transformMatrix);
 
         CommandList.BeginRenderPass(new RenderPassDescription(Framebuffer, new Vector4(1.0f, 0.5f, 0.25f, 1.0f)));
-        CommandList.SetViewport(new Viewport(0, 0, 1280, 720));
+        CommandList.SetViewport(new Viewport(0, 0, (uint) SizeInPixels.Width, (uint) SizeInPixels.Height));
         
         CommandList.SetPipeline(_pipeline);
         CommandList.SetVertexBuffer(0, _vertexBuffer, Vertex.SizeInBytes, 0);

@@ -85,7 +85,7 @@ public class Main : SampleBase
         // Here, we pass in our vertex and pixel modules, as well as our input layout.
         // Don't worry about the other values, we'll get into those in later tutorials.
         PipelineDescription pipelineDesc = new PipelineDescription(vertexModule, pixelModule, inputLayout,
-            DepthStencilDescription.Disabled, RasterizerDescription.CullNone, null);
+            DepthStencilDescription.Disabled, RasterizerDescription.CullNone, BlendDescription.Disabled, null);
 
         _pipeline = Device.CreatePipeline(pipelineDesc);
     }

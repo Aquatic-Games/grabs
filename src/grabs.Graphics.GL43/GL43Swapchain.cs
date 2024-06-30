@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using Silk.NET.OpenGL;
 
 namespace grabs.Graphics.GL43;
@@ -85,6 +86,18 @@ public sealed class GL43Swapchain : Swapchain
                 TextureUsage.Framebuffer | TextureUsage.ShaderResource), null);
         
         return _swapchainTexture;
+    }
+
+    public override unsafe void Resize(Size size)
+    {
+        Width = (uint) size.Width;
+        Height = (uint) size.Height;
+        
+        _swapchainTexture.Dispose();
+        
+        _swapchainTexture = new GL43Texture(_gl,
+            TextureDescription.Texture2D(Width, Height, 1, _swapchainFormat,
+                TextureUsage.Framebuffer | TextureUsage.ShaderResource), null);
     }
 
     public override void Present()

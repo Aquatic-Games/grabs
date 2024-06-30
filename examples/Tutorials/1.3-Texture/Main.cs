@@ -63,7 +63,7 @@ public class Main : SampleBase
         using DescriptorLayout layout = Device.CreateDescriptorLayout(descriptorDesc);
 
         PipelineDescription pipelineDesc = new PipelineDescription(vertexModule, pixelModule, inputLayout,
-            DepthStencilDescription.Disabled, RasterizerDescription.CullNone, [layout]);
+            DepthStencilDescription.Disabled, RasterizerDescription.CullNone, BlendDescription.Disabled, [layout]);
 
         _pipeline = Device.CreatePipeline(pipelineDesc);
         

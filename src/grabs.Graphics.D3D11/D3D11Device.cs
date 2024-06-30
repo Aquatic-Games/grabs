@@ -10,6 +10,8 @@ public sealed class D3D11Device : Device
 {
     private readonly IDXGIFactory _factory;
     private readonly D3D11Surface _surface;
+
+    private D3D11Swapchain _swapchain;
     
     public readonly ID3D11Device Device;
     public readonly ID3D11DeviceContext Context;
@@ -34,12 +36,16 @@ public sealed class D3D11Device : Device
 
     public override Swapchain CreateSwapchain(in SwapchainDescription description)
     {
-        return new D3D11Swapchain(_factory, Device, _surface, description);
+        // TODO: Support multiple swapchains.
+        _swapchain = new D3D11Swapchain(_factory, Device, Context, _surface, description);
+        return _swapchain;
     }
 
     public override CommandList CreateCommandList()
     {
-        return new D3D11CommandList(Device);
+        D3D11CommandList commandList = new D3D11CommandList(Device);
+        _swapchain.CommandLists.Add(commandList);
+        return commandList;
     }
 
     public override Pipeline CreatePipeline(in PipelineDescription description)
