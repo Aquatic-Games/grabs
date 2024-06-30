@@ -82,10 +82,10 @@ public class CubeTest : TestBase
         ImageResult result2 = ImageResult.FromMemory(File.ReadAllBytes("Assets/BAGELMIP.png"), ColorComponents.RedGreenBlueAlpha);
         
         _texture1 = Device.CreateTexture(TextureDescription.Texture2D((uint) result1.Width, (uint) result1.Height, 0,
-            Format.R8G8B8A8_UNorm, TextureUsage.ShaderResource | TextureUsage.GenerateMips), new ReadOnlySpan<byte>(result1.Data));
+            Format.R8G8B8A8_UNorm, TextureUsage.ShaderResource | TextureUsage.GenerateMips), result1.Data);
         
         _texture2 = Device.CreateTexture(TextureDescription.Texture2D((uint) result2.Width, (uint) result2.Height, 0,
-            Format.R8G8B8A8_UNorm, TextureUsage.ShaderResource | TextureUsage.GenerateMips), new ReadOnlySpan<byte>(result2.Data));
+            Format.R8G8B8A8_UNorm, TextureUsage.ShaderResource | TextureUsage.GenerateMips), result2.Data);
         
         CommandList.Begin();
         CommandList.GenerateMipmaps(_texture1);

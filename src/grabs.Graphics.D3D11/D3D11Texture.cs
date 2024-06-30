@@ -11,7 +11,7 @@ public sealed class D3D11Texture : Texture
     public readonly ID3D11ShaderResourceView ResourceView;
 
     public unsafe D3D11Texture(ID3D11Device device, ID3D11DeviceContext context, in TextureDescription description,
-        void* pData)
+        void** ppData)
     {
         BindFlags flags = BindFlags.None;
 
@@ -60,14 +60,48 @@ public sealed class D3D11Texture : Texture
                 
                 break;
             }
+
+            case TextureType.Cubemap:
+            {
+                Texture2DDescription desc = new Texture2DDescription()
+                {
+                    Width = (int) description.Width,
+                    Height = (int) description.Height,
+                    Format = srvDesc.Format,
+                    ArraySize = 6,
+                    MipLevels = (int) description.MipLevels,
+                    SampleDescription = new SampleDescription(1, 0),
+                    Usage = ResourceUsage.Default,
+                    BindFlags = flags,
+                    MiscFlags = ResourceOptionFlags.TextureCube
+                };
+
+                Texture = device.CreateTexture2D(desc);
+
+                srvDesc.ViewDimension = ShaderResourceViewDimension.TextureCube;
+                srvDesc.TextureCube = new TextureCubeShaderResourceView()
+                {
+                    MipLevels = -1,
+                    MostDetailedMip = 0
+                };
+
+                break;
+            }
+            
             default:
                 throw new ArgumentOutOfRangeException();
         }
 
-        if (pData != null)
+        if (ppData != null)
         {
             uint pitch = GraphicsUtils.CalculatePitch(description.Format, description.Width);
-            context.UpdateSubresource(Texture, 0, null, (nint) pData, (int) pitch, 0);
+
+            // TODO: This is a terrible implementation. It doesn't handle arrays or mipmaps or anything. Just cubemaps.
+            for (uint a = 0; a < (description.Type == TextureType.Cubemap ? 6 : 1); a++)
+            {
+                context.UpdateSubresource(Texture, (int) D3D11Utils.CalculateSubresource(0, a, description.MipLevels),
+                    null, (nint) ppData[a], (int) pitch, 0);
+            }
         }
 
         // TODO: TextureView in GRABS

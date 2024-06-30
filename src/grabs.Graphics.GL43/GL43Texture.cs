@@ -12,7 +12,7 @@ public sealed class GL43Texture : Texture
 
     public readonly bool IsRenderbuffer;
 
-    public unsafe GL43Texture(GL gl, in TextureDescription description, void* pData)
+    public unsafe GL43Texture(GL gl, in TextureDescription description, void** ppData)
     {
         _gl = gl;
 
@@ -103,7 +103,7 @@ public sealed class GL43Texture : Texture
         //   - Must only have 1 mip level
         // If these requirements are met, then it will be created as a renderbuffer instead.
         // If this causes issues later down the line then it will be re-evaluated.
-        if ((description.Usage & TextureUsage.ShaderResource) == 0 && description.Type == TextureType.Texture2D && pData == null && description.MipLevels == 1)
+        if ((description.Usage & TextureUsage.ShaderResource) == 0 && description.Type == TextureType.Texture2D && ppData == null && description.MipLevels == 1)
         {
             Console.WriteLine("Info: Texture creating as renderbuffer.");
             IsRenderbuffer = true;
@@ -134,15 +134,15 @@ public sealed class GL43Texture : Texture
             case TextureType.Texture2D:
                 _gl.TexStorage2D(Target, mipLevels, iFmt, width, height);
 
-                if (pData != null)
+                if (ppData != null)
                 {
                     if (isCompressed)
                     {
                         _gl.CompressedTexSubImage2D(Target, 0, 0, 0, width, height, (InternalFormat) iFmt,
-                            GraphicsUtils.CalculateTextureSizeInBytes(format, width, height), pData);
+                            GraphicsUtils.CalculateTextureSizeInBytes(format, width, height), ppData[0]);
                     }
                     else
-                        _gl.TexSubImage2D(Target, 0, 0, 0, description.Width, description.Height, fmt, pType, pData);
+                        _gl.TexSubImage2D(Target, 0, 0, 0, description.Width, description.Height, fmt, pType, ppData[0]);
                 }
 
                 break;

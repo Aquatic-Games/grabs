@@ -21,4 +21,7 @@ public struct TextureDescription
 
     public static TextureDescription Texture2D(uint width, uint height, uint mipLevels, Format format, TextureUsage usage)
         => new TextureDescription(TextureType.Texture2D, width, height, mipLevels, format, usage);
+
+    public static TextureDescription Cubemap(uint width, uint height, uint mipLevels, Format format, TextureUsage usage)
+        => new TextureDescription(TextureType.Cubemap, width, height, mipLevels, format, usage);
 }

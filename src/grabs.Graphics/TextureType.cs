@@ -2,5 +2,6 @@
 
 public enum TextureType
 {
-    Texture2D
+    Texture2D,
+    Cubemap
 }

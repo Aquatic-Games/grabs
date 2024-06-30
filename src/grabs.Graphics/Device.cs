@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace grabs.Graphics;
 
@@ -46,17 +48,29 @@ public abstract class Device : IDisposable
     public unsafe Texture CreateTexture<T>(in TextureDescription description, T[] data) where T : unmanaged
     {
         fixed (void* pData = data)
-            return CreateTexture(description, pData);
+            return CreateTexture(description, &pData);
     }
 
-    public unsafe Texture CreateTexture<T>(in TextureDescription description, in ReadOnlySpan<T> data)
-        where T : unmanaged
+    public unsafe Texture CreateTexture<T>(in TextureDescription description, T[][] datas) where T : unmanaged
     {
-        fixed (void* pData = data)
-            return CreateTexture(description, pData);
+        GCHandle* handles = stackalloc GCHandle[datas.Length];
+        void** pointers = stackalloc void*[datas.Length];
+
+        for (int i = 0; i < datas.Length; i++)
+        {
+            handles[i] = GCHandle.Alloc(datas[i], GCHandleType.Pinned);
+            pointers[i] = (void*) handles[i].AddrOfPinnedObject();
+        }
+
+        Texture texture = CreateTexture(description, pointers);
+
+        for (int i = 0; i < datas.Length; i++)
+            handles[i].Free();
+        
+        return texture;
     }
     
-    public abstract unsafe Texture CreateTexture(in TextureDescription description, void* pData);
+    public abstract unsafe Texture CreateTexture(in TextureDescription description, void** ppData);
     
     public abstract ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint);
 

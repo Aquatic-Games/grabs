@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using Vortice.Direct3D;
 using Vortice.Direct3D11;
 using DXGIFormat = Vortice.DXGI.Format;
@@ -7,6 +8,10 @@ namespace grabs.Graphics.D3D11;
 
 public static class D3D11Utils
 {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint CalculateSubresource(uint mipIndex, uint arrayIndex, uint totalMipLevels)
+        => mipIndex + (arrayIndex * totalMipLevels);
+    
     public static DXGIFormat FormatToD3D(Format format)
     {
         return format switch

@@ -134,7 +134,7 @@ public unsafe class VkDevice : Device
         throw new NotImplementedException();
     }
 
-    public override unsafe Texture CreateTexture(in TextureDescription description, void* pData)
+    public override unsafe Texture CreateTexture(in TextureDescription description, void** ppData)
     {
         throw new NotImplementedException();
     }
