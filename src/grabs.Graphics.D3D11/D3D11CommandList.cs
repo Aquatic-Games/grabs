@@ -67,7 +67,7 @@ public sealed class D3D11CommandList : CommandList
 
         if (d3dBuffer.Description.Dynamic)
         {
-            MappedSubresource mResource = Context.Map(d3dBuffer.Buffer, MapMode.WriteDiscard);
+            MappedSubresource mResource = Context.Map(d3dBuffer.Buffer, Vortice.Direct3D11.MapMode.WriteDiscard);
             Unsafe.CopyBlock((byte*) mResource.DataPointer + offsetInBytes, pData, sizeInBytes);
             Context.Unmap(d3dBuffer.Buffer);
         }

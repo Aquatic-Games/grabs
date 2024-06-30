@@ -79,6 +79,10 @@ public abstract class Device : IDisposable
         => UpdateDescriptorSet(set, descriptions.AsSpan());
     
     public abstract void UpdateDescriptorSet(DescriptorSet set, in ReadOnlySpan<DescriptorSetDescription> descriptions);
+    
+    public abstract nint MapBuffer(Buffer buffer, MapMode mapMode);
+
+    public abstract void UnmapBuffer(Buffer buffer);
 
     public abstract void ExecuteCommandList(CommandList list);
     

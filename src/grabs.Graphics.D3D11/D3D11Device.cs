@@ -83,6 +83,20 @@ public sealed class D3D11Device : Device
 
         d3dSet.Descriptions = descriptions.ToArray();
     }
+    
+    public override IntPtr MapBuffer(Buffer buffer, MapMode mapMode)
+    {
+        D3D11Buffer d3dBuffer = (D3D11Buffer) buffer;
+        MappedSubresource subresource = Context.Map(d3dBuffer.Buffer, D3D11Utils.MapModeToD3D(mapMode));
+
+        return subresource.DataPointer;
+    }
+
+    public override void UnmapBuffer(Buffer buffer)
+    {
+        D3D11Buffer d3dBuffer = (D3D11Buffer) buffer;
+        Context.Unmap(d3dBuffer.Buffer);
+    }
 
     public override void ExecuteCommandList(CommandList list)
     { 

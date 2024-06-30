@@ -82,6 +82,31 @@ public class GL43Device : Device
         glSet.Descriptions = descriptions.ToArray();
     }
 
+    public override unsafe IntPtr MapBuffer(Buffer buffer, MapMode mapMode)
+    {
+        GL43Buffer glBuffer = (GL43Buffer) buffer;
+
+        // TODO: Not great implementation. Mapping 2 buffers of same target will cause a clash.
+        _gl.BindBuffer(glBuffer.Target, glBuffer.Buffer);
+        void* map = _gl.MapBuffer(glBuffer.Target, mapMode switch
+        {
+            MapMode.Read => BufferAccessARB.ReadOnly,
+            MapMode.Write => BufferAccessARB.WriteOnly,
+            MapMode.ReadWrite => BufferAccessARB.ReadWrite,
+            _ => throw new ArgumentOutOfRangeException(nameof(mapMode), mapMode, null)
+        });
+
+        return (nint) map;
+    }
+
+    public override void UnmapBuffer(Buffer buffer)
+    {
+        GL43Buffer glBuffer = (GL43Buffer) buffer;
+
+        _gl.BindBuffer(glBuffer.Target, glBuffer.Buffer);
+        _gl.UnmapBuffer(glBuffer.Target);
+    }
+
     public override unsafe void ExecuteCommandList(CommandList list)
     {
         GL43CommandList cl = (GL43CommandList) list;

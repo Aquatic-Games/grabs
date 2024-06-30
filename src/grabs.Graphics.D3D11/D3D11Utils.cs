@@ -151,4 +151,15 @@ public static class D3D11Utils
             _ => throw new ArgumentOutOfRangeException(nameof(operation), operation, null)
         };
     }
+
+    public static Vortice.Direct3D11.MapMode MapModeToD3D(MapMode mapMode)
+    {
+        return mapMode switch
+        {
+            MapMode.Read => Vortice.Direct3D11.MapMode.Read,
+            MapMode.Write => Vortice.Direct3D11.MapMode.WriteDiscard,
+            MapMode.ReadWrite => Vortice.Direct3D11.MapMode.ReadWrite,
+            _ => throw new ArgumentOutOfRangeException(nameof(mapMode), mapMode, null)
+        };
+    }
 }
