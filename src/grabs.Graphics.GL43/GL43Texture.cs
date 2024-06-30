@@ -19,6 +19,7 @@ public sealed class GL43Texture : Texture
         Target = description.Type switch
         {
             TextureType.Texture2D => TextureTarget.Texture2D,
+            TextureType.Cubemap => TextureTarget.TextureCubeMap,
             _ => throw new ArgumentOutOfRangeException()
         };
 
@@ -146,6 +147,31 @@ public sealed class GL43Texture : Texture
                 }
 
                 break;
+
+            case TextureType.Cubemap:
+            {
+                _gl.TexStorage2D(TextureTarget.TextureCubeMap, mipLevels, iFmt, width, height);
+
+                if (ppData != null)
+                {
+                    for (int a = 0; a < 6; a++)
+                    {
+                        TextureTarget target = TextureTarget.TextureCubeMapPositiveX + a;
+                        void* pData = ppData[a];
+                        
+                        if (isCompressed)
+                        {
+                            _gl.CompressedTexSubImage2D(target, 0, 0, 0, width, height, (InternalFormat) iFmt,
+                                GraphicsUtils.CalculateTextureSizeInBytes(format, width, height), pData);
+                        }
+                        else
+                            _gl.TexSubImage2D(target, 0, 0, 0, description.Width, description.Height, fmt, pType, pData);
+                    }
+                }
+
+                break;
+            }
+            
             default:
                 throw new ArgumentOutOfRangeException();
         }
