@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Numerics;
 using grabs.Graphics;
@@ -132,6 +133,7 @@ public class CubeTest : TestBase
 
         CommandList.BeginRenderPass(new RenderPassDescription(Framebuffer, new Vector4(1.0f, 0.5f, 0.25f, 1.0f)));
         CommandList.SetViewport(new Viewport(0, 0, (uint) SizeInPixels.Width, (uint) SizeInPixels.Height));
+        CommandList.SetScissor(new Rectangle(0, 0, SizeInPixels.Width, SizeInPixels.Height));
         
         CommandList.SetPipeline(_pipeline);
         CommandList.SetVertexBuffer(0, _vertexBuffer, Vertex.SizeInBytes, 0);

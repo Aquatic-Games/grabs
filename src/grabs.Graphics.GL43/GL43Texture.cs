@@ -116,6 +116,7 @@ public sealed class GL43Texture : Texture
         }
         
         Texture = _gl.GenTexture();
+        Console.WriteLine($"ID: {Texture}, Size: {description.Width}x{description.Height}");
         _gl.BindTexture(Target, Texture);
 
         bool isCompressed = format.IsCompressed();
@@ -152,6 +153,9 @@ public sealed class GL43Texture : Texture
     
     public override void Dispose()
     {
-        _gl.DeleteTexture(Texture);
+        if (IsRenderbuffer)
+            _gl.DeleteRenderbuffer(Texture);
+        else
+            _gl.DeleteTexture(Texture);
     }
 }
