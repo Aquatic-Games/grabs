@@ -159,4 +159,16 @@ public static class GraphicsUtils
 
         return CalculatePitch(format, width) * height;
     }
+
+    public static unsafe void CopyToUnmanaged<T>(nint pointer, T[] data) where T : unmanaged
+    {
+        fixed (T* pData = data)
+            Unsafe.CopyBlock((void*) pointer, pData, (uint) (data.Length * sizeof(T)));
+    }
+
+    public static unsafe void CopyToUnmanaged<T>(nint pointer, in ReadOnlySpan<T> data) where T : unmanaged
+    {
+        fixed (T* pData = data)
+            Unsafe.CopyBlock((void*) pointer, pData, (uint) (data.Length * sizeof(T)));
+    }
 }
