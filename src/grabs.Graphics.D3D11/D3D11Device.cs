@@ -32,6 +32,9 @@ public sealed class D3D11Device : Device
         {
             throw new Exception($"Failed to create D3D11 device: {result.Description}");
         }
+
+        // TODO: While this SHOULD be fine for my purposes. I'd like to make this a customizable value, with the addition of Vulkan.
+        Device.QueryInterface<IDXGIDevice1>().MaximumFrameLatency = 1;
     }
 
     public override Swapchain CreateSwapchain(in SwapchainDescription description)
