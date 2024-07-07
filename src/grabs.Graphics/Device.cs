@@ -71,8 +71,9 @@ public abstract class Device : IDisposable
     }
     
     public abstract unsafe Texture CreateTexture(in TextureDescription description, void** ppData);
-    
-    public abstract ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint);
+
+    public abstract ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint,
+        SpecializationConstant[] constants = null);
 
     public Framebuffer CreateFramebuffer(Texture colorTexture, Texture depthTexture = null)
         => CreateFramebuffer(new ReadOnlySpan<Texture>(in colorTexture), depthTexture);

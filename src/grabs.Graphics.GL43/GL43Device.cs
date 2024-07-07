@@ -56,9 +56,10 @@ public class GL43Device : Device
         return new GL43Texture(_gl, description, ppData);
     }
 
-    public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint)
+    public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint,
+        SpecializationConstant[] constants)
     {
-        return new GL43ShaderModule(_gl, stage, spirv, entryPoint);
+        return new GL43ShaderModule(_gl, stage, spirv, entryPoint, constants);
     }
 
     public override Framebuffer CreateFramebuffer(in ReadOnlySpan<Texture> colorTextures, Texture depthTexture)

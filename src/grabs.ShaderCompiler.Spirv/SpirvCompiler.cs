@@ -2,6 +2,8 @@
 using grabs.Graphics;
 using Silk.NET.SPIRV;
 using Silk.NET.SPIRV.Cross;
+using SpecConstant = Silk.NET.SPIRV.Cross.SpecializationConstant;
+using SpecializationConstant = grabs.Graphics.SpecializationConstant;
 
 namespace grabs.ShaderCompiler.Spirv;
 
@@ -14,7 +16,8 @@ public class SpirvCompiler
         Spirv = Cross.GetApi();
     }
     
-    public static unsafe string TranspileSpirv(ShaderStage stage, ShaderLanguage language, byte[] spirv, string entryPoint)
+    public static unsafe string TranspileSpirv(ShaderStage stage, ShaderLanguage language, byte[] spirv,
+        string entryPoint, SpecializationConstant[] constants = null)
     {
         Result result;
         
@@ -95,6 +98,61 @@ public class SpirvCompiler
             Spirv.CompilerSetDecoration(compiler, samplers[i].CombinedId, Decoration.Binding, decoration);
         }
 
+        if (constants != null)
+        {
+            SpecConstant* specConstants;
+            nuint numConstants;
+            Spirv.CompilerGetSpecializationConstants(compiler, &specConstants, &numConstants);
+
+            foreach (SpecializationConstant constant in constants)
+            {
+                // TODO: Horribly inefficient. Change please!
+                for (int i = 0; i < (int) numConstants; i++)
+                {
+                    if (specConstants[i].ConstantId == constant.Id)
+                    {
+                        Constant* c = Spirv.CompilerGetConstantHandle(compiler, specConstants[i].Id);
+                        
+                        switch (constant.Type)
+                        {
+                            case ConstantType.I8:
+                                Spirv.ConstantSetScalarI8(c, 0, 0, (byte) constant.Value);
+                                break;
+                            case ConstantType.I16:
+                                Spirv.ConstantSetScalarI16(c, 0, 0, (short) constant.Value);
+                                break;
+                            case ConstantType.I32:
+                                Spirv.ConstantSetScalarI32(c, 0, 0, (int) constant.Value);
+                                break;
+                            case ConstantType.I64:
+                                Spirv.ConstantSetScalarI64(c, 0, 0, (long) constant.Value);
+                                break;
+                            case ConstantType.U8:
+                                Spirv.ConstantSetScalarU8(c, 0, 0, (byte) constant.Value);
+                                break;
+                            case ConstantType.U16:
+                                Spirv.ConstantSetScalarI16(c, 0, 0, (short) constant.Value);
+                                break;
+                            case ConstantType.U32:
+                                Spirv.ConstantSetScalarU32(c, 0, 0, (uint) constant.Value);
+                                break;
+                            case ConstantType.U64:
+                                Spirv.ConstantSetScalarU64(c, 0, 0, (ulong) constant.Value);
+                                break;
+                            case ConstantType.F32:
+                                Spirv.ConstantSetScalarFp32(c, 0, 0, *(float*) &constant.Value);
+                                break;
+                            case ConstantType.F64:
+                                Spirv.ConstantSetScalarFp64(c, 0, 0, *(double*) &constant.Value);
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
+                }
+            }
+        }
+        
         byte* pStrResult;
         if ((result = Spirv.CompilerCompile(compiler, &pStrResult)) != Result.Success)
             throw new Exception($"Failed to compile SPIRV shader: {result} - {Spirv.ContextGetLastErrorStringS(context)}");

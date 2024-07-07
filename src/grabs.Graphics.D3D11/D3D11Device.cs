@@ -66,9 +66,10 @@ public sealed class D3D11Device : Device
         return new D3D11Texture(Device, Context, description, ppData);
     }
 
-    public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint)
+    public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint,
+        SpecializationConstant[] constants)
     {
-        return new D3D11ShaderModule(stage, spirv, entryPoint);
+        return new D3D11ShaderModule(stage, spirv, entryPoint, constants);
     }
 
     public override Framebuffer CreateFramebuffer(in ReadOnlySpan<Texture> colorTextures, Texture depthTexture)

@@ -9,9 +9,10 @@ public sealed class D3D11ShaderModule : ShaderModule
 {
     public Blob Blob;
     
-    public D3D11ShaderModule(ShaderStage stage, byte[] spirv, string entryPoint) : base(stage)
+    public D3D11ShaderModule(ShaderStage stage, byte[] spirv, string entryPoint, SpecializationConstant[] constants) 
+        : base(stage)
     {
-        string hlsl = SpirvCompiler.TranspileSpirv(stage, ShaderLanguage.Hlsl50, spirv, entryPoint);
+        string hlsl = SpirvCompiler.TranspileSpirv(stage, ShaderLanguage.Hlsl50, spirv, entryPoint, constants);
 
         string profile = stage switch
         {
