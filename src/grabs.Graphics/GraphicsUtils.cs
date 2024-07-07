@@ -152,6 +152,10 @@ public static class GraphicsUtils
         return (width * bpp + 7) >> 3;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint CalculateMipLevels(uint width, uint height)
+        => (uint) float.Floor(float.Log2(uint.Max(width, height)));
+
     public static uint CalculateTextureSizeInBytes(Format format, uint width, uint height)
     {
         if (format.IsCompressed())

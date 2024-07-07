@@ -23,6 +23,10 @@ public sealed class D3D11Texture : Texture
 
         if (description.Format is Format.D32_Float or Format.D16_UNorm or Format.D24_UNorm_S8_UInt)
             flags |= BindFlags.DepthStencil;
+
+        uint mipLevels = description.MipLevels == 0
+            ? GraphicsUtils.CalculateMipLevels(description.Width, description.Height)
+            : description.MipLevels;
         
         ShaderResourceViewDescription srvDesc = new ShaderResourceViewDescription()
         {
@@ -39,7 +43,7 @@ public sealed class D3D11Texture : Texture
                     Height = (int) description.Height,
                     Format = srvDesc.Format,
                     ArraySize = 1,
-                    MipLevels = (int) description.MipLevels,
+                    MipLevels = (int) mipLevels,
                     SampleDescription = new SampleDescription(1, 0),
                     Usage = ResourceUsage.Default,
                     BindFlags = flags,
@@ -69,11 +73,14 @@ public sealed class D3D11Texture : Texture
                     Height = (int) description.Height,
                     Format = srvDesc.Format,
                     ArraySize = 6,
-                    MipLevels = (int) description.MipLevels,
+                    MipLevels = (int) mipLevels,
                     SampleDescription = new SampleDescription(1, 0),
                     Usage = ResourceUsage.Default,
                     BindFlags = flags,
-                    MiscFlags = ResourceOptionFlags.TextureCube
+                    MiscFlags = ResourceOptionFlags.TextureCube |
+                                ((description.Usage & TextureUsage.GenerateMips) == TextureUsage.GenerateMips
+                                    ? ResourceOptionFlags.GenerateMips
+                                    : ResourceOptionFlags.None)
                 };
 
                 Texture = device.CreateTexture2D(desc);
@@ -99,7 +106,7 @@ public sealed class D3D11Texture : Texture
             // TODO: This is a terrible implementation. It doesn't handle arrays or mipmaps or anything. Just cubemaps.
             for (uint a = 0; a < (description.Type == TextureType.Cubemap ? 6 : 1); a++)
             {
-                context.UpdateSubresource(Texture, (int) D3D11Utils.CalculateSubresource(0, a, description.MipLevels),
+                context.UpdateSubresource(Texture, (int) D3D11Utils.CalculateSubresource(0, a, mipLevels),
                     null, (nint) ppData[a], (int) pitch, 0);
             }
         }
