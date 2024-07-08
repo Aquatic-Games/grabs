@@ -90,6 +90,24 @@ public abstract class Device : IDisposable
 
     public abstract DescriptorSet CreateDescriptorSet(DescriptorLayout layout, in ReadOnlySpan<DescriptorSetDescription> descriptions);
 
+    public unsafe void UpdateBuffer<T>(Buffer buffer, uint offsetInBytes, T data) where T : unmanaged
+        => UpdateBuffer(buffer, offsetInBytes, (uint) sizeof(T), data);
+    
+    public void UpdateBuffer<T>(Buffer buffer, uint offsetInBytes, uint sizeInBytes, T data) where T : unmanaged
+        => UpdateBuffer(buffer, offsetInBytes, sizeInBytes, new ReadOnlySpan<T>(ref data));
+
+    public unsafe void UpdateBuffer<T>(Buffer buffer, uint offsetInBytes, in ReadOnlySpan<T> data) where T : unmanaged
+        => UpdateBuffer(buffer, offsetInBytes, (uint) (data.Length * sizeof(T)), data);
+    
+    public unsafe void UpdateBuffer<T>(Buffer buffer, uint offsetInBytes, uint sizeInBytes, in ReadOnlySpan<T> data)
+        where T : unmanaged
+    {
+        fixed (void* pData = data)
+            UpdateBuffer(buffer, offsetInBytes, sizeInBytes, pData);
+    }
+    
+    public abstract unsafe void UpdateBuffer(Buffer buffer, uint offsetInBytes, uint sizeInBytes, void* pData);
+    
     public void UpdateDescriptorSet(DescriptorSet set, params DescriptorSetDescription[] descriptions)
         => UpdateDescriptorSet(set, descriptions.AsSpan());
     

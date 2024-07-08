@@ -65,8 +65,15 @@ public sealed class D3D11CommandList : CommandList
     {
         D3D11Buffer d3dBuffer = (D3D11Buffer) buffer;
 
+        // TODO: If offsetInBytes != 0, you can't map the buffer. For now I've just disabled the offset entirely.
         if (d3dBuffer.Description.Dynamic)
         {
+            if (offsetInBytes != 0)
+            {
+                throw new NotImplementedException(
+                    "Cannot currently update a dynamic buffer with an offset of anything other than 0.");
+            }
+
             MappedSubresource mResource = Context.Map(d3dBuffer.Buffer, Vortice.Direct3D11.MapMode.WriteDiscard);
             Unsafe.CopyBlock((byte*) mResource.DataPointer + offsetInBytes, pData, sizeInBytes);
             Context.Unmap(d3dBuffer.Buffer);

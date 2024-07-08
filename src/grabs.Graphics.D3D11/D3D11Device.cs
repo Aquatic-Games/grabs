@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using SharpGen.Runtime;
 using Vortice.Direct3D;
 using Vortice.Direct3D11;
 using Vortice.DXGI;
+using Vortice.Mathematics;
 
 namespace grabs.Graphics.D3D11;
 
@@ -85,6 +87,30 @@ public sealed class D3D11Device : Device
     public override DescriptorSet CreateDescriptorSet(DescriptorLayout layout, in ReadOnlySpan<DescriptorSetDescription> descriptions)
     {
         return new D3D11DescriptorSet(descriptions.ToArray());
+    }
+
+    public override unsafe void UpdateBuffer(Buffer buffer, uint offsetInBytes, uint sizeInBytes, void* pData)
+    {
+        D3D11Buffer d3dBuffer = (D3D11Buffer) buffer;
+
+        // TODO: If offsetInBytes != 0, you can't map the buffer. For now I've just disabled the offset entirely.
+        if (d3dBuffer.Description.Dynamic)
+        {
+            if (offsetInBytes != 0)
+            {
+                throw new NotImplementedException(
+                    "Cannot currently update a dynamic buffer with an offset of anything other than 0.");
+            }
+
+            MappedSubresource mResource = Context.Map(d3dBuffer.Buffer, Vortice.Direct3D11.MapMode.WriteDiscard);
+            Unsafe.CopyBlock((byte*) mResource.DataPointer + offsetInBytes, pData, sizeInBytes);
+            Context.Unmap(d3dBuffer.Buffer);
+        }
+        else
+        {
+            Context.UpdateSubresource(d3dBuffer.Buffer, 0,
+                new Box((int) offsetInBytes, 0, 0, (int) (offsetInBytes + sizeInBytes), 1, 1), (nint) pData, 0, 0);
+        }
     }
 
     public override void UpdateDescriptorSet(DescriptorSet set, in ReadOnlySpan<DescriptorSetDescription> descriptions)

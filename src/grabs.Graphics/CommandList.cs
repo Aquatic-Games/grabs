@@ -28,8 +28,7 @@ public abstract class CommandList : IDisposable
         fixed (void* pData = data)
             UpdateBuffer(buffer, offsetInBytes, sizeInBytes, pData);
     }
-
-    // TODO: Sadly, may need to remove/change updatebuffer, as it doesn't *really* work with modern graphics APIs.
+    
     public abstract unsafe void UpdateBuffer(Buffer buffer, uint offsetInBytes, uint sizeInBytes, void* pData);
 
     public abstract void GenerateMipmaps(Texture texture);

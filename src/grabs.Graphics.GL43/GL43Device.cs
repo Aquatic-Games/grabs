@@ -77,6 +77,14 @@ public class GL43Device : Device
         return new GL43DescriptorSet(descriptions.ToArray());
     }
 
+    public override unsafe void UpdateBuffer(Buffer buffer, uint offsetInBytes, uint sizeInBytes, void* pData)
+    {
+        GL43Buffer glBuffer = (GL43Buffer) buffer;
+        
+        _gl.BindBuffer(glBuffer.Target, glBuffer.Buffer);
+        _gl.BufferSubData(glBuffer.Target, (nint) offsetInBytes, (nuint) sizeInBytes, pData);
+    }
+
     public override void UpdateDescriptorSet(DescriptorSet set, in ReadOnlySpan<DescriptorSetDescription> descriptions)
     {
         GL43DescriptorSet glSet = (GL43DescriptorSet) set;
@@ -86,10 +94,9 @@ public class GL43Device : Device
     public override unsafe IntPtr MapBuffer(Buffer buffer, MapMode mapMode)
     {
         GL43Buffer glBuffer = (GL43Buffer) buffer;
-
-        // TODO: Not great implementation. Mapping 2 buffers of same target will cause a clash.
-        _gl.BindBuffer(glBuffer.Target, glBuffer.Buffer);
-        void* map = _gl.MapBuffer(glBuffer.Target, mapMode switch
+        
+        _gl.BindBuffer(BufferTargetARB.ArrayBuffer, glBuffer.Buffer);
+        void* map = _gl.MapBuffer(BufferTargetARB.ArrayBuffer, mapMode switch
         {
             MapMode.Read => BufferAccessARB.ReadOnly,
             MapMode.Write => BufferAccessARB.WriteOnly,
@@ -104,8 +111,8 @@ public class GL43Device : Device
     {
         GL43Buffer glBuffer = (GL43Buffer) buffer;
 
-        _gl.BindBuffer(glBuffer.Target, glBuffer.Buffer);
-        _gl.UnmapBuffer(glBuffer.Target);
+        _gl.BindBuffer(BufferTargetARB.ArrayBuffer, glBuffer.Buffer);
+        _gl.UnmapBuffer(BufferTargetARB.ArrayBuffer);
     }
 
     public override unsafe void ExecuteCommandList(CommandList list)
