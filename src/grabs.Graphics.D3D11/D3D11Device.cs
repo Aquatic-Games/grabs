@@ -113,6 +113,16 @@ public sealed class D3D11Device : Device
         }
     }
 
+    public override unsafe void UpdateTexture(Texture texture, int x, int y, uint width, uint height, uint mipLevel, void* pData)
+    {
+        D3D11Texture d3dTexture = (D3D11Texture) texture;
+
+        int pitch = (int) GraphicsUtils.CalculatePitch(d3dTexture.Format, width);
+
+        Context.UpdateSubresource(d3dTexture.Texture, 0, new Box(x, y, 0, x + (int) width, y + (int) height, 1),
+            (IntPtr) pData, pitch, 0);
+    }
+
     public override void UpdateDescriptorSet(DescriptorSet set, in ReadOnlySpan<DescriptorSetDescription> descriptions)
     {
         D3D11DescriptorSet d3dSet = (D3D11DescriptorSet) set;

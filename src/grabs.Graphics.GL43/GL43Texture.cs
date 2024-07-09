@@ -7,12 +7,16 @@ public sealed class GL43Texture : Texture
 {
     private readonly GL _gl;
 
+    private readonly SizedInternalFormat _internalFormat;
+    private readonly PixelFormat _format;
+    private readonly PixelType _pixelType;
+
     public readonly uint Texture;
     public readonly TextureTarget Target;
 
     public readonly bool IsRenderbuffer;
 
-    public unsafe GL43Texture(GL gl, in TextureDescription description, void** ppData)
+    public unsafe GL43Texture(GL gl, in TextureDescription description, void** ppData) : base(description)
     {
         _gl = gl;
 
@@ -27,7 +31,7 @@ public sealed class GL43Texture : Texture
 
         // i think this legitimately gave me a brain aneurysm
         // TODO: Test these
-        (SizedInternalFormat iFmt, PixelFormat fmt, PixelType pType) = format switch
+        (_internalFormat, _format, _pixelType) = format switch
         {
             Format.R8G8B8A8_UNorm => (SizedInternalFormat.Rgba8, PixelFormat.Rgba, PixelType.UnsignedByte),
             Format.B5G6R5_UNorm => (SizedInternalFormat.Rgb565, PixelFormat.Bgr, PixelType.UnsignedShort565),
@@ -110,7 +114,7 @@ public sealed class GL43Texture : Texture
             IsRenderbuffer = true;
             Texture = _gl.GenRenderbuffer();
             _gl.BindRenderbuffer(RenderbufferTarget.Renderbuffer, Texture);
-            _gl.RenderbufferStorage(RenderbufferTarget.Renderbuffer, (InternalFormat) iFmt, description.Width,
+            _gl.RenderbufferStorage(RenderbufferTarget.Renderbuffer, (InternalFormat) _internalFormat, description.Width,
                 description.Height);
 
             return;
@@ -133,24 +137,27 @@ public sealed class GL43Texture : Texture
         switch (description.Type)
         {
             case TextureType.Texture2D:
-                _gl.TexStorage2D(Target, mipLevels, iFmt, width, height);
+                _gl.TexStorage2D(Target, mipLevels, _internalFormat, width, height);
 
                 if (ppData != null)
                 {
                     if (isCompressed)
                     {
-                        _gl.CompressedTexSubImage2D(Target, 0, 0, 0, width, height, (InternalFormat) iFmt,
+                        _gl.CompressedTexSubImage2D(Target, 0, 0, 0, width, height, (InternalFormat) _internalFormat,
                             GraphicsUtils.CalculateTextureSizeInBytes(format, width, height), ppData[0]);
                     }
                     else
-                        _gl.TexSubImage2D(Target, 0, 0, 0, description.Width, description.Height, fmt, pType, ppData[0]);
+                    {
+                        _gl.TexSubImage2D(Target, 0, 0, 0, description.Width, description.Height, _format, _pixelType,
+                            ppData[0]);
+                    }
                 }
 
                 break;
 
             case TextureType.Cubemap:
             {
-                _gl.TexStorage2D(TextureTarget.TextureCubeMap, mipLevels, iFmt, width, height);
+                _gl.TexStorage2D(TextureTarget.TextureCubeMap, mipLevels, _internalFormat, width, height);
 
                 if (ppData != null)
                 {
@@ -158,20 +165,52 @@ public sealed class GL43Texture : Texture
                     {
                         TextureTarget target = TextureTarget.TextureCubeMapPositiveX + a;
                         void* pData = ppData[a];
-                        
+
                         if (isCompressed)
                         {
-                            _gl.CompressedTexSubImage2D(target, 0, 0, 0, width, height, (InternalFormat) iFmt,
+                            _gl.CompressedTexSubImage2D(target, 0, 0, 0, width, height,
+                                (InternalFormat) _internalFormat,
                                 GraphicsUtils.CalculateTextureSizeInBytes(format, width, height), pData);
                         }
                         else
-                            _gl.TexSubImage2D(target, 0, 0, 0, description.Width, description.Height, fmt, pType, pData);
+                        {
+                            _gl.TexSubImage2D(target, 0, 0, 0, description.Width, description.Height, _format,
+                                _pixelType, pData);
+                        }
                     }
                 }
 
                 break;
             }
             
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    public unsafe void Update(int x, int y, uint width, uint height, uint mipLevel, void* pData)
+    {
+        _gl.BindTexture(Target, Texture);
+
+        bool isCompressed = Description.Format.IsCompressed();
+        
+        switch (Description.Type)
+        {
+            case TextureType.Texture2D:
+            {
+                if (isCompressed)
+                {
+                    _gl.CompressedTexSubImage2D(Target, (int) mipLevel, x, y, width, height,
+                        (InternalFormat) _internalFormat,
+                        GraphicsUtils.CalculateTextureSizeInBytes(Description.Format, width, height), pData);
+                }
+                else
+                    _gl.TexSubImage2D(Target, (int) mipLevel, x, y, width, height, _format, _pixelType, pData);
+                
+                break;
+            }
+            case TextureType.Cubemap:
+                throw new NotImplementedException("Cannot update cubemap texture currently.");
             default:
                 throw new ArgumentOutOfRangeException();
         }

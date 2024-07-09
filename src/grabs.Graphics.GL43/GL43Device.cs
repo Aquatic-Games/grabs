@@ -85,6 +85,13 @@ public class GL43Device : Device
         _gl.BufferSubData(glBuffer.Target, (nint) offsetInBytes, (nuint) sizeInBytes, pData);
     }
 
+    public override unsafe void UpdateTexture(Texture texture, int x, int y, uint width, uint height, uint mipLevel, void* pData)
+    {
+        GL43Texture glTexture = (GL43Texture) texture;
+        
+        glTexture.Update(x, y, width, height, mipLevel, pData);
+    }
+
     public override void UpdateDescriptorSet(DescriptorSet set, in ReadOnlySpan<DescriptorSetDescription> descriptions)
     {
         GL43DescriptorSet glSet = (GL43DescriptorSet) set;

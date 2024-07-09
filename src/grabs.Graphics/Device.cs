@@ -107,6 +107,22 @@ public abstract class Device : IDisposable
     }
     
     public abstract unsafe void UpdateBuffer(Buffer buffer, uint offsetInBytes, uint sizeInBytes, void* pData);
+
+    public unsafe void UpdateTexture<T>(Texture texture, int x, int y, uint width, uint height, uint mipLevel, T[] data)
+        where T : unmanaged
+    {
+        fixed (void* pData = data)
+            UpdateTexture(texture, x, y, width, height, mipLevel, pData);
+    }
+
+    public unsafe void UpdateTexture<T>(Texture texture, int x, int y, uint width, uint height, uint mipLevel,
+        in ReadOnlySpan<T> data) where T : unmanaged
+    {
+        fixed (void* pData = data)
+            UpdateTexture(texture, x, y, width, height, mipLevel, pData);
+    }
+    
+    public abstract unsafe void UpdateTexture(Texture texture, int x, int y, uint width, uint height, uint mipLevel, void* pData);
     
     public void UpdateDescriptorSet(DescriptorSet set, params DescriptorSetDescription[] descriptions)
         => UpdateDescriptorSet(set, descriptions.AsSpan());

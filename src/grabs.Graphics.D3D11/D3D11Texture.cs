@@ -10,9 +10,13 @@ public sealed class D3D11Texture : Texture
     public readonly ID3D11Resource Texture;
     public readonly ID3D11ShaderResourceView ResourceView;
 
+    public readonly Format Format;
+
     public unsafe D3D11Texture(ID3D11Device device, ID3D11DeviceContext context, in TextureDescription description,
-        void** ppData)
+        void** ppData) : base(description)
     {
+        Format = description.Format;
+        
         BindFlags flags = BindFlags.None;
 
         if ((description.Usage & TextureUsage.ShaderResource) == TextureUsage.ShaderResource)
@@ -30,7 +34,7 @@ public sealed class D3D11Texture : Texture
         
         ShaderResourceViewDescription srvDesc = new ShaderResourceViewDescription()
         {
-            Format = D3D11Utils.FormatToD3D(description.Format)
+            Format = D3D11Utils.FormatToD3D(Format)
         };
 
         switch (description.Type)
@@ -116,7 +120,7 @@ public sealed class D3D11Texture : Texture
             ResourceView = device.CreateShaderResourceView(Texture, srvDesc);
     }
 
-    public D3D11Texture(ID3D11Resource texture, ID3D11ShaderResourceView resourceView)
+    public D3D11Texture(ID3D11Resource texture, ID3D11ShaderResourceView resourceView) : base(new TextureDescription())
     {
         Texture = texture;
         ResourceView = resourceView;
