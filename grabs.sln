@@ -18,8 +18,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.ShaderCompiler.Spirv"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Core", "src\grabs.Core\grabs.Core.csproj", "{6D67AF15-F72F-4B6A-AB59-EEC0CE33D1EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Graphics.Vulkan", "src\grabs.Graphics.Vulkan\grabs.Graphics.Vulkan.csproj", "{80597A66-3E5E-4788-8E11-1053D4328EDB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Audio", "src\grabs.Audio\grabs.Audio.csproj", "{78DDFCB5-C781-4FF3-B05F-F14BB8864772}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Tests.Audio", "tests\grabs.Tests.Audio\grabs.Tests.Audio.csproj", "{7F891CA1-5BEC-4E72-84D7-E4C0CFEA6D7B}"
@@ -80,10 +78,6 @@ Global
 		{6D67AF15-F72F-4B6A-AB59-EEC0CE33D1EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D67AF15-F72F-4B6A-AB59-EEC0CE33D1EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D67AF15-F72F-4B6A-AB59-EEC0CE33D1EF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{80597A66-3E5E-4788-8E11-1053D4328EDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{80597A66-3E5E-4788-8E11-1053D4328EDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{80597A66-3E5E-4788-8E11-1053D4328EDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{80597A66-3E5E-4788-8E11-1053D4328EDB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{78DDFCB5-C781-4FF3-B05F-F14BB8864772}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{78DDFCB5-C781-4FF3-B05F-F14BB8864772}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78DDFCB5-C781-4FF3-B05F-F14BB8864772}.Release|Any CPU.ActiveCfg = Release|Any CPU

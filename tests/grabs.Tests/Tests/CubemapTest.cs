@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Numerics;
 using grabs.Graphics;
@@ -94,6 +95,8 @@ public class CubemapTest : TestBase
     protected override void Draw()
     {
         CommandList.Begin();
+        CommandList.SetViewport(new Viewport(0, 0, 1280, 720));
+        CommandList.SetScissor(new Rectangle(0, 0, 1280, 720));
         
         CommandList.UpdateBuffer(_worldBuffer, 0, _transformMatrix);
 

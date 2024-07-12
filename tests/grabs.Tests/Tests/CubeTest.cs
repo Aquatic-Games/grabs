@@ -120,6 +120,8 @@ public class CubeTest : TestBase
         base.Draw();
         
         CommandList.Begin();
+        CommandList.SetViewport(new Viewport(0, 0, 1280, 720));
+        CommandList.SetScissor(new Rectangle(0, 0, 1280, 720));
         
         CameraMatrices matrices = new CameraMatrices()
         {
