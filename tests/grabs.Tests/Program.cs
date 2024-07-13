@@ -100,6 +100,8 @@ unsafe
     sdl.VulkanGetInstanceExtensions(window, &numExtensions, extensions);
 
     Instance instance = new VkInstance(extensions);
+    Adapter[] adapters = instance.EnumerateAdapters();
+    Console.WriteLine($"Adapters:\n{string.Join("\n", adapters)}");
 
     bool alive = true;
     while (alive)
@@ -125,4 +127,8 @@ unsafe
     }
     
     instance.Dispose();
+    
+    sdl.DestroyWindow(window);
+    sdl.Quit();
+    sdl.Dispose();
 }

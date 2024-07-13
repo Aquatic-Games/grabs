@@ -4,6 +4,7 @@ using System;
 using System.Reflection;
 using grabs.Core;
 using Silk.NET.Vulkan;
+using static grabs.Graphics.Vulkan.VkUtils;
 
 namespace grabs.Graphics.Vulkan;
 
@@ -56,7 +57,7 @@ public unsafe class VkInstance : Instance
         };
 
         GrabsLog.Log(GrabsLog.LogType.Verbose, "Creating instance.");
-        VkUtils.CheckResult(Vk.CreateInstance(&instanceCreateInfo, null, out Instance), "create instance");
+        CheckResult(Vk.CreateInstance(&instanceCreateInfo, null, out Instance), "create instance");
     }
     
     public override Device CreateDevice(Surface surface, Adapter? adapter = null)
@@ -66,11 +67,48 @@ public unsafe class VkInstance : Instance
 
     public override Adapter[] EnumerateAdapters()
     {
-        throw new NotImplementedException();
+        uint numDevices;
+        CheckResult(Vk.EnumeratePhysicalDevices(Instance, &numDevices, null));
+        PhysicalDevice* pDevices = stackalloc PhysicalDevice[(int) numDevices];
+        CheckResult(Vk.EnumeratePhysicalDevices(Instance, &numDevices, pDevices));
+
+        Adapter[] adapters = new Adapter[numDevices];
+
+        for (uint i = 0; i < numDevices; i++)
+        {
+            PhysicalDevice device = pDevices[i];
+            
+            PhysicalDeviceProperties properties;
+            Vk.GetPhysicalDeviceProperties(device, &properties);
+
+            PhysicalDeviceMemoryProperties memoryProperties;
+            Vk.GetPhysicalDeviceMemoryProperties(device, &memoryProperties);
+
+            string name = new string((sbyte*) properties.DeviceName);
+
+            ulong dedicatedMemory = memoryProperties.MemoryHeapCount > 0
+                ? memoryProperties.MemoryHeaps[0].Size
+                : 0;
+            
+            AdapterType type = properties.DeviceType switch
+            {
+                PhysicalDeviceType.Other => AdapterType.Other,
+                PhysicalDeviceType.IntegratedGpu => AdapterType.Integrated,
+                PhysicalDeviceType.DiscreteGpu => AdapterType.Discrete,
+                PhysicalDeviceType.VirtualGpu => AdapterType.Other,
+                PhysicalDeviceType.Cpu => AdapterType.Software,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            adapters[i] = new Adapter(i, name, dedicatedMemory, type);
+        }
+
+        return adapters;
     }
 
     public override void Dispose()
     {
+        GrabsLog.Log(GrabsLog.LogType.Verbose, "Destroying instance.");
         Vk.DestroyInstance(Instance, null);
     }
 }
