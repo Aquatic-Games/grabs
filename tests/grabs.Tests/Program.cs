@@ -2,13 +2,14 @@
 using System.Drawing;
 using grabs.Core;
 using grabs.Graphics;
+using grabs.Graphics.Vulkan;
 using grabs.Tests;
 using grabs.Tests.Tests;
 using Silk.NET.SDL;
 
 GrabsLog.LogMessage += (type, message) => Console.WriteLine($"[{type}] {message}");
 
-GraphicsApi api = 0;
+/*GraphicsApi api = 0;
 
 unsafe
 {
@@ -75,4 +76,53 @@ unsafe
 }
 
 using TestBase test = new CubemapTest();
-test.Run(api, new Size(1280, 720));
+test.Run(api, new Size(1280, 720));*/
+
+unsafe
+{
+    Sdl sdl = Sdl.GetApi();
+
+    if (sdl.Init(Sdl.InitVideo | Sdl.InitAudio) < 0)
+        throw new Exception($"Failed to initialize SDL: {sdl.GetErrorS()}");
+
+    const int width = 1280;
+    const int height = 720;
+
+    Window* window = sdl.CreateWindow("Vulkan Test", Sdl.WindowposCentered, Sdl.WindowposCentered, width, height,
+        (uint) WindowFlags.Vulkan);
+
+    if (window == null)
+        throw new Exception($"Failed to create window: {sdl.GetErrorS()}");
+
+    uint numExtensions;
+    sdl.VulkanGetInstanceExtensions(window, &numExtensions, (byte**) null);
+    string[] extensions = new string[numExtensions];
+    sdl.VulkanGetInstanceExtensions(window, &numExtensions, extensions);
+
+    Instance instance = new VkInstance(extensions);
+
+    bool alive = true;
+    while (alive)
+    {
+        Event winEvent;
+        while (sdl.PollEvent(&winEvent) != 0)
+        {
+            switch ((EventType) winEvent.Type)
+            {
+                case EventType.Windowevent:
+                {
+                    switch ((WindowEventID) winEvent.Window.Event)
+                    {
+                        case WindowEventID.Close:
+                            alive = false;
+                            break;
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
+    
+    instance.Dispose();
+}
