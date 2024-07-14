@@ -14,10 +14,10 @@ public unsafe class VkInstance : Instance
 {
     public readonly Vk Vk;
 
-    public VulkanInstance Instance;
+    public readonly VulkanInstance Instance;
 
-    public ExtDebugUtils DebugUtils;
-    public DebugUtilsMessengerEXT DebugMessenger;
+    public readonly ExtDebugUtils DebugUtils;
+    public readonly DebugUtilsMessengerEXT DebugMessenger;
     
     public override GraphicsApi Api => GraphicsApi.Vulkan;
 
@@ -95,7 +95,18 @@ public unsafe class VkInstance : Instance
 
     public override Device CreateDevice(Surface surface, Adapter? adapter = null)
     {
-        throw new NotImplementedException();
+        uint numDevices;
+        Vk.EnumeratePhysicalDevices(Instance, &numDevices, null);
+        PhysicalDevice* pDevices = stackalloc PhysicalDevice[(int) numDevices];
+        Vk.EnumeratePhysicalDevices(Instance, &numDevices, pDevices);
+
+        PhysicalDevice device;
+        if (adapter is { } adp)
+            device = pDevices[adp.Index];
+        else
+            device = pDevices[0];
+
+        return new VkDevice(Vk, device, (VkSurface) surface);
     }
 
     public override Adapter[] EnumerateAdapters()
