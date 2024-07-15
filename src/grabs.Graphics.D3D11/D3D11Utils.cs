@@ -1,21 +1,10 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using TerraFX.Interop.Windows;
-using Vortice.Direct3D;
-using Vortice.Direct3D11;
-using DXGIFormat = Vortice.DXGI.Format;
 
 namespace grabs.Graphics.D3D11;
 
 public static class D3D11Utils
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void CheckResult(HRESULT result, string operation)
-    {
-        if (result.FAILED)
-            throw new Exception($"Operation '{operation}' failed with HRESULT {result}.");
-    }
-    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static uint CalculateSubresource(uint mipIndex, uint arrayIndex, uint totalMipLevels)
         => mipIndex + (arrayIndex * totalMipLevels);
