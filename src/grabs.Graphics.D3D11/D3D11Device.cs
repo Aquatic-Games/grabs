@@ -1,35 +1,35 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using SharpGen.Runtime;
-using Vortice.Direct3D;
-using Vortice.Direct3D11;
-using Vortice.DXGI;
-using Vortice.Mathematics;
+using Silk.NET.SPIRV.Cross;
+using TerraFX.Interop.DirectX;
+using static TerraFX.Interop.DirectX.D3D_DRIVER_TYPE;
+using static TerraFX.Interop.DirectX.DirectX;
+using static TerraFX.Interop.DirectX.D3D_FEATURE_LEVEL;
 
 namespace grabs.Graphics.D3D11;
 
-public sealed class D3D11Device : Device
+public sealed unsafe class D3D11Device : Device
 {
-    private readonly IDXGIFactory _factory;
+    private readonly IDXGIFactory1* _factory;
     private readonly D3D11Surface _surface;
 
     private D3D11Swapchain _swapchain;
     
-    public readonly ID3D11Device Device;
-    public readonly ID3D11DeviceContext Context;
+    public readonly ID3D11Device* Device;
+    public readonly ID3D11DeviceContext* Context;
     
-    public D3D11Device(IDXGIFactory1 factory, D3D11Surface surface, IDXGIAdapter1 adapter)
+    public D3D11Device(IDXGIFactory1* factory, D3D11Surface surface, IDXGIAdapter1* adapter)
     {
         _factory = factory;
         _surface = surface;
         
-        FeatureLevel[] levels = new[]
+        D3D_FEATURE_LEVEL[] levels = new[]
         {
-            FeatureLevel.Level_11_0
+            D3D_FEATURE_LEVEL_11_0
         };
 
         Result result;
-        if ((result = Vortice.Direct3D11.D3D11.D3D11CreateDevice(adapter, DriverType.Unknown,
+        if ((result = D3D11CreateDevice(adapter, D3D_DRIVER_TYPE_UNKNOWN,
                 DeviceCreationFlags.BgraSupport, levels, out Device, out Context)).Failure)
         {
             throw new Exception($"Failed to create D3D11 device: {result.Description}");

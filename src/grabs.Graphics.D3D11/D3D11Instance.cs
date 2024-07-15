@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using SharpGen.Runtime;
-using Vortice.DXGI;
+using TerraFX.Interop.DirectX;
+using static TerraFX.Interop.DirectX.DirectX;
+using static TerraFX.Interop.Windows.Windows;
 
 namespace grabs.Graphics.D3D11;
 
-public sealed class D3D11Instance : Instance
+public sealed unsafe class D3D11Instance : Instance
 {
-    public readonly IDXGIFactory1 Factory;
+    public readonly IDXGIFactory1* Factory;
 
     public override GraphicsApi Api => GraphicsApi.D3D11;
 
@@ -15,8 +16,11 @@ public sealed class D3D11Instance : Instance
     {
         Result result;
 
-        if ((result = DXGI.CreateDXGIFactory1(out Factory!)).Failure)
-            throw new Exception($"Failed to create DXGI factory. {result.Description}");
+        fixed (IDXGIFactory1** factory = &Factory)
+        {
+            if ((result = CreateDXGIFactory1(__uuidof<IDXGIFactory1>(), (void**) factory)))
+                throw new Exception($"Failed to create DXGI factory. {result.Description}");
+        }
     }
 
     public override Device CreateDevice(Surface surface, Adapter? adapter = null)
