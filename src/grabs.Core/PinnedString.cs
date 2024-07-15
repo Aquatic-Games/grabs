@@ -3,7 +3,7 @@ using System.Text;
 
 namespace grabs.Core;
 
-public unsafe class PinnedString : IPinnedObject
+public unsafe struct PinnedString : IPinnedObject
 {
     private GCHandle _gcHandle;
 

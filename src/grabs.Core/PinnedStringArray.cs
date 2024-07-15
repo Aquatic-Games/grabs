@@ -4,7 +4,7 @@ using System.Text;
 
 namespace grabs.Core;
 
-public unsafe class PinnedStringArray : IPinnedObject
+public unsafe struct PinnedStringArray : IPinnedObject
 {
     private byte** _stringPtrs;
 

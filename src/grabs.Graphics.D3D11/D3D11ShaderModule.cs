@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using grabs.Core;
 using grabs.ShaderCompiler.Spirv;
-using Vortice.D3DCompiler;
-using Vortice.Direct3D;
+using TerraFX.Interop.DirectX;
+using static TerraFX.Interop.DirectX.DirectX;
 
 namespace grabs.Graphics.D3D11;
 
-public sealed class D3D11ShaderModule : ShaderModule
+[SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
+public sealed unsafe class D3D11ShaderModule : ShaderModule
 {
-    public Blob Blob;
+    public ID3DBlob* Blob;
     
     public D3D11ShaderModule(ShaderStage stage, byte[] spirv, string entryPoint, SpecializationConstant[] constants) 
         : base(stage)
@@ -21,16 +24,28 @@ public sealed class D3D11ShaderModule : ShaderModule
             ShaderStage.Compute => "cs_5_0",
             _ => throw new ArgumentOutOfRangeException(nameof(stage), stage, null)
         };
+
+        using PinnedString pHlsl = new PinnedString(hlsl);
+        using PinnedString pEntryPoint = new PinnedString("main");
+        using PinnedString pProfile = new PinnedString(profile);
         
-        Blob errorBlob;
-        if (Compiler.Compile(hlsl, null, null, "main", null, profile, ShaderFlags.None, EffectFlags.None, out Blob, out errorBlob).Failure)
-            throw new Exception($"Failed to compile HLSL shader: {errorBlob.AsString()}");
-        
-        errorBlob?.Dispose();
+        ID3DBlob* errorBlob;
+        fixed (ID3DBlob** blob = &Blob)
+        {
+            if (D3DCompile(pHlsl, (nuint) hlsl.Length, null, null, null, (sbyte*) pEntryPoint.Handle,
+                    (sbyte*) pProfile.Handle, 0, 0, blob, &errorBlob).FAILED)
+            {
+                throw new Exception(
+                    $"Failed to compile HLSL shader: {new string((sbyte*) errorBlob->GetBufferPointer(), 0, (int) errorBlob->GetBufferSize())}");
+            }
+        }
+
+        if (errorBlob != null)
+            errorBlob->Release();
     }
     
     public override void Dispose()
     {
-        Blob.Dispose();
+        Blob->Release();
     }
 }
