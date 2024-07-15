@@ -1,166 +1,175 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using TerraFX.Interop.DirectX;
+using static TerraFX.Interop.DirectX.D3D_PRIMITIVE_TOPOLOGY;
+using static TerraFX.Interop.DirectX.D3D11_BLEND;
+using static TerraFX.Interop.DirectX.D3D11_BLEND_OP;
+using static TerraFX.Interop.DirectX.D3D11_COMPARISON_FUNC;
+using static TerraFX.Interop.DirectX.D3D11_MAP;
+using static TerraFX.Interop.DirectX.DXGI_FORMAT;
 
 namespace grabs.Graphics.D3D11;
 
+[SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
 public static class D3D11Utils
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static uint CalculateSubresource(uint mipIndex, uint arrayIndex, uint totalMipLevels)
         => mipIndex + (arrayIndex * totalMipLevels);
     
-    public static DXGIFormat FormatToD3D(Format format)
+    public static DXGI_FORMAT FormatToD3D(Format format)
     {
         return format switch
         {
-            Format.B5G6R5_UNorm => DXGIFormat.B5G6R5_UNorm,
-            Format.B5G5R5A1_UNorm => DXGIFormat.B5G5R5A1_UNorm,
-            Format.R8_UNorm => DXGIFormat.R8_UNorm,
-            Format.R8_UInt => DXGIFormat.R8_UInt,
-            Format.R8_SNorm => DXGIFormat.R8_SNorm,
-            Format.R8_SInt => DXGIFormat.R8_SInt,
-            Format.A8_UNorm => DXGIFormat.A8_UNorm,
-            Format.R8G8_UNorm => DXGIFormat.R8G8_UNorm,
-            Format.R8G8_UInt => DXGIFormat.R8G8_UInt,
-            Format.R8G8_SNorm => DXGIFormat.R8G8_SNorm,
-            Format.R8G8_SInt => DXGIFormat.R8G8_SInt,
-            Format.R8G8B8A8_UNorm => DXGIFormat.R8G8B8A8_UNorm,
-            Format.R8G8B8A8_UNorm_SRGB => DXGIFormat.R8G8B8A8_UNorm_SRgb,
-            Format.R8G8B8A8_UInt => DXGIFormat.R8G8B8A8_UInt,
-            Format.R8G8B8A8_SNorm => DXGIFormat.R8G8B8A8_SNorm,
-            Format.R8G8B8A8_SInt => DXGIFormat.R8G8B8A8_SInt,
-            Format.B8G8R8A8_UNorm => DXGIFormat.B8G8R8A8_UNorm,
-            Format.B8G8R8A8_UNorm_SRGB => DXGIFormat.B8G8R8A8_UNorm_SRgb,
-            Format.R10G10B10A2_UNorm => DXGIFormat.R10G10B10A2_UNorm,
-            Format.R10G10B10A2_UInt => DXGIFormat.R10G10B10A2_UInt,
-            Format.R11G11B10_Float => DXGIFormat.R11G11B10_Float,
-            Format.R16_Float => DXGIFormat.R16_Float,
-            Format.D16_UNorm => DXGIFormat.D16_UNorm,
-            Format.R16_UNorm => DXGIFormat.R16_UNorm,
-            Format.R16_UInt => DXGIFormat.R16_UInt,
-            Format.R16_SNorm => DXGIFormat.R16_SNorm,
-            Format.R16_SInt => DXGIFormat.R16_SInt,
-            Format.R16G16_Float => DXGIFormat.R16G16_Float,
-            Format.R16G16_UNorm => DXGIFormat.R16G16_UNorm,
-            Format.R16G16_UInt => DXGIFormat.R16G16_UInt,
-            Format.R16G16_SNorm => DXGIFormat.R16G16_SNorm,
-            Format.R16G16_SInt => DXGIFormat.R16G16_SInt,
-            Format.R16G16B16A16_Float => DXGIFormat.R16G16B16A16_Float,
-            Format.R16G16B16A16_UNorm => DXGIFormat.R16G16B16A16_UNorm,
-            Format.R16G16B16A16_UInt => DXGIFormat.R16G16B16A16_UInt,
-            Format.R16G16B16A16_SNorm => DXGIFormat.R16G16B16A16_SNorm,
-            Format.R16G16B16A16_SInt => DXGIFormat.R16G16B16A16_SInt,
-            Format.R32_Float => DXGIFormat.R32_Float,
-            Format.R32_UInt => DXGIFormat.R32_UInt,
-            Format.R32_SInt => DXGIFormat.R32_SInt,
-            Format.R32G32_Float => DXGIFormat.R32G32_Float,
-            Format.R32G32_UInt => DXGIFormat.R32G32_UInt,
-            Format.R32G32_SInt => DXGIFormat.R32G32_SInt,
-            Format.R32G32B32_Float => DXGIFormat.R32G32B32_Float,
-            Format.R32G32B32_UInt => DXGIFormat.R32G32B32_UInt,
-            Format.R32G32B32_SInt => DXGIFormat.R32G32B32_SInt,
-            Format.R32G32B32A32_Float => DXGIFormat.R32G32B32A32_Float,
-            Format.R32G32B32A32_UInt => DXGIFormat.R32G32B32A32_UInt,
-            Format.R32G32B32A32_SInt => DXGIFormat.R32G32B32A32_SInt,
-            Format.D24_UNorm_S8_UInt => DXGIFormat.D24_UNorm_S8_UInt,
-            Format.D32_Float => DXGIFormat.D32_Float,
-            Format.BC1_UNorm => DXGIFormat.BC1_UNorm,
-            Format.BC1_UNorm_SRGB => DXGIFormat.BC1_UNorm_SRgb,
-            Format.BC2_UNorm => DXGIFormat.BC2_UNorm,
-            Format.BC2_UNorm_SRGB => DXGIFormat.BC2_UNorm_SRgb,
-            Format.BC3_UNorm => DXGIFormat.BC3_UNorm,
-            Format.BC3_UNorm_SRGB => DXGIFormat.BC3_UNorm_SRgb,
-            Format.BC4_UNorm => DXGIFormat.BC4_UNorm,
-            Format.BC4_SNorm => DXGIFormat.BC4_SNorm,
-            Format.BC5_UNorm => DXGIFormat.BC5_UNorm,
-            Format.BC5_SNorm => DXGIFormat.BC5_SNorm,
-            Format.BC6H_UF16 => DXGIFormat.BC6H_Uf16,
-            Format.BC6H_SF16 => DXGIFormat.BC6H_Sf16,
-            Format.BC7_UNorm => DXGIFormat.BC7_UNorm,
-            Format.BC7_UNorm_SRGB => DXGIFormat.BC7_UNorm_SRgb,
+            Format.B5G6R5_UNorm => DXGI_FORMAT_B5G6R5_UNORM,
+            Format.B5G5R5A1_UNorm => DXGI_FORMAT_B5G5R5A1_UNORM,
+            Format.R8_UNorm => DXGI_FORMAT_R8_UNORM,
+            Format.R8_UInt => DXGI_FORMAT_R8_UINT,
+            Format.R8_SNorm => DXGI_FORMAT_R8_SNORM,
+            Format.R8_SInt => DXGI_FORMAT_R8_SINT,
+            Format.A8_UNorm => DXGI_FORMAT_A8_UNORM,
+            Format.R8G8_UNorm => DXGI_FORMAT_R8G8_UNORM,
+            Format.R8G8_UInt => DXGI_FORMAT_R8G8_UINT,
+            Format.R8G8_SNorm => DXGI_FORMAT_R8G8_SNORM,
+            Format.R8G8_SInt => DXGI_FORMAT_R8G8_SINT,
+            Format.R8G8B8A8_UNorm => DXGI_FORMAT_R8G8B8A8_UNORM,
+            Format.R8G8B8A8_UNorm_SRGB => DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
+            Format.R8G8B8A8_UInt => DXGI_FORMAT_R8G8B8A8_UINT,
+            Format.R8G8B8A8_SNorm => DXGI_FORMAT_R8G8B8A8_SNORM,
+            Format.R8G8B8A8_SInt => DXGI_FORMAT_R8G8B8A8_SINT,
+            Format.B8G8R8A8_UNorm => DXGI_FORMAT_B8G8R8A8_UNORM,
+            Format.B8G8R8A8_UNorm_SRGB => DXGI_FORMAT_B8G8R8A8_UNORM_SRGB,
+            Format.R10G10B10A2_UNorm => DXGI_FORMAT_R10G10B10A2_UNORM,
+            Format.R10G10B10A2_UInt => DXGI_FORMAT_R10G10B10A2_UINT,
+            Format.R11G11B10_Float => DXGI_FORMAT_R11G11B10_FLOAT,
+            Format.R16_Float => DXGI_FORMAT_R16_FLOAT,
+            Format.D16_UNorm => DXGI_FORMAT_D16_UNORM,
+            Format.R16_UNorm => DXGI_FORMAT_R16_UNORM,
+            Format.R16_UInt => DXGI_FORMAT_R16_UINT,
+            Format.R16_SNorm => DXGI_FORMAT_R16_SNORM,
+            Format.R16_SInt => DXGI_FORMAT_R16_SINT,
+            Format.R16G16_Float => DXGI_FORMAT_R16G16_FLOAT,
+            Format.R16G16_UNorm => DXGI_FORMAT_R16G16_UNORM,
+            Format.R16G16_UInt => DXGI_FORMAT_R16G16_UINT,
+            Format.R16G16_SNorm => DXGI_FORMAT_R16G16_SNORM,
+            Format.R16G16_SInt => DXGI_FORMAT_R16G16_SINT,
+            Format.R16G16B16A16_Float => DXGI_FORMAT_R16G16B16A16_FLOAT,
+            Format.R16G16B16A16_UNorm => DXGI_FORMAT_R16G16B16A16_UNORM,
+            Format.R16G16B16A16_UInt => DXGI_FORMAT_R16G16B16A16_UINT,
+            Format.R16G16B16A16_SNorm => DXGI_FORMAT_R16G16B16A16_SNORM,
+            Format.R16G16B16A16_SInt => DXGI_FORMAT_R16G16B16A16_SINT,
+            Format.R32_Float => DXGI_FORMAT_R32_FLOAT,
+            Format.R32_UInt => DXGI_FORMAT_R32_UINT,
+            Format.R32_SInt => DXGI_FORMAT_R32_SINT,
+            Format.R32G32_Float => DXGI_FORMAT_R32G32_FLOAT,
+            Format.R32G32_UInt => DXGI_FORMAT_R32G32_UINT,
+            Format.R32G32_SInt => DXGI_FORMAT_R32G32_SINT,
+            Format.R32G32B32_Float => DXGI_FORMAT_R32G32B32_FLOAT,
+            Format.R32G32B32_UInt => DXGI_FORMAT_R32G32B32_UINT,
+            Format.R32G32B32_SInt => DXGI_FORMAT_R32G32B32_SINT,
+            Format.R32G32B32A32_Float => DXGI_FORMAT_R32G32B32A32_FLOAT,
+            Format.R32G32B32A32_UInt => DXGI_FORMAT_R32G32B32A32_UINT,
+            Format.R32G32B32A32_SInt => DXGI_FORMAT_R32G32B32A32_SINT,
+            Format.D24_UNorm_S8_UInt => DXGI_FORMAT_D24_UNORM_S8_UINT,
+            Format.D32_Float => DXGI_FORMAT_D32_FLOAT,
+            Format.BC1_UNorm => DXGI_FORMAT_BC1_UNORM,
+            Format.BC1_UNorm_SRGB => DXGI_FORMAT_BC1_UNORM_SRGB,
+            Format.BC2_UNorm => DXGI_FORMAT_BC2_UNORM,
+            Format.BC2_UNorm_SRGB => DXGI_FORMAT_BC2_UNORM_SRGB,
+            Format.BC3_UNorm => DXGI_FORMAT_BC3_UNORM,
+            Format.BC3_UNorm_SRGB => DXGI_FORMAT_BC3_UNORM_SRGB,
+            Format.BC4_UNorm => DXGI_FORMAT_BC4_UNORM,
+            Format.BC4_SNorm => DXGI_FORMAT_BC4_SNORM,
+            Format.BC5_UNorm => DXGI_FORMAT_BC5_UNORM,
+            Format.BC5_SNorm => DXGI_FORMAT_BC5_SNORM,
+            Format.BC6H_UF16 => DXGI_FORMAT_BC6H_UF16,
+            Format.BC6H_SF16 => DXGI_FORMAT_BC6H_SF16,
+            Format.BC7_UNorm => DXGI_FORMAT_BC7_UNORM,
+            Format.BC7_UNorm_SRGB => DXGI_FORMAT_BC7_UNORM_SRGB,
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
         };
     }
 
-    public static Vortice.Direct3D11.ComparisonFunction ComparisonFunctionToD3D(ComparisonFunction func)
+    public static D3D11_COMPARISON_FUNC ComparisonFunctionToD3D(ComparisonFunction func)
     {
         return func switch
         {
-            ComparisonFunction.Never => Vortice.Direct3D11.ComparisonFunction.Never,
-            ComparisonFunction.Less => Vortice.Direct3D11.ComparisonFunction.Less,
-            ComparisonFunction.Equal => Vortice.Direct3D11.ComparisonFunction.Equal,
-            ComparisonFunction.LessEqual => Vortice.Direct3D11.ComparisonFunction.LessEqual,
-            ComparisonFunction.Greater => Vortice.Direct3D11.ComparisonFunction.Greater,
-            ComparisonFunction.NotEqual => Vortice.Direct3D11.ComparisonFunction.NotEqual,
-            ComparisonFunction.GreaterEqual => Vortice.Direct3D11.ComparisonFunction.GreaterEqual,
-            ComparisonFunction.Always => Vortice.Direct3D11.ComparisonFunction.Always,
+            ComparisonFunction.Never => D3D11_COMPARISON_NEVER,
+            ComparisonFunction.Less => D3D11_COMPARISON_LESS,
+            ComparisonFunction.Equal => D3D11_COMPARISON_EQUAL,
+            ComparisonFunction.LessEqual => D3D11_COMPARISON_LESS_EQUAL,
+            ComparisonFunction.Greater => D3D11_COMPARISON_GREATER,
+            ComparisonFunction.NotEqual => D3D11_COMPARISON_NOT_EQUAL,
+            ComparisonFunction.GreaterEqual => D3D11_COMPARISON_GREATER_EQUAL,
+            ComparisonFunction.Always => D3D11_COMPARISON_ALWAYS,
             _ => throw new ArgumentOutOfRangeException(nameof(func), func, null)
         };
     }
 
-    public static PrimitiveTopology PrimitiveTypeToD3D(PrimitiveType type)
+    public static D3D_PRIMITIVE_TOPOLOGY PrimitiveTypeToD3D(PrimitiveType type)
     {
         return type switch
         {
-            PrimitiveType.PointList => PrimitiveTopology.PointList,
-            PrimitiveType.LineList => PrimitiveTopology.LineList,
-            PrimitiveType.LineStrip => PrimitiveTopology.LineStrip,
-            PrimitiveType.LineListAdjacency => PrimitiveTopology.LineListAdjacency,
-            PrimitiveType.LineStripAdjacency => PrimitiveTopology.LineStripAdjacency,
-            PrimitiveType.TriangleList => PrimitiveTopology.TriangleList,
-            PrimitiveType.TriangleStrip => PrimitiveTopology.TriangleStrip,
-            PrimitiveType.TriangleFan => PrimitiveTopology.TriangleFan,
-            PrimitiveType.TriangleListAdjacency => PrimitiveTopology.TriangleListAdjacency,
-            PrimitiveType.TriangleStripAdjacency => PrimitiveTopology.TriangleStripAdjacency,
+            PrimitiveType.PointList => D3D_PRIMITIVE_TOPOLOGY_POINTLIST,
+            PrimitiveType.LineList => D3D_PRIMITIVE_TOPOLOGY_LINELIST,
+            PrimitiveType.LineStrip => D3D_PRIMITIVE_TOPOLOGY_LINESTRIP,
+            PrimitiveType.LineListAdjacency => D3D_PRIMITIVE_TOPOLOGY_LINELIST_ADJ,
+            PrimitiveType.LineStripAdjacency => D3D_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ,
+            PrimitiveType.TriangleList => D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+            PrimitiveType.TriangleStrip => D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP,
+            PrimitiveType.TriangleFan => D3D_PRIMITIVE_TOPOLOGY_TRIANGLEFAN,
+            PrimitiveType.TriangleListAdjacency => D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ,
+            PrimitiveType.TriangleStripAdjacency => D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ,
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
     }
 
-    public static Blend BlendFactorToD3D(BlendFactor factor)
+    public static D3D11_BLEND BlendFactorToD3D(BlendFactor factor)
     {
         return factor switch
         {
-            BlendFactor.Zero => Blend.Zero,
-            BlendFactor.One => Blend.One,
-            BlendFactor.SrcColor => Blend.SourceColor,
-            BlendFactor.OneMinusSrcColor => Blend.InverseSourceColor,
-            BlendFactor.DestColor => Blend.DestinationColor,
-            BlendFactor.OneMinusDestColor => Blend.InverseDestinationColor,
-            BlendFactor.SrcAlpha => Blend.SourceAlpha,
-            BlendFactor.OneMinusSrcAlpha => Blend.InverseSourceAlpha,
-            BlendFactor.DestAlpha => Blend.DestinationAlpha,
-            BlendFactor.OneMinusDestAlpha => Blend.InverseDestinationAlpha,
-            BlendFactor.ConstantColor => Blend.DestinationColor,
-            BlendFactor.OneMinusConstantColor => Blend.InverseDestinationColor,
-            BlendFactor.SrcAlphaSaturate => Blend.SourceAlphaSaturate,
-            BlendFactor.Src1Color => Blend.Source1Color,
-            BlendFactor.OneMinusSrc1Color => Blend.InverseSource1Color,
-            BlendFactor.Src1Alpha => Blend.Source1Alpha,
-            BlendFactor.OneMinusSrc1Alpha => Blend.InverseSource1Alpha,
+            BlendFactor.Zero => D3D11_BLEND_ZERO,
+            BlendFactor.One => D3D11_BLEND_ONE,
+            BlendFactor.SrcColor => D3D11_BLEND_SRC_COLOR,
+            BlendFactor.OneMinusSrcColor => D3D11_BLEND_INV_SRC_COLOR,
+            BlendFactor.DestColor => D3D11_BLEND_DEST_COLOR,
+            BlendFactor.OneMinusDestColor => D3D11_BLEND_INV_DEST_COLOR,
+            BlendFactor.SrcAlpha => D3D11_BLEND_SRC_ALPHA,
+            BlendFactor.OneMinusSrcAlpha => D3D11_BLEND_INV_SRC_ALPHA,
+            BlendFactor.DestAlpha => D3D11_BLEND_DEST_ALPHA,
+            BlendFactor.OneMinusDestAlpha => D3D11_BLEND_INV_DEST_ALPHA,
+            BlendFactor.ConstantColor => D3D11_BLEND_DEST_COLOR,
+            BlendFactor.OneMinusConstantColor => D3D11_BLEND_INV_DEST_COLOR,
+            BlendFactor.SrcAlphaSaturate => D3D11_BLEND_SRC_ALPHA_SAT,
+            BlendFactor.Src1Color => D3D11_BLEND_SRC1_COLOR,
+            BlendFactor.OneMinusSrc1Color => D3D11_BLEND_INV_SRC1_COLOR,
+            BlendFactor.Src1Alpha => D3D11_BLEND_SRC1_ALPHA,
+            BlendFactor.OneMinusSrc1Alpha => D3D11_BLEND_INV_SRC1_ALPHA,
             _ => throw new ArgumentOutOfRangeException(nameof(factor), factor, null)
         };
     }
 
-    public static Vortice.Direct3D11.BlendOperation BlendOperationToD3D(BlendOperation operation)
+    public static D3D11_BLEND_OP BlendOperationToD3D(BlendOperation operation)
     {
         return operation switch
         {
-            BlendOperation.Add => Vortice.Direct3D11.BlendOperation.Add,
-            BlendOperation.Subtract => Vortice.Direct3D11.BlendOperation.Subtract,
-            BlendOperation.ReverseSubtract => Vortice.Direct3D11.BlendOperation.ReverseSubtract,
-            BlendOperation.Min => Vortice.Direct3D11.BlendOperation.Min,
-            BlendOperation.Max => Vortice.Direct3D11.BlendOperation.Max,
+            BlendOperation.Add => D3D11_BLEND_OP_ADD,
+            BlendOperation.Subtract => D3D11_BLEND_OP_SUBTRACT,
+            BlendOperation.ReverseSubtract => D3D11_BLEND_OP_REV_SUBTRACT,
+            BlendOperation.Min => D3D11_BLEND_OP_MIN,
+            BlendOperation.Max => D3D11_BLEND_OP_MAX,
             _ => throw new ArgumentOutOfRangeException(nameof(operation), operation, null)
         };
     }
 
-    public static Vortice.Direct3D11.MapMode MapModeToD3D(MapMode mapMode)
+    public static D3D11_MAP MapModeToD3D(MapMode mapMode)
     {
         return mapMode switch
         {
-            MapMode.Read => Vortice.Direct3D11.MapMode.Read,
-            MapMode.Write => Vortice.Direct3D11.MapMode.WriteDiscard,
-            MapMode.ReadWrite => Vortice.Direct3D11.MapMode.ReadWrite,
+            MapMode.Read => D3D11_MAP_READ,
+            MapMode.Write => D3D11_MAP_WRITE_DISCARD,
+            MapMode.ReadWrite => D3D11_MAP_READ_WRITE,
             _ => throw new ArgumentOutOfRangeException(nameof(mapMode), mapMode, null)
         };
     }

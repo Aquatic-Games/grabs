@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using TerraFX.Interop.Windows;
 
 namespace grabs.Graphics.D3D11;
 
+[SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
 public static class D3DResult
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

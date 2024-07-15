@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using TerraFX.Interop.DirectX;
 using static TerraFX.Interop.DirectX.DirectX;
 using static TerraFX.Interop.Windows.Windows;
@@ -8,6 +9,7 @@ using static TerraFX.Interop.DirectX.DXGI_ADAPTER_FLAG;
 
 namespace grabs.Graphics.D3D11;
 
+[SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
 public sealed unsafe class D3D11Instance : Instance
 {
     public readonly IDXGIFactory1* Factory;
