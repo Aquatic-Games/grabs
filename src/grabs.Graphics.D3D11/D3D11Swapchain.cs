@@ -85,6 +85,12 @@ public sealed unsafe class D3D11Swapchain : Swapchain
         {
             if (list.CommandList != null)
                 list.CommandList->Release();
+            list.CommandList = null;
+
+            list.Context->ClearState();
+            ID3D11CommandList* cl;
+            list.Context->FinishCommandList(false, &cl);
+            cl->Release();
         }
         
         _context->ClearState();

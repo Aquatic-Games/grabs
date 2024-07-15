@@ -129,7 +129,7 @@ public sealed unsafe class D3D11Pipeline : Pipeline
         for (int i = 0; i < blendDesc.Attachments.Length; i++)
         {
             ref BlendAttachmentDescription attachmentDesc = ref blendDesc.Attachments[i];
-            ref D3D11_RENDER_TARGET_BLEND_DESC rtDesc = bDesc.RenderTarget[0];
+            ref D3D11_RENDER_TARGET_BLEND_DESC rtDesc = ref bDesc.RenderTarget[0];
             
             rtDesc.BlendEnable = attachmentDesc.Enabled;
             rtDesc.SrcBlend = D3D11Utils.BlendFactorToD3D(attachmentDesc.Source);

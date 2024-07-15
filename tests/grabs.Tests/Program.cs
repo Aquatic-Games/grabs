@@ -9,7 +9,7 @@ using Silk.NET.SDL;
 
 GrabsLog.LogMessage += (type, message) => Console.WriteLine($"[{type}] {message}");
 
-/*GraphicsApi api = 0;
+GraphicsApi api = 0;
 
 unsafe
 {
@@ -76,7 +76,9 @@ unsafe
 }
 
 using TestBase test = new CubemapTest();
-test.Run(api, new Size(1280, 720));*/
+test.Run(api, new Size(1280, 720));
+
+return;
 
 unsafe
 {
