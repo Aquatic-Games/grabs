@@ -98,7 +98,7 @@ public sealed unsafe class D3D11Swapchain : Swapchain
 
     public override void Present()
     {
-        SwapChain->Present(_swapInterval, 0);
+        CheckResult(SwapChain->Present(_swapInterval, 0), "Present");
     }
 
     public override void Dispose()
