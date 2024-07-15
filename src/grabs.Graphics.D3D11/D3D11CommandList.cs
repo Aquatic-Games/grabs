@@ -1,44 +1,49 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using Vortice.Direct3D11;
-using Vortice.Mathematics;
+using TerraFX.Interop.DirectX;
+using static grabs.Graphics.D3D11.D3DResult;
 
 namespace grabs.Graphics.D3D11;
 
-public sealed class D3D11CommandList : CommandList
+[SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
+public sealed unsafe class D3D11CommandList : CommandList
 {
     private D3D11Pipeline _currentPipeline;
     private D3D11DescriptorSet[] _setSets; // Lol
     
-    public ID3D11DeviceContext Context;
-    public ID3D11CommandList CommandList;
+    public ID3D11DeviceContext* Context;
+    public ID3D11CommandList* CommandList;
 
-    public D3D11CommandList(ID3D11Device device)
+    public D3D11CommandList(ID3D11Device* device)
     {
         // TODO: This is temporary, set to an arbitrary value. This should auto expand to support thousands of sets if needed.
         _setSets = new D3D11DescriptorSet[16];
         
-        Context = device.CreateDeferredContext();
+        fixed (ID3D11DeviceContext** context = &Context)
+            CheckResult(device->CreateDeferredContext(0, context), "Create deferred context");
     }
 
     public override void Begin()
     {
-        CommandList?.Dispose();
+        if (CommandList != null)
+            CommandList->Release();
         CommandList = null;
     }
 
     public override void End()
     {
-        CommandList = Context.FinishCommandList(false);
+        fixed (ID3D11CommandList** commandList = &CommandList)
+            CheckResult(Context->FinishCommandList(false, commandList));
     }
 
     public override void BeginRenderPass(in RenderPassDescription description)
     {
         D3D11Framebuffer framebuffer = (D3D11Framebuffer) description.Framebuffer;
         
-        Context.OMSetRenderTargets(framebuffer.RenderTargets, framebuffer.DepthTarget);
+        Context->OMSetRenderTargets(framebuffer.RenderTargets, framebuffer.DepthTarget);
 
         if (description.ColorLoadOp is LoadOp.Clear)
         {

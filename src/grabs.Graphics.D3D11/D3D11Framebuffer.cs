@@ -1,30 +1,40 @@
 ﻿using System;
-using Vortice.Direct3D11;
+using System.Diagnostics.CodeAnalysis;
+using TerraFX.Interop.DirectX;
+using static grabs.Graphics.D3D11.D3DResult;
 
 namespace grabs.Graphics.D3D11;
 
-public class D3D11Framebuffer : Framebuffer
+[SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
+public unsafe class D3D11Framebuffer : Framebuffer
 {
-    public readonly ID3D11RenderTargetView[] RenderTargets;
+    public readonly ID3D11RenderTargetView*[] RenderTargets;
 
-    public readonly ID3D11DepthStencilView DepthTarget;
+    public readonly ID3D11DepthStencilView* DepthTarget;
 
-    public D3D11Framebuffer(ID3D11Device device, in ReadOnlySpan<Texture> colorTextures, Texture depthTexture)
+    public D3D11Framebuffer(ID3D11Device* device, in ReadOnlySpan<Texture> colorTextures, Texture depthTexture)
     {
-        RenderTargets = new ID3D11RenderTargetView[colorTextures.Length];
-        
+        RenderTargets = new ID3D11RenderTargetView*[colorTextures.Length];
+
         for (int i = 0; i < colorTextures.Length; i++)
-            RenderTargets[i] = device.CreateRenderTargetView(((D3D11Texture) colorTextures[i]).Texture);
+        {
+            fixed (ID3D11RenderTargetView** target = &RenderTargets[i])
+                CheckResult(device->CreateRenderTargetView(((D3D11Texture) colorTextures[i]).Texture, null, target));
+        }
 
         if (depthTexture != null)
-            DepthTarget = device.CreateDepthStencilView(((D3D11Texture) depthTexture).Texture);
+        {
+            fixed (ID3D11DepthStencilView** depthTarget = &DepthTarget)
+                CheckResult(device->CreateDepthStencilView(((D3D11Texture) depthTexture).Texture, null, depthTarget));
+        }
     }
     
     public override void Dispose()
     {
-        for (int i = 0; i < RenderTargets.Length; i++)
-            RenderTargets[i].Dispose();
+        if (DepthTarget != null)
+            DepthTarget->Release();
         
-        DepthTarget?.Dispose();
+        for (int i = 0; i < RenderTargets.Length; i++)
+            RenderTargets[i]->Release();
     }
 }
