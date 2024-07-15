@@ -115,7 +115,7 @@ public sealed unsafe class D3D11CommandList : CommandList
 
     public override void SetScissor(in Rectangle rectangle)
     {
-        RECT rect = new RECT(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+        RECT rect = new RECT(rectangle.X, rectangle.Y, rectangle.X + rectangle.Width, rectangle.Y + rectangle.Height);
         Context->RSSetScissorRects(1, &rect);
     }
 
