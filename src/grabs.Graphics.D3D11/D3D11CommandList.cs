@@ -4,7 +4,10 @@ using System.Drawing;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using TerraFX.Interop.DirectX;
+using TerraFX.Interop.Windows;
 using static grabs.Graphics.D3D11.D3DResult;
+using static TerraFX.Interop.DirectX.D3D11_CLEAR_FLAG;
+using static TerraFX.Interop.DirectX.D3D11_MAP;
 
 namespace grabs.Graphics.D3D11;
 
@@ -43,30 +46,36 @@ public sealed unsafe class D3D11CommandList : CommandList
     {
         D3D11Framebuffer framebuffer = (D3D11Framebuffer) description.Framebuffer;
         
-        Context->OMSetRenderTargets(framebuffer.RenderTargets, framebuffer.DepthTarget);
+        fixed (ID3D11RenderTargetView** renderTargets = framebuffer.RenderTargets) 
+            Context->OMSetRenderTargets((uint) framebuffer.RenderTargets.Length, renderTargets, framebuffer.DepthTarget);
 
         if (description.ColorLoadOp is LoadOp.Clear)
         {
+            float* clearColor = stackalloc float[4]
+            {
+                description.ClearColor.X, description.ClearColor.Y, description.ClearColor.Z, description.ClearColor.W
+            };
+            
             for (int i = 0; i < framebuffer.RenderTargets.Length; i++)
-                Context.ClearRenderTargetView(framebuffer.RenderTargets[i], new Color4(description.ClearColor));
+                Context->ClearRenderTargetView(framebuffer.RenderTargets[i], clearColor);
         }
 
         if (framebuffer.DepthTarget != null)
         {
-            DepthStencilClearFlags dscf = DepthStencilClearFlags.None;
+            D3D11_CLEAR_FLAG clearFlags = 0;
             if (description.DepthLoadOp == LoadOp.Clear)
-                dscf |= DepthStencilClearFlags.Depth;
+                clearFlags |= D3D11_CLEAR_DEPTH;
             if (description.StencilLoadOp == LoadOp.Clear)
-                dscf |= DepthStencilClearFlags.Stencil;
+                clearFlags |= D3D11_CLEAR_STENCIL;
 
-            Context.ClearDepthStencilView(framebuffer.DepthTarget, dscf, description.DepthValue,
+            Context->ClearDepthStencilView(framebuffer.DepthTarget, (uint) clearFlags, description.DepthValue,
                 description.StencilValue);
         }
     }
 
     public override void EndRenderPass() { }
 
-    public override unsafe void UpdateBuffer(Buffer buffer, uint offsetInBytes, uint sizeInBytes, void* pData)
+    public override void UpdateBuffer(Buffer buffer, uint offsetInBytes, uint sizeInBytes, void* pData)
     {
         D3D11Buffer d3dBuffer = (D3D11Buffer) buffer;
 
@@ -79,58 +88,63 @@ public sealed unsafe class D3D11CommandList : CommandList
                     "Cannot currently update a dynamic buffer with an offset of anything other than 0.");
             }
 
-            MappedSubresource mResource = Context.Map(d3dBuffer.Buffer, Vortice.Direct3D11.MapMode.WriteDiscard);
-            Unsafe.CopyBlock((byte*) mResource.DataPointer + offsetInBytes, pData, sizeInBytes);
-            Context.Unmap(d3dBuffer.Buffer);
+            D3D11_MAPPED_SUBRESOURCE mResource;
+            CheckResult(Context->Map((ID3D11Resource*) d3dBuffer.Buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mResource),
+                "Map buffer");
+            Unsafe.CopyBlock((byte*) mResource.pData + offsetInBytes, pData, sizeInBytes);
+            Context->Unmap((ID3D11Resource*) d3dBuffer.Buffer, 0);
         }
         else
         {
-            Context.UpdateSubresource(d3dBuffer.Buffer, 0,
-                new Box((int) offsetInBytes, 0, 0, (int) (offsetInBytes + sizeInBytes), 1, 1), (nint) pData, 0, 0);
+            D3D11_BOX box = new D3D11_BOX((int) offsetInBytes, 0, 0, (int) (offsetInBytes + sizeInBytes), 1, 1);
+            Context->UpdateSubresource((ID3D11Resource*) d3dBuffer.Buffer, 0, &box, pData, 0, 0);
         }
     }
 
     public override void GenerateMipmaps(Texture texture)
     {
-        Context.GenerateMips(((D3D11Texture) texture).ResourceView);
+        Context->GenerateMips(((D3D11Texture) texture).ResourceView);
     }
 
     public override void SetViewport(in Viewport viewport)
     {
-        Context.RSSetViewport(viewport.X, viewport.Y, viewport.Width, viewport.Height, viewport.MinDepth,
-            viewport.MaxDepth);
+        D3D11_VIEWPORT vp = new D3D11_VIEWPORT(viewport.X, viewport.Y, viewport.Width, viewport.Height,
+            viewport.MinDepth, viewport.MaxDepth);
+        Context->RSSetViewports(1, &vp);
     }
 
     public override void SetScissor(in Rectangle rectangle)
     {
-        Context.RSSetScissorRect(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+        RECT rect = new RECT(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+        Context->RSSetScissorRects(1, &rect);
     }
 
-    public override unsafe void SetPipeline(Pipeline pipeline)
+    public override void SetPipeline(Pipeline pipeline)
     {
         D3D11Pipeline d3dPipeline = (D3D11Pipeline) pipeline;
         _currentPipeline = d3dPipeline;
 
         Vector4 blendConstants = d3dPipeline.BlendConstants;
         
-        Context.VSSetShader(d3dPipeline.VertexShader);
-        Context.PSSetShader(d3dPipeline.PixelShader);
+        Context->VSSetShader(d3dPipeline.VertexShader, null, 0);
+        Context->PSSetShader(d3dPipeline.PixelShader, null, 0);
         if (d3dPipeline.InputLayout != null)
-            Context.IASetInputLayout(d3dPipeline.InputLayout);
-        Context.OMSetDepthStencilState(d3dPipeline.DepthStencilState);
-        Context.RSSetState(d3dPipeline.RasterizerState);
-        Context.OMSetBlendState(d3dPipeline.BlendState, &blendConstants.X);
-        Context.IASetPrimitiveTopology(d3dPipeline.PrimitiveTopology);
+            Context->IASetInputLayout(d3dPipeline.InputLayout);
+        Context->OMSetDepthStencilState(d3dPipeline.DepthStencilState, 0);
+        Context->RSSetState(d3dPipeline.RasterizerState);
+        Context->OMSetBlendState(d3dPipeline.BlendState, &blendConstants.X, 0xFFFFFF);
+        Context->IASetPrimitiveTopology(d3dPipeline.PrimitiveTopology);
     }
 
     public override void SetVertexBuffer(uint slot, Buffer buffer, uint stride, uint offset)
     {
-        Context.IASetVertexBuffer((int) slot, ((D3D11Buffer) buffer).Buffer, (int) stride, (int) offset);
+        ID3D11Buffer* buf = ((D3D11Buffer) buffer).Buffer;
+        Context->IASetVertexBuffers(slot, 1, &buf, &stride, &offset);
     }
 
     public override void SetIndexBuffer(Buffer buffer, Format format)
     {
-        Context.IASetIndexBuffer(((D3D11Buffer) buffer).Buffer, D3D11Utils.FormatToD3D(format), 0);
+        Context->IASetIndexBuffer(((D3D11Buffer) buffer).Buffer, D3D11Utils.FormatToD3D(format), 0);
     }
 
     public override void SetDescriptorSet(uint index, DescriptorSet set)
@@ -142,19 +156,19 @@ public sealed unsafe class D3D11CommandList : CommandList
     public override void Draw(uint numVertices)
     {
         SetPreDrawParameters();
-        Context.Draw((int) numVertices, 0);
+        Context->Draw(numVertices, 0);
     }
 
     public override void DrawIndexed(uint numIndices)
     {
         SetPreDrawParameters();
-        Context.DrawIndexed((int) numIndices, 0, 0);
+        Context->DrawIndexed(numIndices, 0, 0);
     }
 
     public override void DrawIndexed(uint numIndices, uint startIndex, int baseVertex)
     {
         SetPreDrawParameters();
-        Context.DrawIndexed((int) numIndices, (int) startIndex, baseVertex);
+        Context->DrawIndexed(numIndices, startIndex, baseVertex);
     }
 
     private void SetPreDrawParameters()
@@ -175,11 +189,12 @@ public sealed unsafe class D3D11CommandList : CommandList
                 {
                     case DescriptorType.ConstantBuffer:
                         D3D11Buffer buffer = (D3D11Buffer) desc.Buffer;
+                        ID3D11Buffer* buf = buffer.Buffer;
                     
                         if ((binding.Stages & ShaderStage.Vertex) == ShaderStage.Vertex)
-                            Context.VSSetConstantBuffer((int) binding.Binding, buffer.Buffer);
+                            Context->VSSetConstantBuffers(binding.Binding, 1, &buf);
                         if ((binding.Stages & ShaderStage.Pixel) == ShaderStage.Pixel)
-                            Context.PSSetConstantBuffer((int) binding.Binding, buffer.Buffer);
+                            Context->PSSetConstantBuffers(binding.Binding, 1, &buf);
                         if ((binding.Stages & ShaderStage.Compute) == ShaderStage.Compute)
                             throw new NotImplementedException();
                         
@@ -187,11 +202,12 @@ public sealed unsafe class D3D11CommandList : CommandList
                 
                     case DescriptorType.Texture:
                         D3D11Texture texture = (D3D11Texture) desc.Texture;
+                        ID3D11ShaderResourceView* resView = texture.ResourceView;
                     
                         if ((binding.Stages & ShaderStage.Vertex) == ShaderStage.Vertex)
-                            Context.VSSetShaderResource((int) binding.Binding, texture.ResourceView);
+                            Context->VSSetShaderResources(binding.Binding, 1, &resView);
                         if ((binding.Stages & ShaderStage.Pixel) == ShaderStage.Pixel)
-                            Context.PSSetShaderResource((int) binding.Binding, texture.ResourceView);
+                            Context->PSSetShaderResources(binding.Binding, 1, &resView);
                         if ((binding.Stages & ShaderStage.Compute) == ShaderStage.Compute)
                             throw new NotImplementedException();
                     
@@ -205,7 +221,9 @@ public sealed unsafe class D3D11CommandList : CommandList
 
     public override void Dispose()
     {
-        CommandList?.Dispose();
-        Context.Dispose();
+        if (CommandList != null)
+            CommandList->Release();
+
+        Context->Release();
     }
 }

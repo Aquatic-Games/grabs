@@ -97,7 +97,7 @@ public sealed unsafe class D3D11Device : Device
         return new D3D11DescriptorSet(descriptions.ToArray());
     }
 
-    public override unsafe void UpdateBuffer(Buffer buffer, uint offsetInBytes, uint sizeInBytes, void* pData)
+    public override void UpdateBuffer(Buffer buffer, uint offsetInBytes, uint sizeInBytes, void* pData)
     {
         D3D11Buffer d3dBuffer = (D3D11Buffer) buffer;
 
@@ -123,7 +123,7 @@ public sealed unsafe class D3D11Device : Device
         }
     }
 
-    public override unsafe void UpdateTexture(Texture texture, int x, int y, uint width, uint height, uint mipLevel, void* pData)
+    public override void UpdateTexture(Texture texture, int x, int y, uint width, uint height, uint mipLevel, void* pData)
     {
         D3D11Texture d3dTexture = (D3D11Texture) texture;
 
