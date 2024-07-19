@@ -102,6 +102,11 @@ public unsafe class VkDevice : Device
         throw new NotImplementedException();
     }
 
+    public override Sampler CreateSampler(in SamplerDescription description)
+    {
+        throw new NotImplementedException();
+    }
+
     public override unsafe void UpdateBuffer(Buffer buffer, uint offsetInBytes, uint sizeInBytes, void* pData)
     {
         throw new NotImplementedException();

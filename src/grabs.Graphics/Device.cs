@@ -90,6 +90,8 @@ public abstract class Device : IDisposable
 
     public abstract DescriptorSet CreateDescriptorSet(DescriptorLayout layout, in ReadOnlySpan<DescriptorSetDescription> descriptions);
 
+    public abstract Sampler CreateSampler(in SamplerDescription description);
+
     public unsafe void UpdateBuffer<T>(Buffer buffer, uint offsetInBytes, T data) where T : unmanaged
         => UpdateBuffer(buffer, offsetInBytes, (uint) sizeof(T), data);
     

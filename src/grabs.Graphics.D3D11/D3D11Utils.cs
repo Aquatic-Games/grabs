@@ -7,6 +7,7 @@ using static TerraFX.Interop.DirectX.D3D11_BLEND;
 using static TerraFX.Interop.DirectX.D3D11_BLEND_OP;
 using static TerraFX.Interop.DirectX.D3D11_COMPARISON_FUNC;
 using static TerraFX.Interop.DirectX.D3D11_MAP;
+using static TerraFX.Interop.DirectX.D3D11_TEXTURE_ADDRESS_MODE;
 using static TerraFX.Interop.DirectX.DXGI_FORMAT;
 
 namespace grabs.Graphics.D3D11;
@@ -171,6 +172,18 @@ public static class D3D11Utils
             MapMode.Write => D3D11_MAP_WRITE_DISCARD,
             MapMode.ReadWrite => D3D11_MAP_READ_WRITE,
             _ => throw new ArgumentOutOfRangeException(nameof(mapMode), mapMode, null)
+        };
+    }
+
+    public static D3D11_TEXTURE_ADDRESS_MODE TextureAddressToD3D(TextureAddress address)
+    {
+        return address switch
+        {
+            TextureAddress.RepeatWrap => D3D11_TEXTURE_ADDRESS_WRAP,
+            TextureAddress.RepeatWrapMirrored => D3D11_TEXTURE_ADDRESS_MIRROR,
+            TextureAddress.ClampToEdge => D3D11_TEXTURE_ADDRESS_CLAMP,
+            TextureAddress.ClampToBorder => D3D11_TEXTURE_ADDRESS_BORDER,
+            _ => throw new ArgumentOutOfRangeException(nameof(address), address, null)
         };
     }
 }

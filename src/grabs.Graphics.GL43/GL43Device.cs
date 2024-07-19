@@ -77,6 +77,11 @@ public class GL43Device : Device
         return new GL43DescriptorSet(descriptions.ToArray());
     }
 
+    public override Sampler CreateSampler(in SamplerDescription description)
+    {
+        throw new NotImplementedException();
+    }
+
     public override unsafe void UpdateBuffer(Buffer buffer, uint offsetInBytes, uint sizeInBytes, void* pData)
     {
         GL43Buffer glBuffer = (GL43Buffer) buffer;

@@ -20,12 +20,13 @@ public class CubeTest : TestBase
 
     private Buffer _cameraBuffer;
     private Buffer _transformBuffer;
-
+    
     private Pipeline _pipeline;
 
     private Texture _texture1;
     private Texture _texture2;
-
+    private Sampler _sampler;
+    
     private DescriptorSet _transformSet;
     private DescriptorSet _textureSet;
 
@@ -77,6 +78,8 @@ public class CubeTest : TestBase
                 new InputLayoutDescription(Format.R32G32_Float, 12, 0, InputType.PerVertex) // TexCoord
             }, DepthStencilDescription.DepthLessEqual, RasterizerDescription.CullClockwise, BlendDescription.Disabled,
             [transformLayout, textureLayout]));
+
+        _sampler = Device.CreateSampler(SamplerDescription.LinearWrap);
         
         ImageResult result1 = ImageResult.FromMemory(File.ReadAllBytes("Assets/awesomeface.png"), ColorComponents.RedGreenBlueAlpha);
         ImageResult result2 = ImageResult.FromMemory(File.ReadAllBytes("Assets/BAGELMIP.png"), ColorComponents.RedGreenBlueAlpha);
@@ -160,6 +163,7 @@ public class CubeTest : TestBase
         
         _texture2.Dispose();
         _texture1.Dispose();
+        _sampler.Dispose();
         
         _pipeline.Dispose();
         

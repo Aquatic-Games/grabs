@@ -97,6 +97,11 @@ public sealed unsafe class D3D11Device : Device
         return new D3D11DescriptorSet(descriptions.ToArray());
     }
 
+    public override Sampler CreateSampler(in SamplerDescription description)
+    {
+        return new D3D11Sampler(Device, description);
+    }
+
     public override void UpdateBuffer(Buffer buffer, uint offsetInBytes, uint sizeInBytes, void* pData)
     {
         D3D11Buffer d3dBuffer = (D3D11Buffer) buffer;
