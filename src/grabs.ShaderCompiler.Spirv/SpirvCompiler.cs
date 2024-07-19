@@ -83,7 +83,8 @@ public class SpirvCompiler
         ChangeDescriptorBindingsForType(compiler, resources, ResourceType.SeparateImage, ref bindIndex);
         ChangeDescriptorBindingsForType(compiler, resources, ResourceType.SeparateSamplers, ref bindIndex);
         
-        // I have absolutely no idea how I figured this out. Copied directly from Pie's compiler.
+        // TODO: Combined image samplers need to be reimplemented. This should be tested with GLSL though, as I can't figure out DXC's combined samplers right now. Something is broken here!
+        /*// I have absolutely no idea how I figured this out. Copied directly from Pie's compiler.
         uint id;
         Spirv.CompilerBuildDummySamplerForCombinedImages(compiler, &id);
         Spirv.CompilerBuildCombinedImageSamplers(compiler);
@@ -96,7 +97,7 @@ public class SpirvCompiler
         {
             uint decoration = Spirv.CompilerGetDecoration(compiler, samplers[i].ImageId, Decoration.Binding);
             Spirv.CompilerSetDecoration(compiler, samplers[i].CombinedId, Decoration.Binding, decoration);
-        }
+        }*/
 
         if (constants != null)
         {
@@ -161,6 +162,8 @@ public class SpirvCompiler
         
         Spirv.ContextReleaseAllocations(context);
         Spirv.ContextDestroy(context);
+        
+        Console.WriteLine(strResult);
 
         return strResult;
     }

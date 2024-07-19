@@ -75,7 +75,7 @@ unsafe
     api = (GraphicsApi) buttonId;
 }
 
-using TestBase test = new CubemapTest();
+using TestBase test = new CubeTest();
 test.Run(api, new Size(1280, 720));
 
 return;
