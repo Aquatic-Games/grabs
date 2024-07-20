@@ -57,11 +57,11 @@ public class CubeTest : TestBase
 
         DescriptorLayoutDescription transformLayoutDesc = new DescriptorLayoutDescription(
             new DescriptorBindingDescription(0, DescriptorType.ConstantBuffer, ShaderStage.Vertex),
-            new DescriptorBindingDescription(1, DescriptorType.ConstantBuffer, ShaderStage.Vertex));
+            new DescriptorBindingDescription(2, DescriptorType.ConstantBuffer, ShaderStage.Vertex));
 
         DescriptorLayoutDescription textureLayoutDesc =
             new DescriptorLayoutDescription(
-                new DescriptorBindingDescription(0, DescriptorType.Sampler, ShaderStage.Pixel),
+                new DescriptorBindingDescription(10, DescriptorType.Sampler, ShaderStage.Pixel),
                 new DescriptorBindingDescription(1, DescriptorType.Image, ShaderStage.Pixel)
                 );
 

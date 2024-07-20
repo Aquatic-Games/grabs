@@ -147,27 +147,25 @@ public sealed unsafe class D3D11Pipeline : Pipeline
         if (description.DescriptorLayouts != null)
         {
             Layouts = new D3D11DescriptorLayout[description.DescriptorLayouts.Length];
-            uint currentBindingIndex = 0;
+            uint totalMaxBinding = 0;
+            uint currentMaxBinding = 0;
             for (int i = 0; i < Layouts.Length; i++)
             {
                 D3D11DescriptorLayout layout = (D3D11DescriptorLayout) description.DescriptorLayouts[i];
                 DescriptorBindingDescription[] descriptions = new DescriptorBindingDescription[layout.Bindings.Length];
-
-                // TODO: This logic is really stupid!
-                // The SPIR-v shader transpiler does these in a specific order:
-                //   - Constant buffers
-                //   - Samplers
-                //   - Images
-                // This code needs to be adjusted to work in the same way.
-                // Currently, this just takes everything in ANY order and reorders it. So if you don't put things in the
-                // right order, then oops.
-                // TODO: While this is a neat idea, I think the remapping logic of descriptor sets needs to be reevaluated. There must be a better way.
+                
                 for (int j = 0; j < descriptions.Length; j++)
                 {
                     DescriptorBindingDescription desc = layout.Bindings[j];
-                    desc.Binding = currentBindingIndex++;
+                    if (desc.Binding >= currentMaxBinding)
+                        currentMaxBinding = desc.Binding;
+                    
+                    desc.Binding += totalMaxBinding;
                     descriptions[j] = desc;
                 }
+
+                totalMaxBinding += currentMaxBinding + 1;
+                currentMaxBinding = 0;
 
                 Layouts[i] = new D3D11DescriptorLayout(descriptions);
             }
