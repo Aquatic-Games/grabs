@@ -26,8 +26,8 @@ cbuffer WorldMatrix : register(b1, space0)
     float4x4 World;
 }
 
-Texture2D Texture : register(t0, space1);
 SamplerState Sampler : register(s0, space1);
+Texture2D Texture : register(t1, space1);
 
 VSOutput Vertex(const in VSInput input)
 {

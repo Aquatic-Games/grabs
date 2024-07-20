@@ -6,5 +6,6 @@ namespace grabs.Graphics;
 public enum DescriptorType
 {
     ConstantBuffer,
-    Texture
+    Image,
+    Sampler
 }

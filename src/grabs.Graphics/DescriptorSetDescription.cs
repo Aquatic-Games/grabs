@@ -6,9 +6,12 @@ public struct DescriptorSetDescription
 
     public Texture Texture;
 
-    public DescriptorSetDescription(Buffer buffer = null, Texture texture = null)
+    public Sampler Sampler;
+
+    public DescriptorSetDescription(Buffer buffer = null, Texture texture = null, Sampler sampler = null)
     {
         Buffer = buffer;
         Texture = texture;
+        Sampler = sampler;
     }
 }

@@ -80,8 +80,8 @@ public class SpirvCompiler
 
         uint bindIndex = 0;
         ChangeDescriptorBindingsForType(compiler, resources, ResourceType.UniformBuffer, ref bindIndex);
-        ChangeDescriptorBindingsForType(compiler, resources, ResourceType.SeparateImage, ref bindIndex);
         ChangeDescriptorBindingsForType(compiler, resources, ResourceType.SeparateSamplers, ref bindIndex);
+        ChangeDescriptorBindingsForType(compiler, resources, ResourceType.SeparateImage, ref bindIndex);
         
         // TODO: Combined image samplers need to be reimplemented. This should be tested with GLSL though, as I can't figure out DXC's combined samplers right now. Something is broken here!
         /*// I have absolutely no idea how I figured this out. Copied directly from Pie's compiler.

@@ -25,7 +25,8 @@ public class CubeTest : TestBase
 
     private Texture _texture1;
     private Texture _texture2;
-    private Sampler _sampler;
+    private Sampler _sampler1;
+    private Sampler _sampler2;
     
     private DescriptorSet _transformSet;
     private DescriptorSet _textureSet;
@@ -59,8 +60,10 @@ public class CubeTest : TestBase
             new DescriptorBindingDescription(1, DescriptorType.ConstantBuffer, ShaderStage.Vertex));
 
         DescriptorLayoutDescription textureLayoutDesc =
-            new DescriptorLayoutDescription(new DescriptorBindingDescription(0, DescriptorType.Texture,
-                ShaderStage.Pixel));
+            new DescriptorLayoutDescription(
+                new DescriptorBindingDescription(0, DescriptorType.Sampler, ShaderStage.Pixel),
+                new DescriptorBindingDescription(1, DescriptorType.Image, ShaderStage.Pixel)
+                );
 
         DescriptorLayout transformLayout = Device.CreateDescriptorLayout(transformLayoutDesc);
         DescriptorLayout textureLayout = Device.CreateDescriptorLayout(textureLayoutDesc);
@@ -79,10 +82,11 @@ public class CubeTest : TestBase
             }, DepthStencilDescription.DepthLessEqual, RasterizerDescription.CullClockwise, BlendDescription.Disabled,
             [transformLayout, textureLayout]));
 
-        _sampler = Device.CreateSampler(SamplerDescription.LinearWrap);
+        _sampler1 = Device.CreateSampler(SamplerDescription.Anisotropic16x);
+        _sampler2 = Device.CreateSampler(SamplerDescription.PointWrap /*with { MipLodBias = 4 }*/);
         
         ImageResult result1 = ImageResult.FromMemory(File.ReadAllBytes("Assets/awesomeface.png"), ColorComponents.RedGreenBlueAlpha);
-        ImageResult result2 = ImageResult.FromMemory(File.ReadAllBytes("Assets/BAGELMIP.png"), ColorComponents.RedGreenBlueAlpha);
+        ImageResult result2 = ImageResult.FromMemory(File.ReadAllBytes("Assets/ball.png"), ColorComponents.RedGreenBlueAlpha);
         
         _texture1 = Device.CreateTexture(TextureDescription.Texture2D((uint) result1.Width, (uint) result1.Height, 0,
             Format.R8G8B8A8_UNorm, TextureUsage.ShaderResource | TextureUsage.GenerateMips), result1.Data);
@@ -99,7 +103,8 @@ public class CubeTest : TestBase
         _transformSet = Device.CreateDescriptorSet(transformLayout, new DescriptorSetDescription(buffer: _cameraBuffer),
             new DescriptorSetDescription(buffer: _transformBuffer));
 
-        _textureSet = Device.CreateDescriptorSet(textureLayout, new DescriptorSetDescription(texture: _texture1));
+        _textureSet = Device.CreateDescriptorSet(textureLayout, new DescriptorSetDescription(sampler: _sampler1),
+            new DescriptorSetDescription(texture: _texture1));
         
         transformLayout.Dispose();
         textureLayout.Dispose();
@@ -113,9 +118,16 @@ public class CubeTest : TestBase
                             Matrix4x4.CreateFromAxisAngle(Vector3.UnitX, dt);
 
         if (IsKeyDown(KeyCode.K1))
-            Device.UpdateDescriptorSet(_textureSet, new DescriptorSetDescription(texture: _texture1));
+        {
+            Device.UpdateDescriptorSet(_textureSet, new DescriptorSetDescription(sampler: _sampler1),
+                new DescriptorSetDescription(texture: _texture1));
+        }
+
         if (IsKeyDown(KeyCode.K2))
-            Device.UpdateDescriptorSet(_textureSet, new DescriptorSetDescription(texture: _texture2));
+        {
+            Device.UpdateDescriptorSet(_textureSet, new DescriptorSetDescription(sampler: _sampler2),
+                new DescriptorSetDescription(texture: _texture2));
+        }
     }
 
     protected override void Draw()
@@ -163,7 +175,8 @@ public class CubeTest : TestBase
         
         _texture2.Dispose();
         _texture1.Dispose();
-        _sampler.Dispose();
+        _sampler2.Dispose();
+        _sampler1.Dispose();
         
         _pipeline.Dispose();
         

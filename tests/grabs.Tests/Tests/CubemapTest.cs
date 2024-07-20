@@ -47,7 +47,7 @@ public class CubemapTest : TestBase
             new DescriptorLayoutDescription(
                 new DescriptorBindingDescription(0, DescriptorType.ConstantBuffer, ShaderStage.Vertex),
                 new DescriptorBindingDescription(1, DescriptorType.ConstantBuffer, ShaderStage.Vertex),
-                new DescriptorBindingDescription(2, DescriptorType.Texture, ShaderStage.Pixel)));
+                new DescriptorBindingDescription(2, DescriptorType.Image, ShaderStage.Pixel)));
 
         PipelineDescription pipelineDesc = new PipelineDescription(vModule, pModule, inputLayout,
             DepthStencilDescription.DepthLessEqual, RasterizerDescription.CullClockwise, BlendDescription.Disabled,

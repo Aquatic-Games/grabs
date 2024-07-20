@@ -56,8 +56,8 @@ public class Main : SampleBase
         ];
 
         DescriptorLayoutDescription descriptorDesc = new DescriptorLayoutDescription(
-            new DescriptorBindingDescription(0, DescriptorType.Texture, ShaderStage.Pixel),
-            new DescriptorBindingDescription(1, DescriptorType.Texture, ShaderStage.Pixel)
+            new DescriptorBindingDescription(0, DescriptorType.Image, ShaderStage.Pixel),
+            new DescriptorBindingDescription(1, DescriptorType.Image, ShaderStage.Pixel)
         );
 
         using DescriptorLayout layout = Device.CreateDescriptorLayout(descriptorDesc);

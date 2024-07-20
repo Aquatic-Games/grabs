@@ -390,7 +390,7 @@ public class GL43Device : Device
                     case DescriptorType.ConstantBuffer:
                         _gl.BindBufferBase(BufferTargetARB.UniformBuffer, binding.Binding, ((GL43Buffer) desc.Buffer).Buffer);
                         break;
-                    case DescriptorType.Texture:
+                    case DescriptorType.Image:
                         GL43Texture texture = (GL43Texture) desc.Texture;
                                 
                         _gl.ActiveTexture(TextureUnit.Texture0 + (int) binding.Binding);

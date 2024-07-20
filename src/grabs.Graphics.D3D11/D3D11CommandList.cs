@@ -188,30 +188,50 @@ public sealed unsafe class D3D11CommandList : CommandList
                 switch (binding.Type)
                 {
                     case DescriptorType.ConstantBuffer:
+                    {
                         D3D11Buffer buffer = (D3D11Buffer) desc.Buffer;
                         ID3D11Buffer* buf = buffer.Buffer;
-                    
+
                         if ((binding.Stages & ShaderStage.Vertex) == ShaderStage.Vertex)
                             Context->VSSetConstantBuffers(binding.Binding, 1, &buf);
                         if ((binding.Stages & ShaderStage.Pixel) == ShaderStage.Pixel)
                             Context->PSSetConstantBuffers(binding.Binding, 1, &buf);
                         if ((binding.Stages & ShaderStage.Compute) == ShaderStage.Compute)
                             throw new NotImplementedException();
-                        
+
                         break;
-                
-                    case DescriptorType.Texture:
+                    }
+
+                    case DescriptorType.Image:
+                    {
                         D3D11Texture texture = (D3D11Texture) desc.Texture;
                         ID3D11ShaderResourceView* resView = texture.ResourceView;
-                    
+
                         if ((binding.Stages & ShaderStage.Vertex) == ShaderStage.Vertex)
                             Context->VSSetShaderResources(binding.Binding, 1, &resView);
                         if ((binding.Stages & ShaderStage.Pixel) == ShaderStage.Pixel)
                             Context->PSSetShaderResources(binding.Binding, 1, &resView);
                         if ((binding.Stages & ShaderStage.Compute) == ShaderStage.Compute)
                             throw new NotImplementedException();
-                    
+
                         break;
+                    }
+
+                    case DescriptorType.Sampler:
+                    {
+                        D3D11Sampler sampler = (D3D11Sampler) desc.Sampler;
+                        ID3D11SamplerState* state = sampler.SamplerState;
+
+                        if ((binding.Stages & ShaderStage.Vertex) == ShaderStage.Vertex)
+                            Context->VSSetSamplers(binding.Binding, 1, &state);
+                        if ((binding.Stages & ShaderStage.Pixel) == ShaderStage.Pixel)
+                            Context->PSSetSamplers(binding.Binding, 1, &state);
+                        if ((binding.Stages & ShaderStage.Compute) == ShaderStage.Compute)
+                            throw new NotImplementedException();
+                        
+                        break;
+                    }
+                    
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
