@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using grabs.Graphics;
 using Silk.NET.SPIRV;
 using Silk.NET.SPIRV.Cross;
@@ -65,6 +67,8 @@ public class SpirvCompiler
                 break;
             case ShaderLanguage.Glsl430:
                 Spirv.CompilerOptionsSetUint(options, CompilerOption.GlslVersion, 430);
+                
+                Spirv.CompilerBuildCombinedImageSamplers(compiler);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(language), language, null);
@@ -78,10 +82,40 @@ public class SpirvCompiler
         Resources* resources;
         Spirv.CompilerCreateShaderResources(compiler, &resources);
 
-        uint bindIndex = 0;
+        List<ShaderResource> allResources = new List<ShaderResource>();
+        GetShaderResourcesForType(compiler, resources, ResourceType.UniformBuffer, ref allResources);
+        GetShaderResourcesForType(compiler, resources, ResourceType.SeparateImage, ref allResources);
+        GetShaderResourcesForType(compiler, resources, ResourceType.SeparateSamplers, ref allResources);
+        //GetShaderResourcesForType(compiler, resources, ResourceType.SampledImage, ref allResources);
+
+        uint totalMaxBinding = 0;
+        uint currentMaxBinding = 0;
+        uint currentSet = 0;
+        foreach (ShaderResource resource in allResources.OrderBy(resource => resource.Set))
+        {
+            if (resource.Set != currentSet)
+            {
+                currentSet = resource.Set;
+                totalMaxBinding = currentMaxBinding + 1;
+                currentMaxBinding = 0;
+            }
+            
+            Console.WriteLine($"Resource: Set: {resource.Set}, Binding: {resource.Binding}, CurrentMaxBinding: {currentMaxBinding}, TotalMaxBinding: {totalMaxBinding}");
+
+            Spirv.CompilerUnsetDecoration(compiler, resource.Id, Decoration.DescriptorSet);
+            Spirv.CompilerSetDecoration(compiler, resource.Id, Decoration.Binding, resource.Binding + totalMaxBinding);
+
+            if (resource.Binding > currentMaxBinding)
+                currentMaxBinding = resource.Binding;
+        }
+
+        /*uint bindIndex = 0;
         ChangeDescriptorBindingsForType(compiler, resources, ResourceType.UniformBuffer, ref bindIndex);
         ChangeDescriptorBindingsForType(compiler, resources, ResourceType.SeparateSamplers, ref bindIndex);
         ChangeDescriptorBindingsForType(compiler, resources, ResourceType.SeparateImage, ref bindIndex);
+        ChangeDescriptorBindingsForType(compiler, resources, ResourceType.SampledImage, ref bindIndex);*/
+        
+        
         
         // TODO: Combined image samplers need to be reimplemented. This should be tested with GLSL though, as I can't figure out DXC's combined samplers right now. Something is broken here!
         /*// I have absolutely no idea how I figured this out. Copied directly from Pie's compiler.
@@ -168,7 +202,24 @@ public class SpirvCompiler
         return strResult;
     }
 
-    private static unsafe void ChangeDescriptorBindingsForType(Compiler* compiler, Resources* resources, ResourceType type, ref uint currentIndex)
+    private static unsafe void GetShaderResourcesForType(Compiler* compiler, Resources* resources, ResourceType type,
+        ref List<ShaderResource> resourcesList)
+    {
+        nuint numResources;
+        ReflectedResource* resourceList;
+        Spirv.ResourcesGetResourceListForType(resources, type, &resourceList, &numResources);
+
+        for (int i = 0; i < (int) numResources; i++)
+        {
+            uint id = resourceList[i].Id;
+            uint set = Spirv.CompilerGetDecoration(compiler, id, Decoration.DescriptorSet);
+            uint binding = Spirv.CompilerGetDecoration(compiler, id, Decoration.Binding);
+
+            resourcesList.Add(new ShaderResource(id, set, binding));
+        }
+    }
+
+    /*private static unsafe void ChangeDescriptorBindingsForType(Compiler* compiler, Resources* resources, ResourceType type, ref uint currentIndex)
     {
         nuint numResources;
         ReflectedResource* resourceList;
@@ -184,10 +235,26 @@ public class SpirvCompiler
             Console.WriteLine("Set:" + Spirv.CompilerGetDecoration(compiler, resourceList[i].Id, Decoration.DescriptorSet));
             Console.WriteLine("Binding:" + Spirv.CompilerGetDecoration(compiler, resourceList[i].Id, Decoration.Binding));
             
-            Console.WriteLine();*/
+            Console.WriteLine();
             
             Spirv.CompilerUnsetDecoration(compiler, resourceList[i].Id, Decoration.DescriptorSet);
             Spirv.CompilerSetDecoration(compiler, resourceList[i].Id, Decoration.Binding, currentIndex++);
+        }
+    }*/
+    
+    private readonly struct ShaderResource
+    {
+        public readonly uint Id;
+        
+        public readonly uint Set;
+        
+        public readonly uint Binding;
+
+        public ShaderResource(uint id, uint set, uint binding)
+        {
+            Id = id;
+            Set = set;
+            Binding = binding;
         }
     }
 }
