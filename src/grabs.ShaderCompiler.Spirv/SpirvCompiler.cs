@@ -19,7 +19,7 @@ public class SpirvCompiler
     }
     
     public static unsafe string TranspileSpirv(ShaderStage stage, ShaderLanguage language, byte[] spirv,
-        string entryPoint, SpecializationConstant[] constants = null)
+        string entryPoint, out DescriptorRemappings remappings, SpecializationConstant[] constants = null)
     {
         Result result;
         
@@ -82,7 +82,12 @@ public class SpirvCompiler
         Resources* resources;
         Spirv.CompilerCreateShaderResources(compiler, &resources);
 
-        List<ShaderResource> allResources = new List<ShaderResource>();
+        remappings = new DescriptorRemappings();
+        RemapDescriptorBindingsForType(compiler, resources, ResourceType.UniformBuffer, ref remappings);
+        RemapDescriptorBindingsForType(compiler, resources, ResourceType.SeparateImage, ref remappings);
+        RemapDescriptorBindingsForType(compiler, resources, ResourceType.SeparateSamplers, ref remappings);
+
+        /*List<ShaderResource> allResources = new List<ShaderResource>();
         GetShaderResourcesForType(compiler, resources, ResourceType.UniformBuffer, ref allResources);
         GetShaderResourcesForType(compiler, resources, ResourceType.SeparateImage, ref allResources);
         GetShaderResourcesForType(compiler, resources, ResourceType.SeparateSamplers, ref allResources);
@@ -107,7 +112,7 @@ public class SpirvCompiler
 
             if (resource.Binding > currentMaxBinding)
                 currentMaxBinding = resource.Binding;
-        }
+        }*/
 
         /*uint bindIndex = 0;
         ChangeDescriptorBindingsForType(compiler, resources, ResourceType.UniformBuffer, ref bindIndex);
@@ -219,12 +224,13 @@ public class SpirvCompiler
         }
     }
 
-    /*private static unsafe void ChangeDescriptorBindingsForType(Compiler* compiler, Resources* resources, ResourceType type, ref uint currentIndex)
+    private static unsafe void RemapDescriptorBindingsForType(Compiler* compiler, Resources* resources, ResourceType type, ref DescriptorRemappings remappings)
     {
         nuint numResources;
         ReflectedResource* resourceList;
         Spirv.ResourcesGetResourceListForType(resources, type, &resourceList, &numResources);
 
+        uint newBinding = 0;
         for (int i = 0; i < (int) numResources; i++)
         {
             /*Console.WriteLine(new string((sbyte*) resourceList[i].Name));
@@ -235,12 +241,27 @@ public class SpirvCompiler
             Console.WriteLine("Set:" + Spirv.CompilerGetDecoration(compiler, resourceList[i].Id, Decoration.DescriptorSet));
             Console.WriteLine("Binding:" + Spirv.CompilerGetDecoration(compiler, resourceList[i].Id, Decoration.Binding));
             
-            Console.WriteLine();
+            Console.WriteLine();*/
+
+            uint id = resourceList[i].Id;
+
+            uint currentSet = Spirv.CompilerGetDecoration(compiler, id, Decoration.DescriptorSet);
+            uint currentBinding = Spirv.CompilerGetDecoration(compiler, id, Decoration.Binding);
             
-            Spirv.CompilerUnsetDecoration(compiler, resourceList[i].Id, Decoration.DescriptorSet);
-            Spirv.CompilerSetDecoration(compiler, resourceList[i].Id, Decoration.Binding, currentIndex++);
+            Spirv.CompilerUnsetDecoration(compiler, id, Decoration.DescriptorSet);
+            Spirv.CompilerSetDecoration(compiler, id, Decoration.Binding, newBinding);
+
+            if (!remappings.Sets.TryGetValue(currentSet, out Remapping remapping))
+            {
+                remapping = new Remapping();
+                remappings.Sets.Add(currentSet, remapping);
+            }
+            
+            remapping.Bindings.Add(currentBinding, newBinding);
+            
+            newBinding++;
         }
-    }*/
+    }
     
     private readonly struct ShaderResource
     {

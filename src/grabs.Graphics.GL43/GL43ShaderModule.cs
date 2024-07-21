@@ -9,6 +9,8 @@ public sealed class GL43ShaderModule : ShaderModule
     private readonly GL _gl;
     
     public readonly uint Shader;
+
+    public readonly DescriptorRemappings DescriptorRemappings;
     
     public GL43ShaderModule(GL gl, ShaderStage stage, byte[] spirv, string entryPoint, SpecializationConstant[] constants) 
         : base(stage)
@@ -25,7 +27,9 @@ public sealed class GL43ShaderModule : ShaderModule
 
         Shader = _gl.CreateShader(type);
 
-        string source = SpirvCompiler.TranspileSpirv(stage, ShaderLanguage.Glsl430, spirv, entryPoint, constants);
+        string source = SpirvCompiler.TranspileSpirv(stage, ShaderLanguage.Glsl430, spirv, entryPoint,
+            out DescriptorRemappings, constants);
+        
         _gl.ShaderSource(Shader, source);
         _gl.CompileShader(Shader);
 

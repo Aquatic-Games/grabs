@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using grabs.ShaderCompiler.Spirv;
 using TerraFX.Interop.DirectX;
 using TerraFX.Interop.Windows;
 using static grabs.Graphics.D3D11.D3DResult;
@@ -15,15 +17,14 @@ namespace grabs.Graphics.D3D11;
 public sealed unsafe class D3D11CommandList : CommandList
 {
     private D3D11Pipeline _currentPipeline;
-    private D3D11DescriptorSet[] _setSets; // Lol
+    private Dictionary<uint, D3D11DescriptorSet> _boundSets;
     
     public ID3D11DeviceContext* Context;
     public ID3D11CommandList* CommandList;
 
     public D3D11CommandList(ID3D11Device* device)
     {
-        // TODO: This is temporary, set to an arbitrary value. This should auto expand to support thousands of sets if needed.
-        _setSets = new D3D11DescriptorSet[16];
+        _boundSets = new Dictionary<uint, D3D11DescriptorSet>();
         
         fixed (ID3D11DeviceContext** context = &Context)
             CheckResult(device->CreateDeferredContext(0, context), "Create deferred context");
@@ -150,7 +151,7 @@ public sealed unsafe class D3D11CommandList : CommandList
     public override void SetDescriptorSet(uint index, DescriptorSet set)
     {
         D3D11DescriptorSet d3dSet = (D3D11DescriptorSet) set;
-        _setSets[index] = d3dSet;
+        _boundSets[index] = d3dSet;
     }
 
     public override void Draw(uint numVertices)
@@ -173,10 +174,96 @@ public sealed unsafe class D3D11CommandList : CommandList
 
     private void SetPreDrawParameters()
     {
-        if (_currentPipeline.Layouts == null)
-            return;
+        foreach ((uint slot, D3D11DescriptorSet set) in _boundSets)
+        {
+            D3D11DescriptorLayout layout = _currentPipeline.Layouts[slot];
+            DescriptorRemappings vertexRemappings = _currentPipeline.VertexRemappings;
+            DescriptorRemappings pixelRemappings = _currentPipeline.PixelRemappings;
+
+            for (int i = 0; i < layout.Bindings.Length; i++)
+            {
+                ref DescriptorBindingDescription binding = ref layout.Bindings[i];
+                ref DescriptorSetDescription description = ref set.Descriptions[i];
+                
+                bool hasVertexStage = (binding.Stages & ShaderStage.Vertex) == ShaderStage.Vertex;
+                bool hasPixelStage = (binding.Stages & ShaderStage.Pixel) == ShaderStage.Pixel;
+                
+                Remapping remapping;
+                uint newBinding;
+
+                if (hasVertexStage && vertexRemappings.TryGetRemappedSet(slot, out remapping) &&
+                    remapping.TryGetRemappedBinding(binding.Binding, out newBinding))
+                {
+                    switch (binding.Type)
+                    {
+                        case DescriptorType.ConstantBuffer:
+                        {
+                            D3D11Buffer buffer = (D3D11Buffer) description.Buffer;
+                            ID3D11Buffer* buf = buffer.Buffer;
+                            Context->VSSetConstantBuffers(newBinding, 1, &buf);
+                            break;
+                        }
+
+                        case DescriptorType.Image:
+                        {
+                            D3D11Texture texture = (D3D11Texture) description.Texture;
+                            ID3D11ShaderResourceView* resView = texture.ResourceView;
+                            Context->VSSetShaderResources(newBinding, 1, &resView);
+                            break;
+                        }
+                        
+                        case DescriptorType.Sampler:
+                        {
+                            D3D11Sampler sampler = (D3D11Sampler) description.Sampler;
+                            ID3D11SamplerState* state = sampler.SamplerState;
+                            Context->VSSetSamplers(newBinding, 1, &state);
+                            break;
+                        }
+                        
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+                
+                if (hasPixelStage && pixelRemappings.TryGetRemappedSet(slot, out remapping) &&
+                    remapping.TryGetRemappedBinding(binding.Binding, out newBinding))
+                {
+                    switch (binding.Type)
+                    {
+                        case DescriptorType.ConstantBuffer:
+                        {
+                            D3D11Buffer buffer = (D3D11Buffer) description.Buffer;
+                            ID3D11Buffer* buf = buffer.Buffer;
+                            Context->PSSetConstantBuffers(newBinding, 1, &buf);
+                            break;
+                        }
+
+                        case DescriptorType.Image:
+                        {
+                            D3D11Texture texture = (D3D11Texture) description.Texture;
+                            ID3D11ShaderResourceView* resView = texture.ResourceView;
+                            Context->PSSetShaderResources(newBinding, 1, &resView);
+                            break;
+                        }
+                        
+                        case DescriptorType.Sampler:
+                        {
+                            D3D11Sampler sampler = (D3D11Sampler) description.Sampler;
+                            ID3D11SamplerState* state = sampler.SamplerState;
+                            Context->PSSetSamplers(newBinding, 1, &state);
+                            break;
+                        }
+                        
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+            }
+        }
         
-        for (int i = 0; i < _currentPipeline.Layouts.Length; i++)
+        _boundSets.Clear();
+        
+        /*for (int i = 0; i < _currentPipeline.Layouts.Length; i++)
         {
             D3D11DescriptorLayout layout = _currentPipeline.Layouts[i];
 
@@ -236,7 +323,7 @@ public sealed unsafe class D3D11CommandList : CommandList
                         throw new ArgumentOutOfRangeException();
                 }
             }
-        }
+        }*/
     }
 
     public override void Dispose()

@@ -57,7 +57,7 @@ public class CubeTest : TestBase
 
         DescriptorLayoutDescription transformLayoutDesc = new DescriptorLayoutDescription(
             new DescriptorBindingDescription(0, DescriptorType.ConstantBuffer, ShaderStage.Vertex),
-            new DescriptorBindingDescription(2, DescriptorType.ConstantBuffer, ShaderStage.Vertex));
+            new DescriptorBindingDescription(5, DescriptorType.ConstantBuffer, ShaderStage.Vertex));
 
         DescriptorLayoutDescription textureLayoutDesc =
             new DescriptorLayoutDescription(
@@ -69,8 +69,8 @@ public class CubeTest : TestBase
         DescriptorLayout textureLayout = Device.CreateDescriptorLayout(textureLayoutDesc);
 
         string hlsl = File.ReadAllText("Shaders/Basic3D.hlsl");
-        byte[] vSpv = Compiler.CompileToSpirV(hlsl, "Vertex", ShaderStage.Vertex, true);
-        byte[] pSpv = Compiler.CompileToSpirV(hlsl, "Pixel", ShaderStage.Pixel, true);
+        byte[] vSpv = Compiler.CompileToSpirV(hlsl, "Vertex", ShaderStage.Vertex, false);
+        byte[] pSpv = Compiler.CompileToSpirV(hlsl, "Pixel", ShaderStage.Pixel, false);
 
         using ShaderModule vModule = Device.CreateShaderModule(ShaderStage.Vertex, vSpv, "Vertex");
         using ShaderModule pModule = Device.CreateShaderModule(ShaderStage.Pixel, pSpv, "Pixel");

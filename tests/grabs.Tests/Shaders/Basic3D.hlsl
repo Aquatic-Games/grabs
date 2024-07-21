@@ -21,7 +21,7 @@ cbuffer CameraMatrices : register(b0, space0)
     float4x4 View;
 }
 
-cbuffer WorldMatrix : register(b2, space0)
+cbuffer WorldMatrix : register(b5, space0)
 {
     float4x4 World;
 }

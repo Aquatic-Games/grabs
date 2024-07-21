@@ -10,12 +10,15 @@ namespace grabs.Graphics.D3D11;
 [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
 public sealed unsafe class D3D11ShaderModule : ShaderModule
 {
-    public ID3DBlob* Blob;
+    public readonly ID3DBlob* Blob;
+    
+    public readonly DescriptorRemappings DescriptorRemappings;
     
     public D3D11ShaderModule(ShaderStage stage, byte[] spirv, string entryPoint, SpecializationConstant[] constants) 
         : base(stage)
     {
-        string hlsl = SpirvCompiler.TranspileSpirv(stage, ShaderLanguage.Hlsl50, spirv, entryPoint, constants);
+        string hlsl = SpirvCompiler.TranspileSpirv(stage, ShaderLanguage.Hlsl50, spirv, entryPoint,
+            out DescriptorRemappings, constants);
 
         string profile = stage switch
         {

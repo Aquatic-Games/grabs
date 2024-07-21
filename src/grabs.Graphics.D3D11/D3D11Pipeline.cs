@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using grabs.Core;
+using grabs.ShaderCompiler.Spirv;
 using TerraFX.Interop.DirectX;
 using static grabs.Graphics.D3D11.D3DResult;
 using static TerraFX.Interop.DirectX.D3D11_CULL_MODE;
@@ -16,6 +18,9 @@ public sealed unsafe class D3D11Pipeline : Pipeline
 {
     public readonly ID3D11VertexShader* VertexShader;
     public readonly ID3D11PixelShader* PixelShader;
+    
+    public readonly DescriptorRemappings VertexRemappings;
+    public readonly DescriptorRemappings PixelRemappings;
 
     public readonly ID3D11InputLayout* InputLayout;
 
@@ -45,6 +50,9 @@ public sealed unsafe class D3D11Pipeline : Pipeline
                 device->CreatePixelShader(pShaderModule.Blob->GetBufferPointer(), pShaderModule.Blob->GetBufferSize(),
                     null, pShader), "Create pixel shader");
         }
+        
+        VertexRemappings = vShaderModule.DescriptorRemappings;
+        PixelRemappings = pShaderModule.DescriptorRemappings;
 
         // Some things don't need an input layout, for example, if the drawing occurs entirely within the shader.
         // If so, ignore and do not create the input layout.
@@ -146,20 +154,22 @@ public sealed unsafe class D3D11Pipeline : Pipeline
 
         if (description.DescriptorLayouts != null)
         {
-            Layouts = new D3D11DescriptorLayout[description.DescriptorLayouts.Length];
+            Layouts = Array.ConvertAll(description.DescriptorLayouts, layout => (D3D11DescriptorLayout) layout);
+
+            /*Layouts = new D3D11DescriptorLayout[description.DescriptorLayouts.Length];
             uint totalMaxBinding = 0;
             uint currentMaxBinding = 0;
             for (int i = 0; i < Layouts.Length; i++)
             {
                 D3D11DescriptorLayout layout = (D3D11DescriptorLayout) description.DescriptorLayouts[i];
                 DescriptorBindingDescription[] descriptions = new DescriptorBindingDescription[layout.Bindings.Length];
-                
+
                 for (int j = 0; j < descriptions.Length; j++)
                 {
                     DescriptorBindingDescription desc = layout.Bindings[j];
                     if (desc.Binding >= currentMaxBinding)
                         currentMaxBinding = desc.Binding;
-                    
+
                     desc.Binding += totalMaxBinding;
                     descriptions[j] = desc;
                 }
@@ -168,7 +178,7 @@ public sealed unsafe class D3D11Pipeline : Pipeline
                 currentMaxBinding = 0;
 
                 Layouts[i] = new D3D11DescriptorLayout(descriptions);
-            }
+            }*/
         }
 
         PrimitiveTopology = D3D11Utils.PrimitiveTypeToD3D(description.PrimitiveType);

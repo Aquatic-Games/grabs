@@ -37,8 +37,8 @@ const string shaderCode = """
                               float4x4 World;
                           }
                           
-                          Texture2D Texture  : register(t1, space1);
-                          SamplerState state : register(s1, space1);
+                          Texture2D Texture  : register(t5, space2);
+                          SamplerState state : register(s0, space2);
 
                           VSOutput Vertex(const in VSInput input)
                           {
@@ -62,4 +62,12 @@ const string shaderCode = """
                           """;
 
 byte[] result = Compiler.CompileToSpirV(shaderCode, entryPoint, stage, true);
-Console.WriteLine(SpirvCompiler.TranspileSpirv(stage, ShaderLanguage.Hlsl50, result, entryPoint));
+Console.WriteLine(SpirvCompiler.TranspileSpirv(stage, ShaderLanguage.Hlsl50, result, entryPoint, out DescriptorRemappings remappings));
+
+foreach ((uint set, Remapping remapping) in remappings.Sets)
+{
+    foreach ((uint originalBinding, uint newBinding) in remapping.Bindings)
+    {
+        Console.WriteLine($"Remapping: Set {set}, Binding: {originalBinding} -> Binding {newBinding}");
+    }
+}
