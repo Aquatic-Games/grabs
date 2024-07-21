@@ -7,5 +7,6 @@ public enum DescriptorType
 {
     ConstantBuffer,
     Image,
-    Sampler
+    Sampler,
+    Texture
 }

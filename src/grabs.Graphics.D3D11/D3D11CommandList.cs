@@ -219,7 +219,18 @@ public sealed unsafe class D3D11CommandList : CommandList
                             Context->VSSetSamplers(newBinding, 1, &state);
                             break;
                         }
-                        
+
+                        case DescriptorType.Texture:
+                        {
+                            D3D11Texture texture = (D3D11Texture) description.Texture;
+                            ID3D11ShaderResourceView* resView = texture.ResourceView;
+                            D3D11Sampler sampler = (D3D11Sampler) description.Sampler;
+                            ID3D11SamplerState* state = sampler.SamplerState;
+                            Context->VSSetShaderResources(newBinding, 1, &resView);
+                            Context->VSSetSamplers(newBinding, 1, &state);
+                            break;
+                        }
+
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
@@ -250,6 +261,17 @@ public sealed unsafe class D3D11CommandList : CommandList
                         {
                             D3D11Sampler sampler = (D3D11Sampler) description.Sampler;
                             ID3D11SamplerState* state = sampler.SamplerState;
+                            Context->PSSetSamplers(newBinding, 1, &state);
+                            break;
+                        }
+                        
+                        case DescriptorType.Texture:
+                        {
+                            D3D11Texture texture = (D3D11Texture) description.Texture;
+                            ID3D11ShaderResourceView* resView = texture.ResourceView;
+                            D3D11Sampler sampler = (D3D11Sampler) description.Sampler;
+                            ID3D11SamplerState* state = sampler.SamplerState;
+                            Context->PSSetShaderResources(newBinding, 1, &resView);
                             Context->PSSetSamplers(newBinding, 1, &state);
                             break;
                         }
