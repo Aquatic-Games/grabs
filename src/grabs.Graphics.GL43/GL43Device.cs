@@ -79,7 +79,7 @@ public class GL43Device : Device
 
     public override Sampler CreateSampler(in SamplerDescription description)
     {
-        throw new NotImplementedException();
+        return new GL43Sampler(_gl, description);
     }
 
     public override unsafe void UpdateBuffer(Buffer buffer, uint offsetInBytes, uint sizeInBytes, void* pData)
@@ -225,20 +225,8 @@ public class GL43Device : Device
                     {
                         _gl.Enable(EnableCap.DepthTest);
                         _gl.DepthMask(depthDesc.DepthWrite);
-
-                        DepthFunction depthFunc = depthDesc.ComparisonFunction switch
-                        {
-                            ComparisonFunction.Never => DepthFunction.Never,
-                            ComparisonFunction.Less => DepthFunction.Less,
-                            ComparisonFunction.Equal => DepthFunction.Equal,
-                            ComparisonFunction.LessEqual => DepthFunction.Lequal,
-                            ComparisonFunction.Greater => DepthFunction.Greater,
-                            ComparisonFunction.NotEqual => DepthFunction.Notequal,
-                            ComparisonFunction.GreaterEqual => DepthFunction.Gequal,
-                            ComparisonFunction.Always => DepthFunction.Always,
-                            _ => throw new ArgumentOutOfRangeException()
-                        };
-                        _gl.DepthFunc(depthFunc);
+                        
+                        _gl.DepthFunc(GLUtils.ComparisonFunctionToGL(depthDesc.ComparisonFunction));
                     }
                     else
                         _gl.Disable(EnableCap.DepthTest);

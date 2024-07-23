@@ -5,6 +5,22 @@ namespace grabs.Graphics.GL43;
 
 public static class GLUtils
 {
+    public static DepthFunction ComparisonFunctionToGL(ComparisonFunction comparison)
+    {
+        return comparison switch
+        {
+            ComparisonFunction.Never => DepthFunction.Never,
+            ComparisonFunction.Less => DepthFunction.Less,
+            ComparisonFunction.Equal => DepthFunction.Equal,
+            ComparisonFunction.LessEqual => DepthFunction.Lequal,
+            ComparisonFunction.Greater => DepthFunction.Greater,
+            ComparisonFunction.NotEqual => DepthFunction.Notequal,
+            ComparisonFunction.GreaterEqual => DepthFunction.Gequal,
+            ComparisonFunction.Always => DepthFunction.Always,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+    
     public static BlendingFactor BlendFactorToGL(BlendFactor factor)
     {
         return factor switch
@@ -40,6 +56,18 @@ public static class GLUtils
             BlendOperation.Min => BlendEquationModeEXT.Min,
             BlendOperation.Max => BlendEquationModeEXT.Max,
             _ => throw new ArgumentOutOfRangeException(nameof(operation), operation, null)
+        };
+    }
+
+    public static TextureWrapMode TextureAddressToGL(TextureAddress address)
+    {
+        return address switch
+        {
+            TextureAddress.RepeatWrap => TextureWrapMode.Repeat,
+            TextureAddress.RepeatWrapMirrored => TextureWrapMode.MirroredRepeat,
+            TextureAddress.ClampToEdge => TextureWrapMode.ClampToEdge,
+            TextureAddress.ClampToBorder => TextureWrapMode.ClampToBorder,
+            _ => throw new ArgumentOutOfRangeException(nameof(address), address, null)
         };
     }
 }
