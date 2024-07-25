@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using grabs.Core;
 using grabs.Graphics;
 using Silk.NET.SPIRV;
 using Silk.NET.SPIRV.Cross;
@@ -108,8 +109,16 @@ public class SpirvCompiler
                 Spirv.CompilerGetCombinedImageSamplers(compiler, &combinedSamplers, &numSamplers);
                 for (uint i = 0; i < (int) numSamplers; i++)
                 {
-                    Spirv.CompilerSetDecoration(compiler, combinedSamplers[i].CombinedId, Decoration.Binding,
-                        newBinding++);
+                    uint id = combinedSamplers[i].ImageId;
+
+                    uint set = Spirv.CompilerGetDecoration(compiler, id, Decoration.DescriptorSet);
+                    uint binding = Spirv.CompilerGetDecoration(compiler, id, Decoration.Binding);
+                    
+                    Spirv.CompilerSetDecoration(compiler, combinedSamplers[i].CombinedId, Decoration.Binding, newBinding);
+                    
+                    AddRemapping(ref remappings, set, binding, newBinding);
+
+                    newBinding++;
                 }
 
                 break;
@@ -182,7 +191,7 @@ public class SpirvCompiler
         Spirv.ContextReleaseAllocations(context);
         Spirv.ContextDestroy(context);
         
-        Console.WriteLine(strResult);
+        GrabsLog.Log(GrabsLog.Severity.Verbose, strResult);
 
         return strResult;
     }
@@ -213,15 +222,20 @@ public class SpirvCompiler
             Spirv.CompilerUnsetDecoration(compiler, id, Decoration.DescriptorSet);
             Spirv.CompilerSetDecoration(compiler, id, Decoration.Binding, newBinding);
 
-            if (!remappings.Sets.TryGetValue(currentSet, out Remapping remapping))
-            {
-                remapping = new Remapping();
-                remappings.Sets.Add(currentSet, remapping);
-            }
-            
-            remapping.Bindings.Add(currentBinding, newBinding);
+            AddRemapping(ref remappings, currentSet, currentBinding, newBinding);
             
             newBinding++;
         }
+    }
+
+    private static void AddRemapping(ref DescriptorRemappings remappings, uint set, uint binding, uint newBinding)
+    {
+        if (!remappings.Sets.TryGetValue(set, out Remapping remapping))
+        {
+            remapping = new Remapping();
+            remappings.Sets.Add(set, remapping);
+        }
+            
+        remapping.Bindings.Add(binding, newBinding);
     }
 }

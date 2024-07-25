@@ -68,7 +68,7 @@ public unsafe class VkInstance : Instance
             PpEnabledLayerNames = pLayers
         };
 
-        GrabsLog.Log(GrabsLog.LogType.Verbose, "Creating instance.");
+        GrabsLog.Log(GrabsLog.Severity.Verbose, "Creating instance.");
         CheckResult(Vk.CreateInstance(&instanceCreateInfo, null, out Instance), "create instance");
 
         if (!Vk.TryGetInstanceExtension(Instance, out DebugUtils))
@@ -89,7 +89,7 @@ public unsafe class VkInstance : Instance
             PfnUserCallback = new PfnDebugUtilsMessengerCallbackEXT(DebugCallback)
         };
         
-        GrabsLog.Log(GrabsLog.LogType.Verbose, "Creating debug messenger.");
+        GrabsLog.Log(GrabsLog.Severity.Verbose, "Creating debug messenger.");
         CheckResult(DebugUtils.CreateDebugUtilsMessenger(Instance, &messengerCreateInfo, null, out DebugMessenger));
     }
 
@@ -158,13 +158,13 @@ public unsafe class VkInstance : Instance
         if (messageSeverity == DebugUtilsMessageSeverityFlagsEXT.ErrorBitExt)
             throw new Exception(message);
 
-        GrabsLog.LogType type = messageSeverity switch
+        GrabsLog.Severity type = messageSeverity switch
         {
-            DebugUtilsMessageSeverityFlagsEXT.None => GrabsLog.LogType.Verbose,
-            DebugUtilsMessageSeverityFlagsEXT.VerboseBitExt => GrabsLog.LogType.Verbose,
-            DebugUtilsMessageSeverityFlagsEXT.InfoBitExt => GrabsLog.LogType.Info,
-            DebugUtilsMessageSeverityFlagsEXT.WarningBitExt => GrabsLog.LogType.Warning,
-            DebugUtilsMessageSeverityFlagsEXT.ErrorBitExt => GrabsLog.LogType.Error,
+            DebugUtilsMessageSeverityFlagsEXT.None => GrabsLog.Severity.Verbose,
+            DebugUtilsMessageSeverityFlagsEXT.VerboseBitExt => GrabsLog.Severity.Verbose,
+            DebugUtilsMessageSeverityFlagsEXT.InfoBitExt => GrabsLog.Severity.Info,
+            DebugUtilsMessageSeverityFlagsEXT.WarningBitExt => GrabsLog.Severity.Warning,
+            DebugUtilsMessageSeverityFlagsEXT.ErrorBitExt => GrabsLog.Severity.Error,
             _ => throw new ArgumentOutOfRangeException(nameof(messageSeverity), messageSeverity, null)
         };
         
@@ -175,11 +175,11 @@ public unsafe class VkInstance : Instance
 
     public override void Dispose()
     {
-        GrabsLog.Log(GrabsLog.LogType.Verbose, "Destroying debug messenger.");
+        GrabsLog.Log(GrabsLog.Severity.Verbose, "Destroying debug messenger.");
         DebugUtils.DestroyDebugUtilsMessenger(Instance, DebugMessenger, null);
         DebugUtils.Dispose();
         
-        GrabsLog.Log(GrabsLog.LogType.Verbose, "Destroying instance.");
+        GrabsLog.Log(GrabsLog.Severity.Verbose, "Destroying instance.");
         Vk.DestroyInstance(Instance, null);
     }
 }

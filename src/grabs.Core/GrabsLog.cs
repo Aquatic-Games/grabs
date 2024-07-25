@@ -6,12 +6,12 @@ public static class GrabsLog
 {
     public static event OnLogMessage LogMessage = delegate { };
     
-    public static void Log(LogType type, string message)
+    public static void Log(Severity severity, string message)
     {
-        LogMessage.Invoke(type, message);
+        LogMessage.Invoke(severity, message);
     }
     
-    public enum LogType
+    public enum Severity
     {
         Verbose,
         Debug,
@@ -21,5 +21,5 @@ public static class GrabsLog
         Critical
     }
     
-    public delegate void OnLogMessage(LogType type, string message);
+    public delegate void OnLogMessage(Severity type, string message);
 }
