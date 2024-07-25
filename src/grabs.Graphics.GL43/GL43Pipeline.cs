@@ -1,4 +1,5 @@
 ﻿using System;
+using grabs.ShaderCompiler.Spirv;
 using Silk.NET.OpenGL;
 
 namespace grabs.Graphics.GL43;
@@ -8,11 +9,12 @@ public class GL43Pipeline : Pipeline
     private readonly GL _gl;
 
     public readonly uint VertexProgram;
-
     public readonly uint FragmentProgram;
+
+    public readonly DescriptorRemappings VertexRemappings;
+    public readonly DescriptorRemappings PixelRemappings;
     
     public readonly uint Pipeline;
-    
     public readonly uint Vao;
 
     public readonly Silk.NET.OpenGL.PrimitiveType PrimitiveType;
@@ -31,6 +33,9 @@ public class GL43Pipeline : Pipeline
 
         GL43ShaderModule vShaderModule = (GL43ShaderModule) description.VertexShader;
         GL43ShaderModule pShaderModule = (GL43ShaderModule) description.PixelShader;
+
+        VertexRemappings = vShaderModule.DescriptorRemappings;
+        PixelRemappings = pShaderModule.DescriptorRemappings;
 
         VertexProgram = CreateShaderProgram(gl, vShaderModule);
         FragmentProgram = CreateShaderProgram(gl, pShaderModule);
@@ -95,24 +100,7 @@ public class GL43Pipeline : Pipeline
         };
 
         if (description.DescriptorLayouts != null)
-        {
-            Layouts = new GL43DescriptorLayout[description.DescriptorLayouts.Length];
-            uint currentBindIndex = 0;
-            for (int i = 0; i < Layouts.Length; i++)
-            {
-                GL43DescriptorLayout layout = (GL43DescriptorLayout) description.DescriptorLayouts[i];
-                DescriptorBindingDescription[] bindings = new DescriptorBindingDescription[layout.Bindings.Length];
-
-                for (int j = 0; j < bindings.Length; j++)
-                {
-                    DescriptorBindingDescription desc = layout.Bindings[j];
-                    desc.Binding = currentBindIndex++;
-                    bindings[j] = desc;
-                }
-
-                Layouts[i] = new GL43DescriptorLayout(bindings);
-            }
-        }
+            Layouts = Array.ConvertAll(description.DescriptorLayouts, layout => (GL43DescriptorLayout) layout);
     }
     
     public override void Dispose()

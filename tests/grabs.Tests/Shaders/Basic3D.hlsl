@@ -21,12 +21,12 @@ cbuffer CameraMatrices : register(b0, space0)
     float4x4 View;
 }
 
-cbuffer WorldMatrix : register(b5, space0)
+cbuffer WorldMatrix : register(b1, space0)
 {
     float4x4 World;
 }
 
-SamplerState Sampler : register(s10, space1);
+SamplerState Sampler : register(s0, space1);
 Texture2D Texture : register(t1, space1);
 
 VSOutput Vertex(const in VSInput input)

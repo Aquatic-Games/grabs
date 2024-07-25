@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using grabs.ShaderCompiler.Spirv;
 using Silk.NET.OpenGL;
+using Silk.NET.SPIRV.Cross;
 
 namespace grabs.Graphics.GL43;
 
@@ -11,7 +14,7 @@ public class GL43Device : Device
     private GL43Swapchain _swapchain;
 
     private GL43Pipeline _currentPipeline;
-    private GL43DescriptorSet[] _setSets;
+    private Dictionary<uint, GL43DescriptorSet> _boundSets;
 
     private DrawElementsType _currentDrawElementsType;
     private uint _currentDrawElementsSizeInBytes;
@@ -22,7 +25,7 @@ public class GL43Device : Device
         _gl = gl;
         _surface = surface;
 
-        _setSets = new GL43DescriptorSet[16];
+        _boundSets = new Dictionary<uint, GL43DescriptorSet>();
         
         // Scissor test is always enabled.
         _gl.Enable(EnableCap.ScissorTest);
@@ -326,7 +329,7 @@ public class GL43Device : Device
                 case CommandListActionType.SetDescriptor:
                 {
                     GL43DescriptorSet set = action.DescriptorSet;
-                    _setSets[action.Slot] = set;
+                    _boundSets[action.Slot] = set;
                     
                     break;
                 }
@@ -361,34 +364,74 @@ public class GL43Device : Device
 
     private void SetPreDrawParameters()
     {
-        if (_currentPipeline.Layouts == null)
-            return;
-        
-        for (int i = 0; i < _currentPipeline.Layouts.Length; i++)
+        foreach ((uint slot, GL43DescriptorSet set) in _boundSets)
         {
-            GL43DescriptorLayout layout = _currentPipeline.Layouts[i];
+            GL43DescriptorLayout layout = _currentPipeline.Layouts[slot];
+            DescriptorRemappings vertexRemappings = _currentPipeline.VertexRemappings;
+            DescriptorRemappings pixelRemappings = _currentPipeline.PixelRemappings;
 
-            for (int j = 0; j < layout.Bindings.Length; j++)
+            GL43Sampler currentSampler = null;
+
+            for (int i = 0; i < layout.Bindings.Length; i++)
             {
-                ref DescriptorBindingDescription binding = ref layout.Bindings[j];
-                ref DescriptorSetDescription desc = ref _setSets[i].Descriptions[j];
+                ref DescriptorBindingDescription binding = ref layout.Bindings[i];
+                ref DescriptorSetDescription description = ref set.Descriptions[i];
 
-                switch (binding.Type)
+                if (binding.Type is DescriptorType.Sampler)
+                    currentSampler = (GL43Sampler) description.Sampler;
+                
+                Remapping remapping;
+                uint newBinding;
+
+                if ((vertexRemappings.TryGetRemappedSet(slot, out remapping) ||
+                     pixelRemappings.TryGetRemappedSet(slot, out remapping)) &&
+                    remapping.TryGetRemappedBinding(binding.Binding, out newBinding))
                 {
-                    case DescriptorType.ConstantBuffer:
-                        _gl.BindBufferBase(BufferTargetARB.UniformBuffer, binding.Binding, ((GL43Buffer) desc.Buffer).Buffer);
-                        break;
-                    case DescriptorType.Image:
-                        GL43Texture texture = (GL43Texture) desc.Texture;
-                                
-                        _gl.ActiveTexture(TextureUnit.Texture0 + (int) binding.Binding);
-                        _gl.BindTexture(texture.Target, texture.Texture);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
+                    switch (binding.Type)
+                    {
+                        case DescriptorType.ConstantBuffer:
+                            _gl.BindBufferBase(GLEnum.UniformBuffer, newBinding, ((GL43Buffer) description.Buffer).Buffer);
+                            break;
+                        
+                        case DescriptorType.Image:
+                        {
+                            GL43Texture texture = (GL43Texture) description.Texture;
+
+                            _gl.ActiveTexture(TextureUnit.Texture0 + (int) newBinding);
+                            _gl.BindTexture(texture.Target, texture.Texture);
+
+                            if (currentSampler != null)
+                                _gl.BindSampler(newBinding, currentSampler.Sampler);
+                            
+                            break;
+                        }
+
+                        case DescriptorType.Sampler:
+                        {
+                            currentSampler = (GL43Sampler) description.Sampler;
+                            break;
+                        }
+
+                        case DescriptorType.Texture:
+                        {
+                            GL43Texture texture = (GL43Texture) description.Texture;
+                            GL43Sampler sampler = (GL43Sampler) description.Sampler;
+
+                            _gl.ActiveTexture(TextureUnit.Texture0 + (int) newBinding);
+                            _gl.BindTexture(texture.Target, texture.Texture);
+                            _gl.BindSampler(newBinding, sampler.Sampler);
+                            
+                            break;
+                        }
+
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
                 }
-            }
+            }   
         }
+        
+        _boundSets.Clear();
     }
 
     public override void Dispose() { }
