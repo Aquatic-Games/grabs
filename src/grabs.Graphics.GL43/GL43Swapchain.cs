@@ -124,6 +124,8 @@ public sealed class GL43Swapchain : Swapchain
         
         // Scissor test is always enabled. Except here, where it is ignored.
         _gl.Enable(EnableCap.ScissorTest);
+        // Must bind program to 0 as UseProgram overrides BindProgramPipeline.
+        _gl.UseProgram(0);
         
         _surface.PresentFunc(_swapInterval);
     }

@@ -68,6 +68,7 @@ public class SpirvCompiler
                 break;
             case ShaderLanguage.Glsl430:
                 Spirv.CompilerOptionsSetUint(options, CompilerOption.GlslVersion, 430);
+                Spirv.CompilerOptionsSetBool(options, CompilerOption.GlslSeparateShaderObjects, 1);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(language), language, null);

@@ -7,7 +7,11 @@ public class GL43Pipeline : Pipeline
 {
     private readonly GL _gl;
 
-    public readonly uint ShaderProgram;
+    public readonly uint VertexProgram;
+
+    public readonly uint FragmentProgram;
+    
+    public readonly uint Pipeline;
     
     public readonly uint Vao;
 
@@ -27,19 +31,13 @@ public class GL43Pipeline : Pipeline
 
         GL43ShaderModule vShaderModule = (GL43ShaderModule) description.VertexShader;
         GL43ShaderModule pShaderModule = (GL43ShaderModule) description.PixelShader;
-        
-        ShaderProgram = _gl.CreateProgram();
-        _gl.AttachShader(ShaderProgram, vShaderModule.Shader);
-        _gl.AttachShader(ShaderProgram, pShaderModule.Shader);
-        
-        _gl.LinkProgram(ShaderProgram);
 
-        _gl.GetProgram(ShaderProgram, ProgramPropertyARB.LinkStatus, out int status);
-        if (status != (int) GLEnum.True)
-            throw new Exception($"Failed to link program: {_gl.GetProgramInfoLog(ShaderProgram)}");
-        
-        _gl.DetachShader(ShaderProgram, vShaderModule.Shader);
-        _gl.DetachShader(ShaderProgram, pShaderModule.Shader);
+        VertexProgram = CreateShaderProgram(gl, vShaderModule);
+        FragmentProgram = CreateShaderProgram(gl, pShaderModule);
+
+        Pipeline = _gl.GenProgramPipeline();
+        _gl.UseProgramStages(Pipeline, UseProgramStageMask.VertexShaderBit, VertexProgram);
+        _gl.UseProgramStages(Pipeline, UseProgramStageMask.FragmentShaderBit, FragmentProgram);
 
         Vao = _gl.CreateVertexArray();
         _gl.BindVertexArray(Vao);
@@ -119,7 +117,26 @@ public class GL43Pipeline : Pipeline
     
     public override void Dispose()
     {
-        _gl.DeleteProgram(ShaderProgram);
         _gl.DeleteVertexArray(Vao);
+        
+        _gl.DeleteProgramPipeline(Pipeline);
+        _gl.DeleteProgram(FragmentProgram);
+        _gl.DeleteProgram(VertexProgram);
+    }
+
+    private static uint CreateShaderProgram(GL gl, GL43ShaderModule module)
+    {
+        uint program = gl.CreateProgram();
+        gl.AttachShader(program, module.Shader);
+        gl.ProgramParameter(program, ProgramParameterPName.Separable, (int) GLEnum.True);
+        
+        gl.LinkProgram(program);
+        gl.GetProgram(program, ProgramPropertyARB.LinkStatus, out int status);
+        if (status != (int) GLEnum.True)
+            throw new Exception($"Failed to link program: {gl.GetProgramInfoLog(program)}");
+        
+        gl.DetachShader(program, module.Shader);
+
+        return program;
     }
 }

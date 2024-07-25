@@ -215,7 +215,7 @@ public class GL43Device : Device
                     _currentPipeline = pipeline;
                     
                     _gl.BindVertexArray(pipeline.Vao);
-                    _gl.UseProgram(pipeline.ShaderProgram);
+                    _gl.BindProgramPipeline(pipeline.Pipeline);
 
                     DepthStencilDescription depthDesc = pipeline.DepthStencilDescription;
                     RasterizerDescription rasterizerDesc = pipeline.RasterizerDescription;
