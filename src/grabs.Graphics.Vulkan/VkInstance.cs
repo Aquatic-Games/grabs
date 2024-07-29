@@ -6,7 +6,7 @@ using System.Reflection;
 using grabs.Core;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.EXT;
-using static grabs.Graphics.Vulkan.VkUtils;
+using static grabs.Graphics.Vulkan.VkResult;
 
 namespace grabs.Graphics.Vulkan;
 
