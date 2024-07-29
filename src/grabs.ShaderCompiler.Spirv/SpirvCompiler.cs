@@ -10,7 +10,7 @@ using SpecializationConstant = grabs.Graphics.SpecializationConstant;
 
 namespace grabs.ShaderCompiler.Spirv;
 
-public class SpirvCompiler
+public static class SpirvCompiler
 {
     public static Cross Spirv;
 
@@ -197,7 +197,8 @@ public class SpirvCompiler
         return strResult;
     }
 
-    private static unsafe void RemapDescriptorBindingsForType(Compiler* compiler, Resources* resources, ResourceType type, ref uint newBinding, ref DescriptorRemappings remappings)
+    private static unsafe void RemapDescriptorBindingsForType(Compiler* compiler, Resources* resources,
+        ResourceType type, ref uint newBinding, ref DescriptorRemappings remappings)
     {
         nuint numResources;
         ReflectedResource* resourceList;
@@ -205,16 +206,6 @@ public class SpirvCompiler
         
         for (int i = 0; i < (int) numResources; i++)
         {
-            /*Console.WriteLine(new string((sbyte*) resourceList[i].Name));
-            Console.WriteLine(resourceList[i].Id);
-            Console.WriteLine(resourceList[i].TypeId);
-            Console.WriteLine(resourceList[i].BaseTypeId);
-
-            Console.WriteLine("Set:" + Spirv.CompilerGetDecoration(compiler, resourceList[i].Id, Decoration.DescriptorSet));
-            Console.WriteLine("Binding:" + Spirv.CompilerGetDecoration(compiler, resourceList[i].Id, Decoration.Binding));
-            
-            Console.WriteLine();*/
-
             uint id = resourceList[i].Id;
 
             uint currentSet = Spirv.CompilerGetDecoration(compiler, id, Decoration.DescriptorSet);
