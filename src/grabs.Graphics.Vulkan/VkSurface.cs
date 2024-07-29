@@ -4,7 +4,7 @@ using Silk.NET.Vulkan.Extensions.KHR;
 
 namespace grabs.Graphics.Vulkan;
 
-public class VkSurface : Surface
+public sealed class VkSurface : Surface
 {
     public readonly VkInstance Instance;
     public readonly SurfaceKHR Surface;

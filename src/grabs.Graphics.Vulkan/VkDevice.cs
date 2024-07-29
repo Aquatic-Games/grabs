@@ -10,7 +10,7 @@ using static grabs.Graphics.Vulkan.VkUtils;
 
 namespace grabs.Graphics.Vulkan;
 
-public unsafe class VkDevice : Device
+public sealed unsafe class VkDevice : Device
 {
     private readonly Vk _vk;
     
@@ -19,7 +19,12 @@ public unsafe class VkDevice : Device
     
     public readonly VulkanDevice Device;
 
-    public VkDevice(Vk vk, PhysicalDevice pDevice, VkSurface surface)
+    public readonly KhrSwapchain KhrSwapchain;
+
+    public readonly Queue GraphicsQueue;
+    public readonly Queue PresentQueue;
+
+    public VkDevice(Vk vk, VulkanInstance instance, PhysicalDevice pDevice, VkSurface surface)
     {
         _vk = vk;
 
@@ -90,6 +95,12 @@ public unsafe class VkDevice : Device
         };
 
         CheckResult(_vk.CreateDevice(pDevice, &deviceCreateInfo, null, out Device), "Create device");
+
+        if (!_vk.TryGetDeviceExtension(instance, Device, out KhrSwapchain))
+            throw new Exception("Failed to get VK_KHR_swapchain device extension.");
+
+        _vk.GetDeviceQueue(Device, _graphicsQueueIndex, 0, out GraphicsQueue);
+        _vk.GetDeviceQueue(Device, _presentQueueIndex, 0, out PresentQueue);
     }
     
     public override Swapchain CreateSwapchain(in SwapchainDescription description)
@@ -175,6 +186,8 @@ public unsafe class VkDevice : Device
 
     public override void Dispose()
     {
+        CheckResult(_vk.DeviceWaitIdle(Device));
+        KhrSwapchain.Dispose();
         _vk.DestroyDevice(Device, null);
     }
 }
