@@ -1,8 +1,12 @@
 global using VulkanDevice = Silk.NET.Vulkan.Device;
 
 using System;
+using System.Collections.Generic;
+using grabs.Core;
 using Silk.NET.Core;
 using Silk.NET.Vulkan;
+using Silk.NET.Vulkan.Extensions.KHR;
+using static grabs.Graphics.Vulkan.VkUtils;
 
 namespace grabs.Graphics.Vulkan;
 
@@ -48,12 +52,44 @@ public unsafe class VkDevice : Device
                 $"Cannot create device: Graphics or Present queue not available. (GQueue: {graphicsQueue}, PQueue: {presentQueue})");
         }
 
+        _graphicsQueueIndex = graphicsQueue.Value;
+        _presentQueueIndex = presentQueue.Value;
+
+        HashSet<uint> uniqueQueueFamilies = [_graphicsQueueIndex, _presentQueueIndex];
+        DeviceQueueCreateInfo* queueCreateInfos = stackalloc DeviceQueueCreateInfo[uniqueQueueFamilies.Count];
+
+        int currentQueueIndex = 0;
+        float queuePriority = 1.0f;
+        foreach (uint queue in uniqueQueueFamilies)
+        {
+            queueCreateInfos[currentQueueIndex++] = new DeviceQueueCreateInfo()
+            {
+                SType = StructureType.DeviceQueueCreateInfo,
+
+                QueueCount = 1,
+                QueueFamilyIndex = queue,
+                PQueuePriorities = &queuePriority
+            };
+        }
+
+        using PinnedStringArray deviceExtensions = new PinnedStringArray(KhrSwapchain.ExtensionName);
+
+        PhysicalDeviceFeatures enabledFeatures = new PhysicalDeviceFeatures();
+
         DeviceCreateInfo deviceCreateInfo = new DeviceCreateInfo()
         {
             SType = StructureType.DeviceCreateInfo,
             
+            QueueCreateInfoCount = (uint) uniqueQueueFamilies.Count,
+            PQueueCreateInfos = queueCreateInfos,
             
+            EnabledExtensionCount = deviceExtensions.Length,
+            PpEnabledExtensionNames = deviceExtensions,
+            
+            PEnabledFeatures = &enabledFeatures
         };
+
+        CheckResult(_vk.CreateDevice(pDevice, &deviceCreateInfo, null, out Device), "Create device");
     }
     
     public override Swapchain CreateSwapchain(in SwapchainDescription description)
@@ -139,6 +175,6 @@ public unsafe class VkDevice : Device
 
     public override void Dispose()
     {
-        throw new NotImplementedException();
+        _vk.DestroyDevice(Device, null);
     }
 }
