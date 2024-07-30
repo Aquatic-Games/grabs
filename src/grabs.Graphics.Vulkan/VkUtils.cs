@@ -1,4 +1,5 @@
 using System;
+using Silk.NET.Vulkan;
 
 namespace grabs.Graphics.Vulkan;
 
@@ -75,6 +76,17 @@ public static class VkUtils
             Format.BC7_UNorm_SRGB => Silk.NET.Vulkan.Format.BC7SrgbBlock,
 
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
+        };
+    }
+
+    public static PresentModeKHR PresentModeToVk(PresentMode presentMode)
+    {
+        return presentMode switch
+        {
+            PresentMode.Immediate => PresentModeKHR.ImmediateKhr,
+            PresentMode.VerticalSync => PresentModeKHR.FifoKhr,
+            PresentMode.AdaptiveSync => PresentModeKHR.FifoRelaxedKhr,
+            _ => throw new ArgumentOutOfRangeException(nameof(presentMode), presentMode, null)
         };
     }
 }
