@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using grabs.Core;
 using grabs.Graphics;
 using Silk.NET.SPIRV;
@@ -192,7 +193,15 @@ public static class SpirvCompiler
         Spirv.ContextReleaseAllocations(context);
         Spirv.ContextDestroy(context);
         
-        GrabsLog.Log(GrabsLog.Severity.Verbose, strResult);
+        //GrabsLog.Log(GrabsLog.Severity.Verbose, strResult);
+        StringBuilder builder = new StringBuilder();
+        int lineNum = 1;
+        foreach (string line in strResult.Split('\n'))
+        {
+            builder.AppendLine($"{lineNum++}: {line}");
+        }
+        
+        GrabsLog.Log(GrabsLog.Severity.Verbose, builder.ToString());
 
         return strResult;
     }
