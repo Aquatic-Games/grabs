@@ -5,11 +5,17 @@ using grabs.Graphics;
 using grabs.Graphics.Vulkan;
 using grabs.Tests;
 using grabs.Tests.Tests;
+using Silk.NET.Core.Native;
 using Silk.NET.SDL;
+using Silk.NET.Vulkan;
+using Device = grabs.Graphics.Device;
+using Event = Silk.NET.SDL.Event;
+using Instance = grabs.Graphics.Instance;
+using Surface = grabs.Graphics.Surface;
 
 GrabsLog.LogMessage += (type, message) => Console.WriteLine($"[{type}] {message}");
 
-GraphicsApi api = 0;
+/*GraphicsApi api = 0;
 
 unsafe
 {
@@ -78,7 +84,7 @@ unsafe
 using TestBase test = new CubeTest();
 test.Run(api, new Size(1280, 720));
 
-return;
+return;*/
 
 unsafe
 {
@@ -105,6 +111,17 @@ unsafe
     Adapter[] adapters = instance.EnumerateAdapters();
     Console.WriteLine($"Adapters:\n{string.Join("\n", adapters)}");
 
+    SurfaceKHR vkSurface;
+    sdl.VulkanCreateSurface(window, new VkHandle(((VkInstance) instance).Instance.Handle),
+        (VkNonDispatchableHandle*) &vkSurface);
+
+    Surface surface = new VkSurface((VkInstance) instance, vkSurface);
+
+    Device device = instance.CreateDevice(surface);
+
+    Swapchain swapchain =
+        device.CreateSwapchain(new SwapchainDescription(width, height, bufferCount: 4, presentMode: PresentMode.VerticalSync));
+
     bool alive = true;
     while (alive)
     {
@@ -128,6 +145,9 @@ unsafe
         }
     }
     
+    swapchain.Dispose();
+    device.Dispose();
+    surface.Dispose();
     instance.Dispose();
     
     sdl.DestroyWindow(window);

@@ -6,11 +6,11 @@ using System.Reflection;
 using grabs.Core;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.EXT;
-using static grabs.Graphics.Vulkan.VkUtils;
+using static grabs.Graphics.Vulkan.VkResult;
 
 namespace grabs.Graphics.Vulkan;
 
-public unsafe class VkInstance : Instance
+public sealed unsafe class VkInstance : Instance
 {
     public readonly Vk Vk;
 
@@ -106,7 +106,7 @@ public unsafe class VkInstance : Instance
         else
             device = pDevices[0];
 
-        return new VkDevice(Vk, device, (VkSurface) surface);
+        return new VkDevice(Vk, Instance, device, (VkSurface) surface);
     }
 
     public override Adapter[] EnumerateAdapters()
