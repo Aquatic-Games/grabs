@@ -25,6 +25,8 @@ public sealed unsafe class VkDevice : Device
     public readonly Queue GraphicsQueue;
     public readonly Queue PresentQueue;
 
+    public readonly CommandPool CommandPool;
+
     public VkDevice(Vk vk, VulkanInstance instance, PhysicalDevice pDevice, VkSurface surface)
     {
         _vk = vk;
@@ -103,6 +105,15 @@ public sealed unsafe class VkDevice : Device
 
         _vk.GetDeviceQueue(Device, GraphicsQueueIndex, 0, out GraphicsQueue);
         _vk.GetDeviceQueue(Device, PresentQueueIndex, 0, out PresentQueue);
+
+        CommandPoolCreateInfo commandPoolInfo = new CommandPoolCreateInfo()
+        {
+            SType = StructureType.CommandPoolCreateInfo,
+            QueueFamilyIndex = PresentQueueIndex,
+            Flags = CommandPoolCreateFlags.ResetCommandBufferBit
+        };
+        
+        CheckResult(_vk.CreateCommandPool(Device, &commandPoolInfo, null, out CommandPool));
     }
     
     public override Swapchain CreateSwapchain(in SwapchainDescription description)
@@ -112,7 +123,7 @@ public sealed unsafe class VkDevice : Device
 
     public override CommandList CreateCommandList()
     {
-        throw new NotImplementedException();
+        return new VkCommandList(_vk, Device, CommandPool);
     }
 
     public override Pipeline CreatePipeline(in PipelineDescription description)
@@ -189,6 +200,7 @@ public sealed unsafe class VkDevice : Device
     public override void Dispose()
     {
         CheckResult(_vk.DeviceWaitIdle(Device));
+        _vk.DestroyCommandPool(Device, CommandPool, null);
         KhrSwapchain.Dispose();
         _vk.DestroyDevice(Device, null);
     }

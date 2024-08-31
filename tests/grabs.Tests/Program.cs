@@ -122,6 +122,8 @@ unsafe
     Swapchain swapchain =
         device.CreateSwapchain(new SwapchainDescription(width, height, bufferCount: 4, presentMode: PresentMode.VerticalSync));
 
+    CommandList commandList = device.CreateCommandList();
+
     bool alive = true;
     while (alive)
     {
@@ -144,9 +146,10 @@ unsafe
             }
         }
         
-        swapchain.Present();
+        //swapchain.Present();
     }
     
+    commandList.Dispose();
     swapchain.Dispose();
     device.Dispose();
     surface.Dispose();
