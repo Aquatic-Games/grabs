@@ -143,6 +143,8 @@ unsafe
                 }
             }
         }
+        
+        swapchain.Present();
     }
     
     swapchain.Dispose();

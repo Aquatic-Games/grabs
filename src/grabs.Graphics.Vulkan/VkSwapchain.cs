@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.KHR;
 using static grabs.Graphics.Vulkan.VkResult;
@@ -8,8 +9,16 @@ public sealed unsafe class VkSwapchain : Swapchain
 {
     private readonly Vk _vk;
     private readonly VulkanDevice _device;
-    private readonly Queue _presentQueue;
+    
     private readonly KhrSwapchain _khrSwapchain;
+    
+    private readonly Queue _graphicsQueue;
+    private readonly Queue _presentQueue;
+
+    private readonly Semaphore _presentSemaphore;
+    private readonly Semaphore _renderSemaphore;
+
+    private readonly Fence _waitFence;
 
     public readonly SwapchainKHR Swapchain;
     
@@ -19,8 +28,10 @@ public sealed unsafe class VkSwapchain : Swapchain
     {
         _vk = vk;
         _device = device.Device;
-        _presentQueue = device.PresentQueue;
         _khrSwapchain = device.KhrSwapchain;
+        
+        _graphicsQueue = device.GraphicsQueue;
+        _presentQueue = device.PresentQueue;
 
         SwapchainCreateInfoKHR swapchainCreateInfo = new SwapchainCreateInfoKHR()
         {
@@ -50,6 +61,22 @@ public sealed unsafe class VkSwapchain : Swapchain
         }
         
         CheckResult(_khrSwapchain.CreateSwapchain(_device, &swapchainCreateInfo, null, out Swapchain), "Create swapchain");
+
+        SemaphoreCreateInfo semaphoreInfo = new SemaphoreCreateInfo()
+        {
+            SType = StructureType.SemaphoreCreateInfo
+        };
+        
+        CheckResult(_vk.CreateSemaphore(_device, &semaphoreInfo, null, out _presentSemaphore), "Create present semaphore");
+        CheckResult(_vk.CreateSemaphore(_device, &semaphoreInfo, null, out _renderSemaphore), "Create render semaphore");
+
+        FenceCreateInfo fenceInfo = new FenceCreateInfo()
+        {
+            SType = StructureType.FenceCreateInfo,
+            Flags = FenceCreateFlags.SignaledBit
+        };
+        
+        CheckResult(_vk.CreateFence(_device, &fenceInfo, null, out _waitFence), "Create wait fence");
     }
     
     public override Texture GetSwapchainTexture()
@@ -64,17 +91,55 @@ public sealed unsafe class VkSwapchain : Swapchain
 
     public override void Present()
     {
+        _vk.WaitForFences(_device, 1, in _waitFence, true, ulong.MaxValue);
+        _vk.ResetFences(_device, 1, in _waitFence);
+
+        uint imageIndex;
+        CheckResult(_khrSwapchain.AcquireNextImage(_device, Swapchain, ulong.MaxValue, _presentSemaphore, new Fence(), &imageIndex), "Acquire next image");
+
+        PipelineStageFlags waitStage = PipelineStageFlags.ColorAttachmentOutputBit;
+
+        Semaphore presentSemaphore = _presentSemaphore;
+        Semaphore renderSemaphore = _renderSemaphore;
+        SwapchainKHR swapchain = Swapchain;
+
+        SubmitInfo submitInfo = new SubmitInfo()
+        {
+            SType = StructureType.SubmitInfo,
+            PWaitDstStageMask = &waitStage,
+
+            CommandBufferCount = 0,
+
+            WaitSemaphoreCount = 1,
+            PWaitSemaphores = &presentSemaphore,
+
+            SignalSemaphoreCount = 1,
+            PSignalSemaphores = &renderSemaphore
+        };
+
+        CheckResult(_vk.QueueSubmit(_graphicsQueue, 1, &submitInfo, _waitFence));
+
         PresentInfoKHR presentInfo = new PresentInfoKHR()
         {
             SType = StructureType.PresentInfoKhr,
-            
-        }
+
+            WaitSemaphoreCount = 1,
+            PWaitSemaphores = &renderSemaphore,
+
+            SwapchainCount = 1,
+            PSwapchains = &swapchain,
+            PImageIndices = &imageIndex
+        };
         
-        _khrSwapchain.QueuePresent(_presentQueue, )
+        CheckResult(_khrSwapchain.QueuePresent(_presentQueue, &presentInfo), "Present");
     }
 
     public override void Dispose()
     {
+        _vk.DestroyFence(_device, _waitFence, null);
+        _vk.DestroySemaphore(_device, _renderSemaphore, null);
+        _vk.DestroySemaphore(_device, _presentSemaphore, null);
+        
         _khrSwapchain.DestroySwapchain(_device, Swapchain, null);
     }
 }
