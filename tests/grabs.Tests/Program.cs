@@ -12,6 +12,7 @@ using Device = grabs.Graphics.Device;
 using Event = Silk.NET.SDL.Event;
 using Instance = grabs.Graphics.Instance;
 using Surface = grabs.Graphics.Surface;
+using Texture = grabs.Graphics.Texture;
 
 GrabsLog.LogMessage += (type, message) => Console.WriteLine($"[{type}] {message}");
 
@@ -122,6 +123,8 @@ unsafe
     Swapchain swapchain =
         device.CreateSwapchain(new SwapchainDescription(width, height, bufferCount: 4, presentMode: PresentMode.VerticalSync));
 
+    Texture swapchainTexture = swapchain.GetSwapchainTexture();
+
     CommandList commandList = device.CreateCommandList();
 
     bool alive = true;
@@ -150,6 +153,7 @@ unsafe
     }
     
     commandList.Dispose();
+    swapchainTexture.Dispose();
     swapchain.Dispose();
     device.Dispose();
     surface.Dispose();

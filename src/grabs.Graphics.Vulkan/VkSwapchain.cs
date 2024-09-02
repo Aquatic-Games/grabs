@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.CompilerServices;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.KHR;
@@ -9,6 +10,10 @@ public sealed unsafe class VkSwapchain : Swapchain
 {
     private readonly Vk _vk;
     private readonly VulkanDevice _device;
+
+    private readonly Format _format;
+    private uint _width;
+    private uint _height;
     
     private readonly KhrSwapchain _khrSwapchain;
     
@@ -32,6 +37,10 @@ public sealed unsafe class VkSwapchain : Swapchain
         
         _graphicsQueue = device.GraphicsQueue;
         _presentQueue = device.PresentQueue;
+
+        _format = description.Format;
+        _width = description.Width;
+        _height = description.Height;
 
         SwapchainCreateInfoKHR swapchainCreateInfo = new SwapchainCreateInfoKHR()
         {
@@ -81,7 +90,13 @@ public sealed unsafe class VkSwapchain : Swapchain
     
     public override Texture GetSwapchainTexture()
     {
-        throw new System.NotImplementedException();
+        uint numImages;
+        _khrSwapchain.GetSwapchainImages(_device, Swapchain, &numImages, null);
+        Span<Image> images = stackalloc Image[(int) numImages];
+        fixed (Image* pImages = images)
+            _khrSwapchain.GetSwapchainImages(_device, Swapchain, &numImages, pImages);
+
+        return new VkSwapchainTexture(_vk, _device, images, _format, _width, _height);
     }
 
     public override void Resize(uint width, uint height)
