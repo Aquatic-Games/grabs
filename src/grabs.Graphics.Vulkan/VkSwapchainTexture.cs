@@ -56,7 +56,7 @@ public sealed unsafe class VkSwapchainTexture : Texture
     
     public override void Dispose()
     {
-        for (int i = 0; i < Images.Length; i++)
+        for (int i = 0; i < Views.Length; i++)
             _vk.DestroyImageView(_device, Views[i], null);
         
         // Cannot destroy the actual images themselves as they are owned by the swapchain.

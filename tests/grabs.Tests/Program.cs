@@ -10,6 +10,7 @@ using Silk.NET.SDL;
 using Silk.NET.Vulkan;
 using Device = grabs.Graphics.Device;
 using Event = Silk.NET.SDL.Event;
+using Framebuffer = grabs.Graphics.Framebuffer;
 using Instance = grabs.Graphics.Instance;
 using Surface = grabs.Graphics.Surface;
 using Texture = grabs.Graphics.Texture;
@@ -124,6 +125,7 @@ unsafe
         device.CreateSwapchain(new SwapchainDescription(width, height, bufferCount: 4, presentMode: PresentMode.VerticalSync));
 
     Texture swapchainTexture = swapchain.GetSwapchainTexture();
+    Framebuffer swapchainFramebuffer = device.CreateFramebuffer(swapchainTexture);
 
     CommandList commandList = device.CreateCommandList();
 
@@ -153,6 +155,7 @@ unsafe
     }
     
     commandList.Dispose();
+    swapchainFramebuffer.Dispose();
     swapchainTexture.Dispose();
     swapchain.Dispose();
     device.Dispose();

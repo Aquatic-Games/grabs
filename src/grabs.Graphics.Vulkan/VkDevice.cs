@@ -149,6 +149,9 @@ public sealed unsafe class VkDevice : Device
 
     public override Framebuffer CreateFramebuffer(in ReadOnlySpan<Texture> colorTextures, Texture depthTexture = null)
     {
+        if (colorTextures[0] is VkSwapchainTexture swapchainTexture)
+            return new VkSwapchainFramebuffer(swapchainTexture);
+
         throw new NotImplementedException();
     }
 
