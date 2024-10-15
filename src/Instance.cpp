@@ -4,6 +4,6 @@
 
 namespace grabs {
     std::unique_ptr<Instance> Instance::Create(const InstanceInfo& info) {
-        return std::make_unique<Vk::VulkanInstance>();
+        return std::make_unique<Vk::VulkanInstance>(info);
     }
 }

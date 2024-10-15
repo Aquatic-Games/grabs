@@ -10,7 +10,7 @@ namespace grabs::Vk {
     public:
         VkInstance Instance;
 
-        VulkanInstance(bool debug);
+        VulkanInstance(const InstanceInfo& info);
         ~VulkanInstance();
     };
 

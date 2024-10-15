@@ -8,7 +8,10 @@ add_library(grabs STATIC
         src/Instance.cpp
         include/grabs/Common.h
         src/Vk/VulkanInstance.cpp
-        src/Vk/VulkanInstance.h)
+        src/Vk/VulkanInstance.h
+        src/Common.h
+        src/Vk/VkUtils.h
+        src/Vk/VkUtils.cpp)
 
 target_include_directories(grabs PUBLIC include/)
 

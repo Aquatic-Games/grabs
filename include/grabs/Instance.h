@@ -1,12 +1,13 @@
 ﻿#pragma once
 
 #include <memory>
+#include <cstdint>
 
 namespace grabs {
 
     struct InstanceInfo {
         bool Debug;
-        const char** (*GetInstanceExtensions)();
+        const char** (*GetInstanceExtensions)(uint32_t* numExtensions);
         void* (*CreateSurface)();
 
         InstanceInfo() {
