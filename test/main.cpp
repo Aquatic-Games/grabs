@@ -40,6 +40,11 @@ int main(int argc, char* argv[]) {
 
     auto instance = Instance::Create(info);
 
+    auto adapters = instance->EnumerateAdapters();
+    for (const auto& adapter : adapters) {
+        std::cout << adapter.Name << " - " << adapter.Memory / 1024 / 1024 << "MB" << std::endl;
+    }
+
     SDL_DestroyWindow(window);
     SDL_Quit();
 

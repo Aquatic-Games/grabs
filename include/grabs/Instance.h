@@ -5,6 +5,8 @@
 #include <vector>
 #include <functional>
 
+#include "Common.h"
+
 namespace grabs {
 
     struct InstanceInfo {
@@ -15,6 +17,10 @@ namespace grabs {
 
     class Instance {
     public:
+        virtual ~Instance() = default;
+
+        virtual std::vector<Adapter> EnumerateAdapters() = 0;
+
         static std::unique_ptr<Instance> Create(const InstanceInfo& info = {});
     };
 

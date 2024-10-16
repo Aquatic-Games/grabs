@@ -11,7 +11,9 @@ namespace grabs::Vk {
         VkInstance Instance;
 
         explicit VulkanInstance(const InstanceInfo& info);
-        ~VulkanInstance();
+        ~VulkanInstance() override;
+
+        std::vector<Adapter> EnumerateAdapters() override;
     };
 
 }

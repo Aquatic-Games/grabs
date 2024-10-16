@@ -41,4 +41,46 @@ namespace grabs::Vk {
     VulkanInstance::~VulkanInstance() {
         vkDestroyInstance(Instance, nullptr);
     }
+
+    std::vector<Adapter> VulkanInstance::EnumerateAdapters() {
+        uint32_t numDevices;
+        vkEnumeratePhysicalDevices(Instance, &numDevices, nullptr);
+        std::vector<VkPhysicalDevice> devices(numDevices);
+        vkEnumeratePhysicalDevices(Instance, &numDevices, devices.data());
+
+        std::vector<Adapter> adapters;
+
+        for (uint32_t i = 0; i < numDevices; i++) {
+            auto device = devices[i];
+
+            VkPhysicalDeviceProperties props;
+            VkPhysicalDeviceFeatures features;
+            VkPhysicalDeviceMemoryProperties mem;
+            vkGetPhysicalDeviceProperties(device, &props);
+            vkGetPhysicalDeviceFeatures(device, &features);
+            vkGetPhysicalDeviceMemoryProperties(device, &mem);
+
+            uint64_t memory = 0;
+            if (mem.memoryHeapCount > 0) {
+                memory = mem.memoryHeaps[0].size;
+            }
+
+            AdapterSupports supports {
+                .GeometryShader = static_cast<bool>(features.geometryShader),
+                .Anisotropy = static_cast<bool>(features.samplerAnisotropy),
+                .MaxAnisotropy = props.limits.maxSamplerAnisotropy
+            };
+
+            Adapter adapter {
+                .Index = i,
+                .Name = std::string(props.deviceName),
+                .Memory = memory,
+                .Supports = supports
+            };
+
+            adapters.push_back(adapter);
+        }
+
+        return adapters;
+    }
 }
