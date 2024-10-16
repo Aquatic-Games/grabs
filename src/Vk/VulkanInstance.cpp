@@ -2,8 +2,20 @@
 #include "../Common.h"
 
 #include <vector>
+#include <iostream>
+#include <stdexcept>
 
 #include "VkUtils.h"
+
+VkBool32 DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+                       VkDebugUtilsMessageTypeFlagsEXT messageTypes,
+                       const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
+    if ((messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
+        throw std::runtime_error("Vulkan error: " + std::string(pCallbackData->pMessage));
+    }
+
+    std::cout << pCallbackData->pMessage << std::endl;
+}
 
 namespace grabs::Vk {
     VulkanInstance::VulkanInstance(const InstanceInfo& info) {
@@ -23,6 +35,7 @@ namespace grabs::Vk {
 
         std::vector<const char*> layers;
         if (info.Debug) {
+            extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
             layers.push_back("VK_LAYER_KHRONOS_validation");
         }
 
@@ -36,9 +49,26 @@ namespace grabs::Vk {
         };
 
         CHECK_RESULT(vkCreateInstance(&instanceInfo, nullptr, &Instance));
+
+        if (info.Debug) {
+            VkDebugUtilsMessengerCreateInfoEXT createInfo {
+                .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+                .messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+                .messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+                .pfnUserCallback = DebugCallback,
+            };
+
+            const auto createDebugMessenger = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(Instance, "vkCreateDebugUtilsMessengerEXT"));
+            CHECK_RESULT(createDebugMessenger(Instance, &createInfo, nullptr, &DebugMessenger));
+        }
     }
 
     VulkanInstance::~VulkanInstance() {
+        if (DebugMessenger) {
+            const auto destroyDebugMessenger = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(Instance, "vkDestroyDebugUtilsMessengerEXT"));
+            destroyDebugMessenger(Instance, DebugMessenger, nullptr);
+        }
+
         vkDestroyInstance(Instance, nullptr);
     }
 

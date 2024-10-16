@@ -9,6 +9,7 @@ namespace grabs::Vk {
     class VulkanInstance : public Instance {
     public:
         VkInstance Instance;
+        VkDebugUtilsMessengerEXT DebugMessenger;
 
         explicit VulkanInstance(const InstanceInfo& info);
         ~VulkanInstance() override;
