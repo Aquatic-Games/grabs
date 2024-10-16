@@ -9,7 +9,7 @@
 { \
     VkResult res = (result); \
     if (res != VK_SUCCESS) { \
-        throw std::runtime_error(std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": Vulkan operation failed with error: " + grabs::Vk::Utils::ResultToString(res)); \
+        throw std::runtime_error(std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " + std::string(__FUNCTION__) + " failed with error: " + grabs::Vk::Utils::ResultToString(res)); \
     } \
 }
 

@@ -12,8 +12,8 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    const int width = 1280;
-    const int height = 720;
+    constexpr int width = 1280;
+    constexpr int height = 720;
 
     SDL_Window* window = SDL_CreateWindow("Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_VULKAN);
 
@@ -30,11 +30,6 @@ int main(int argc, char* argv[]) {
             std::vector<const char*> extensions(numExtensions);
             SDL_Vulkan_GetInstanceExtensions(window, &numExtensions, extensions.data());
             return extensions;
-        },
-        .CreateSurface = [window](void* instance) {
-            VkSurfaceKHR surface;
-            SDL_Vulkan_CreateSurface(window, static_cast<VkInstance>(instance), &surface);
-            return surface;
         }
     };
 
@@ -43,6 +38,33 @@ int main(int argc, char* argv[]) {
     auto adapters = instance->EnumerateAdapters();
     for (const auto& adapter : adapters) {
         std::cout << adapter.Name << " - " << adapter.Memory / 1024 / 1024 << "MB" << std::endl;
+    }
+
+    auto surface = std::make_unique<VulkanSurface>([window](void* vkInstance) {
+        VkSurfaceKHR surface;
+        SDL_Vulkan_CreateSurface(window, static_cast<VkInstance>(vkInstance), &surface);
+        return surface;
+    });
+
+    auto device = instance->CreateDevice(surface.get());
+
+    bool alive = true;
+    while (alive) {
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            switch (event.type) {
+                case SDL_WINDOWEVENT: {
+                    switch (event.window.event) {
+                        case SDL_WINDOWEVENT_CLOSE: {
+                            alive = false;
+                            break;
+                        }
+                    }
+
+                    break;
+                }
+            }
+        }
     }
 
     SDL_DestroyWindow(window);

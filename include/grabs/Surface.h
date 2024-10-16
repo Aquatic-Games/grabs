@@ -1,14 +1,21 @@
 ﻿#pragma once
 
+#include <functional>
+
 namespace grabs {
 
     class Surface {
-
+    public:
+        virtual ~Surface() = default;
     };
 
-    class VulkanSurface : public Surface {
+    class VulkanSurface final : public Surface {
     public:
-        void* VkSurface;
+        explicit VulkanSurface(const std::function<void*(void* instance)>& createSurfaceFn) {
+            CreateSurfaceFn = createSurfaceFn;
+        }
+
+        std::function<void*(void* instance)> CreateSurfaceFn;
     };
 
 }

@@ -14,6 +14,8 @@ namespace grabs::Vk {
         explicit VulkanInstance(const InstanceInfo& info);
         ~VulkanInstance() override;
 
+        std::unique_ptr<Device> CreateDevice(Surface* surface, uint32_t adapterIndex) override;
+
         std::vector<Adapter> EnumerateAdapters() override;
     };
 

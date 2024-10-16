@@ -3,6 +3,9 @@
 #include <optional>
 #include <stdexcept>
 #include <vector>
+#include <set>
+
+#include "VkUtils.h"
 
 namespace grabs::Vk {
     VulkanDevice::VulkanDevice(VkInstance instance, VulkanSurface* surface, uint32_t adapterIndex) {
@@ -21,7 +24,7 @@ namespace grabs::Vk {
         std::optional<uint32_t> graphicsQueue;
         std::optional<uint32_t> presentQueue;
 
-        auto surfaceKhr = static_cast<VkSurfaceKHR>(surface->VkSurface);
+        auto surfaceKhr = static_cast<VkSurfaceKHR>(surface->CreateSurfaceFn(instance));
 
         for (auto i = 0; i < numFamilies; i++) {
             if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
@@ -56,15 +59,41 @@ namespace grabs::Vk {
             throw std::runtime_error("Vulkan: " + unavailableQueue + " queue not available on the current adapter." );
         }
 
+        GraphicsQueueIndex = graphicsQueue.value();
+        PresentQueueIndex = presentQueue.value();
+
+        std::set uniqueFamilies { GraphicsQueueIndex, PresentQueueIndex };
+
+        std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+
+        float queuePriority = 1.0f;
+        for (const auto family : uniqueFamilies) {
+            VkDeviceQueueCreateInfo createInfo {
+                .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+                .queueFamilyIndex = family,
+                .queueCount = 1,
+                .pQueuePriorities = &queuePriority
+            };
+
+            queueCreateInfos.push_back(createInfo);
+        }
+
+        VkPhysicalDeviceFeatures features;
+        vkGetPhysicalDeviceFeatures(device, &features);
+
         VkDeviceCreateInfo createInfo {
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-            .queueCreateInfoCount = ,
-            .pQueueCreateInfos = ,
-            .enabledLayerCount = ,
-            .ppEnabledLayerNames = ,
-            .enabledExtensionCount = ,
-            .ppEnabledExtensionNames = ,
-            .pEnabledFeatures =
+            .queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size()),
+            .pQueueCreateInfos = queueCreateInfos.data(),
+            //.enabledExtensionCount = ,
+            //.ppEnabledExtensionNames = ,
+            .pEnabledFeatures = &features
         };
+
+        CHECK_RESULT(vkCreateDevice(device, &createInfo, nullptr, &Device));
+    }
+
+    VulkanDevice::~VulkanDevice() {
+        vkDestroyDevice(Device, nullptr);
     }
 }

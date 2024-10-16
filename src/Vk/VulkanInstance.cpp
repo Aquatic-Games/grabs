@@ -1,11 +1,12 @@
 ﻿#include "VulkanInstance.h"
-#include "../Common.h"
 
 #include <vector>
 #include <iostream>
 #include <stdexcept>
 
+#include "../Common.h"
 #include "VkUtils.h"
+#include "VulkanDevice.h"
 
 VkBool32 DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
                        VkDebugUtilsMessageTypeFlagsEXT messageTypes,
@@ -15,11 +16,12 @@ VkBool32 DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
     }
 
     std::cout << pCallbackData->pMessage << std::endl;
+
+    return VK_TRUE;
 }
 
 namespace grabs::Vk {
     VulkanInstance::VulkanInstance(const InstanceInfo& info) {
-        NULL_CHECK(info.CreateSurface);
         NULL_CHECK(info.GetInstanceExtensions);
 
         VkApplicationInfo appInfo {
@@ -70,6 +72,14 @@ namespace grabs::Vk {
         }
 
         vkDestroyInstance(Instance, nullptr);
+    }
+
+    std::unique_ptr<Device> VulkanInstance::CreateDevice(Surface* surface, uint32_t adapterIndex) {
+        NULL_CHECK(surface);
+
+        auto vkSurface = dynamic_cast<VulkanSurface*>(surface);
+
+        return std::make_unique<VulkanDevice>(Instance, vkSurface, adapterIndex);
     }
 
     std::vector<Adapter> VulkanInstance::EnumerateAdapters() {

@@ -11,6 +11,9 @@ namespace grabs::Vk {
     public:
         VkDevice Device;
 
+        uint32_t GraphicsQueueIndex;
+        uint32_t PresentQueueIndex;
+
         VulkanDevice(VkInstance instance, VulkanSurface* surface, uint32_t adapterIndex);
         ~VulkanDevice() override;
     };

@@ -14,14 +14,17 @@ namespace grabs {
     struct InstanceInfo {
         bool Debug;
         std::function<std::vector<const char*>()> GetInstanceExtensions;
-        std::function<void*(void* instance)> CreateSurface;
     };
 
     class Instance {
     public:
         virtual ~Instance() = default;
 
-        virtual std::unique_ptr<Device> CreateDevice(Surface* surface, uint32_t adapterIndex = 0);
+        virtual std::unique_ptr<Device> CreateDevice(Surface* surface, uint32_t adapterIndex) = 0;
+
+        std::unique_ptr<Device> CreateDevice(Surface* surface) {
+            return CreateDevice(surface, 0);
+        }
 
         virtual std::vector<Adapter> EnumerateAdapters() = 0;
 
