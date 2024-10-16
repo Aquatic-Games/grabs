@@ -11,7 +11,11 @@ add_library(grabs STATIC
         src/Vk/VulkanInstance.h
         src/Common.h
         src/Vk/VkUtils.h
-        src/Vk/VkUtils.cpp)
+        src/Vk/VkUtils.cpp
+        include/grabs/Device.h
+        src/Vk/VulkanDevice.cpp
+        src/Vk/VulkanDevice.h
+        include/grabs/Surface.h)
 
 target_include_directories(grabs PUBLIC include/)
 

@@ -6,6 +6,8 @@
 #include <functional>
 
 #include "Common.h"
+#include "Device.h"
+#include "Surface.h"
 
 namespace grabs {
 
@@ -18,6 +20,8 @@ namespace grabs {
     class Instance {
     public:
         virtual ~Instance() = default;
+
+        virtual std::unique_ptr<Device> CreateDevice(Surface* surface, uint32_t adapterIndex = 0);
 
         virtual std::vector<Adapter> EnumerateAdapters() = 0;
 
