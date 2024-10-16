@@ -17,5 +17,11 @@ target_include_directories(grabs PUBLIC include/)
 
 # ---------- Vulkan ----------
 find_package(Vulkan REQUIRED)
-target_link_libraries(grabs PUBLIC vulkan)
+target_link_libraries(grabs PUBLIC ${Vulkan_LIBRARIES})
 target_include_directories(grabs PUBLIC ${Vulkan_INCLUDE_DIR})
+
+# ----- Test -----
+add_executable(grabsTest test/main.cpp)
+target_link_libraries(grabsTest PUBLIC grabs)
+target_link_libraries(grabsTest PUBLIC C:/VulkanSDK/1.3.296.0/Lib/SDL2main.lib)
+target_link_libraries(grabsTest PUBLIC C:/VulkanSDK/1.3.296.0/Lib/SDL2.lib)

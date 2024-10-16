@@ -2,19 +2,15 @@
 
 #include <memory>
 #include <cstdint>
+#include <vector>
+#include <functional>
 
 namespace grabs {
 
     struct InstanceInfo {
         bool Debug;
-        const char** (*GetInstanceExtensions)(uint32_t* numExtensions);
-        void* (*CreateSurface)();
-
-        InstanceInfo() {
-            Debug = false;
-            CreateSurface = nullptr;
-            GetInstanceExtensions = nullptr;
-        }
+        std::function<std::vector<const char*>()> GetInstanceExtensions;
+        std::function<void*(void* instance)> CreateSurface;
     };
 
     class Instance {

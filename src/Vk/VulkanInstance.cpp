@@ -16,16 +16,10 @@ namespace grabs::Vk {
             .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
             .pEngineName = "GRABS",
             .engineVersion = VK_MAKE_VERSION(1, 0, 0),
-            .apiVersion = VK_VERSION_1_3
+            .apiVersion = VK_API_VERSION_1_3
         };
 
-        uint32_t extCount;
-        auto ext = info.GetInstanceExtensions(&extCount);
-
-        std::vector<const char*> extensions;
-        for (int i = 0; i < extCount; i++) {
-            extensions.push_back(ext[i]);
-        }
+        auto extensions = info.GetInstanceExtensions();
 
         std::vector<const char*> layers;
         if (info.Debug) {
@@ -42,5 +36,9 @@ namespace grabs::Vk {
         };
 
         CHECK_RESULT(vkCreateInstance(&instanceInfo, nullptr, &Instance));
+    }
+
+    VulkanInstance::~VulkanInstance() {
+        vkDestroyInstance(Instance, nullptr);
     }
 }
