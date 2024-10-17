@@ -91,9 +91,16 @@ namespace grabs::Vk {
         };
 
         CHECK_RESULT(vkCreateDevice(device, &createInfo, nullptr, &Device));
+
+        vkGetDeviceQueue(Device, GraphicsQueueIndex, 0, &GraphicsQueue);
+        vkGetDeviceQueue(Device, PresentQueueIndex, 0, &PresentQueue);
     }
 
     VulkanDevice::~VulkanDevice() {
         vkDestroyDevice(Device, nullptr);
+    }
+
+    std::unique_ptr<Swapchain> VulkanDevice::CreateSwapchain(const SwapchainDescription& description, Surface* surface) {
+
     }
 }
