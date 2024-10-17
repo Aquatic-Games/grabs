@@ -34,9 +34,9 @@ namespace grabs {
         B8G8R8A8_UNorm,
         B8G8R8A8_UNorm_SRGB,
 
-        R10G10B10A2_UNorm,
-        R10G10B10A2_UInt,
-        R11G11B10_Float,
+        //R10G10B10A2_UNorm,
+        //R10G10B10A2_UInt,
+        //R11G11B10_Float,
 
         R16_Float,
         D16_UNorm,

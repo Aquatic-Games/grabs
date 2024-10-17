@@ -5,6 +5,9 @@
 #include <string>
 #include <stdexcept>
 
+#include "grabs/Common.h"
+#include "grabs/Swapchain.h"
+
 #define CHECK_RESULT(result) \
 { \
     VkResult res = (result); \
@@ -16,4 +19,7 @@
 namespace grabs::Vk::Utils {
     std::string ResultToString(VkResult result);
 
+    VkFormat FormatToVk(Format format);
+
+    VkPresentModeKHR PresentModeToVk(PresentMode mode);
 }
