@@ -6,15 +6,19 @@
 #include <set>
 
 #include "VkUtils.h"
+#include "VulkanSwapchain.h"
 
 namespace grabs::Vk {
     VulkanDevice::VulkanDevice(VkInstance instance, VulkanSurface* surface, uint32_t adapterIndex) {
+        Instance = instance;
+
         uint32_t numDevices;
         vkEnumeratePhysicalDevices(instance, &numDevices, nullptr);
         std::vector<VkPhysicalDevice> devices(numDevices);
         vkEnumeratePhysicalDevices(instance, &numDevices, devices.data());
 
         VkPhysicalDevice device = devices[adapterIndex];
+        PhysicalDevice = device;
 
         uint32_t numFamilies;
         vkGetPhysicalDeviceQueueFamilyProperties(device, &numFamilies, nullptr);
@@ -81,12 +85,15 @@ namespace grabs::Vk {
         VkPhysicalDeviceFeatures features;
         vkGetPhysicalDeviceFeatures(device, &features);
 
+        std::vector<const char*> extensions;
+        extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+
         VkDeviceCreateInfo createInfo {
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
             .queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size()),
             .pQueueCreateInfos = queueCreateInfos.data(),
-            //.enabledExtensionCount = ,
-            //.ppEnabledExtensionNames = ,
+            .enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
+            .ppEnabledExtensionNames = extensions.data(),
             .pEnabledFeatures = &features
         };
 
@@ -101,6 +108,6 @@ namespace grabs::Vk {
     }
 
     std::unique_ptr<Swapchain> VulkanDevice::CreateSwapchain(const SwapchainDescription& description, Surface* surface) {
-
+        return std::make_unique<VulkanSwapchain>(Instance, PhysicalDevice, this, description, dynamic_cast<VulkanSurface*>(surface));
     }
 }

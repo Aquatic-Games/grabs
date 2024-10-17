@@ -9,6 +9,8 @@ namespace grabs::Vk {
 
     class VulkanDevice : public Device {
     public:
+        VkInstance Instance;
+        VkPhysicalDevice PhysicalDevice;
         VkDevice Device;
 
         uint32_t GraphicsQueueIndex;

@@ -48,6 +48,14 @@ int main(int argc, char* argv[]) {
 
     auto device = instance->CreateDevice(surface.get());
 
+    SwapchainDescription swapchainDesc {
+        .Size = { width, height },
+        .Format = Format::B8G8R8A8_UNorm,
+        .NumBuffers = 2,
+        .PresentMode = PresentMode::Fifo
+    };
+    auto swapchain = device->CreateSwapchain(swapchainDesc, surface.get());
+
     bool alive = true;
     while (alive) {
         SDL_Event event;
