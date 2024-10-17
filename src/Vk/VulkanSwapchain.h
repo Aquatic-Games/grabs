@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "grabs/Surface.h"
 #include "grabs/Swapchain.h"
+#include "VulkanSurface.h"
 
 namespace grabs::Vk {
 

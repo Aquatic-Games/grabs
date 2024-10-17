@@ -18,7 +18,9 @@ add_library(grabs STATIC
         include/grabs/Surface.h
         include/grabs/Swapchain.h
         src/Vk/VulkanSwapchain.cpp
-        src/Vk/VulkanSwapchain.h)
+        src/Vk/VulkanSwapchain.h
+        src/Vk/VulkanSurface.h
+        src/Surface.cpp)
 
 target_include_directories(grabs PUBLIC include/)
 

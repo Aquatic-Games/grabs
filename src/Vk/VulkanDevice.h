@@ -3,7 +3,7 @@
 #include <vulkan/vulkan.h>
 
 #include "grabs/Device.h"
-#include "grabs/Surface.h"
+#include "VulkanSurface.h"
 
 namespace grabs::Vk {
 

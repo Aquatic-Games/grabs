@@ -24,7 +24,7 @@ namespace grabs::Vk {
         std::optional<uint32_t> graphicsQueue;
         std::optional<uint32_t> presentQueue;
 
-        auto surfaceKhr = static_cast<VkSurfaceKHR>(surface->CreateSurfaceFn(instance));
+        auto surfaceKhr = surface->Surface;
 
         for (auto i = 0; i < numFamilies; i++) {
             if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {

@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
         std::cout << adapter.Name << " - " << adapter.Memory / 1024 / 1024 << "MB" << std::endl;
     }
 
-    auto surface = std::make_unique<VulkanSurface>([window](void* vkInstance) {
+    auto surface = Surface::Vulkan(instance.get(), [window](void* vkInstance) {
         VkSurfaceKHR surface;
         SDL_Vulkan_CreateSurface(window, static_cast<VkInstance>(vkInstance), &surface);
         return surface;
