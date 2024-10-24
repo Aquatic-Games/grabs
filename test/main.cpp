@@ -56,6 +56,8 @@ int main(int argc, char* argv[]) {
     };
     auto swapchain = device->CreateSwapchain(swapchainDesc, surface.get());
 
+    auto cl = device->CreateCommandList();
+
     bool alive = true;
     while (alive) {
         SDL_Event event;

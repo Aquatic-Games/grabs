@@ -6,6 +6,7 @@
 #include <set>
 
 #include "VkUtils.h"
+#include "VulkanCommandList.h"
 #include "VulkanSwapchain.h"
 
 namespace grabs::Vk {
@@ -101,13 +102,25 @@ namespace grabs::Vk {
 
         vkGetDeviceQueue(Device, GraphicsQueueIndex, 0, &GraphicsQueue);
         vkGetDeviceQueue(Device, PresentQueueIndex, 0, &PresentQueue);
+
+        VkCommandPoolCreateInfo commandPoolInfo {
+            .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+            .queueFamilyIndex = GraphicsQueueIndex
+        };
+
+        CHECK_RESULT(vkCreateCommandPool(Device, &commandPoolInfo, nullptr, &CommandPool));
     }
 
     VulkanDevice::~VulkanDevice() {
+        vkDestroyCommandPool(Device, CommandPool, nullptr);
         vkDestroyDevice(Device, nullptr);
     }
 
     std::unique_ptr<Swapchain> VulkanDevice::CreateSwapchain(const SwapchainDescription& description, Surface* surface) {
         return std::make_unique<VulkanSwapchain>(Instance, PhysicalDevice, this, description, dynamic_cast<VulkanSurface*>(surface));
+    }
+
+    std::unique_ptr<CommandList> VulkanDevice::CreateCommandList() {
+        return std::make_unique<VulkanCommandList>(Device, CommandPool);
     }
 }
