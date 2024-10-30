@@ -25,7 +25,6 @@ namespace grabs::Vk {
         ~VulkanDevice() override;
 
         std::unique_ptr<Swapchain> CreateSwapchain(const SwapchainDescription& description, Surface* surface) override;
-
         std::unique_ptr<CommandList> CreateCommandList() override;
     };
 

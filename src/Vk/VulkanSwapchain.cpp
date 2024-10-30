@@ -1,5 +1,7 @@
 ﻿#include "VulkanSwapchain.h"
 
+#include <algorithm>
+
 #include "VkUtils.h"
 
 namespace grabs::Vk {
@@ -9,8 +11,7 @@ namespace grabs::Vk {
         VkSurfaceCapabilitiesKHR surfaceCapabilities;
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physDevice, surface->Surface, &surfaceCapabilities);
 
-        uint32_t minImages = description.NumBuffers;
-        std::clamp(minImages, surfaceCapabilities.minImageCount, surfaceCapabilities.maxImageCount);
+        uint32_t minImages = std::clamp(description.NumBuffers, surfaceCapabilities.minImageCount, surfaceCapabilities.maxImageCount);
 
         VkFormat format = Utils::FormatToVk(description.Format);
         VkPresentModeKHR presentMode = Utils::PresentModeToVk(description.PresentMode);
