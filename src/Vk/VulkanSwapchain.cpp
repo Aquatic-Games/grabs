@@ -38,9 +38,53 @@ namespace grabs::Vk {
         };
 
         CHECK_RESULT(vkCreateSwapchainKHR(Device, &swapchainCreateInfo, nullptr, &Swapchain));
+
+        uint32_t numImages;
+        CHECK_RESULT(vkGetSwapchainImagesKHR(Device, Swapchain, &numImages, nullptr));
+        std::vector<VkImage> swapchainImages(numImages);
+        CHECK_RESULT(vkGetSwapchainImagesKHR(Device, Swapchain, &numImages, swapchainImages.data()));
+
+        for (const auto image : swapchainImages) {
+            VkImageViewCreateInfo info {
+                .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+                .image = image,
+                .viewType = VK_IMAGE_VIEW_TYPE_2D,
+                .format = swapchainCreateInfo.imageFormat,
+                .components = {
+                    .r = VK_COMPONENT_SWIZZLE_IDENTITY,
+                    .g = VK_COMPONENT_SWIZZLE_IDENTITY,
+                    .b = VK_COMPONENT_SWIZZLE_IDENTITY,
+                    .a = VK_COMPONENT_SWIZZLE_IDENTITY
+                },
+                .subresourceRange = {
+                    .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                    .baseMipLevel = 0,
+                    .levelCount = 1,
+                    .baseArrayLayer = 0,
+                    .layerCount = 1
+                }
+            };
+
+            VkImageView view;
+            CHECK_RESULT(vkCreateImageView(Device, &info, nullptr, &view));
+
+            SwapchainViews.push_back(view);
+        }
     }
 
     VulkanSwapchain::~VulkanSwapchain() {
+        for (const auto view : SwapchainViews) {
+            vkDestroyImageView(Device, view, nullptr);
+        }
+
         vkDestroySwapchainKHR(Device, Swapchain, nullptr);
+    }
+
+    Texture* VulkanSwapchain::GetNextTexture() {
+        return nullptr;
+    }
+
+    void VulkanSwapchain::Present() {
+
     }
 }

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Common.h"
+#include "Texture.h"
 
 namespace grabs {
 
@@ -11,7 +12,7 @@ namespace grabs {
     };
 
     struct SwapchainDescription {
-        Size Size;
+        Size2D Size;
         Format Format;
         uint32_t NumBuffers;
         PresentMode PresentMode;
@@ -20,6 +21,10 @@ namespace grabs {
     class Swapchain {
     public:
         virtual ~Swapchain() = default;
+
+        virtual Texture* GetNextTexture() = 0;
+
+        virtual void Present() = 0;
     };
 
 }

@@ -5,9 +5,15 @@
 
 namespace grabs {
 
-    struct Size {
+    struct Size2D {
         uint32_t Width;
         uint32_t Height;
+    };
+
+    struct Size3D {
+        uint32_t Width;
+        uint32_t Height;
+        uint32_t Depth;
     };
 
     enum class Format {

@@ -142,7 +142,7 @@ namespace grabs::Vk::Utils {
             case Format::BC2_UNorm:
                 return VK_FORMAT_BC2_UNORM_BLOCK;
             case Format::BC2_UNorm_SRGB:
-                return VK_FORMAT_BC2_UNORM_BLOCK;
+                return VK_FORMAT_BC2_SRGB_BLOCK;
             case Format::BC3_UNorm:
                 return VK_FORMAT_BC3_UNORM_BLOCK;
             case Format::BC3_UNorm_SRGB:

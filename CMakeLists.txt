@@ -23,7 +23,10 @@ add_library(grabs STATIC
         src/Surface.cpp
         include/grabs/CommandList.h
         src/Vk/VulkanCommandList.cpp
-        src/Vk/VulkanCommandList.h)
+        src/Vk/VulkanCommandList.h
+        include/grabs/Texture.h
+        src/Vk/VulkanTexture.cpp
+        src/Vk/VulkanTexture.h)
 
 target_include_directories(grabs PUBLIC include/)
 
