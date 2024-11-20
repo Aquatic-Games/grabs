@@ -37,12 +37,12 @@ namespace grabs::Vk {
             .oldSwapchain = nullptr
         };
 
-        CHECK_RESULT(vkCreateSwapchainKHR(Device, &swapchainCreateInfo, nullptr, &Swapchain));
+        VK_CHECK_RESULT(vkCreateSwapchainKHR(Device, &swapchainCreateInfo, nullptr, &Swapchain));
 
         uint32_t numImages;
-        CHECK_RESULT(vkGetSwapchainImagesKHR(Device, Swapchain, &numImages, nullptr));
+        VK_CHECK_RESULT(vkGetSwapchainImagesKHR(Device, Swapchain, &numImages, nullptr));
         std::vector<VkImage> swapchainImages(numImages);
-        CHECK_RESULT(vkGetSwapchainImagesKHR(Device, Swapchain, &numImages, swapchainImages.data()));
+        VK_CHECK_RESULT(vkGetSwapchainImagesKHR(Device, Swapchain, &numImages, swapchainImages.data()));
 
         for (const auto image : swapchainImages) {
             VkImageViewCreateInfo info {
@@ -66,7 +66,7 @@ namespace grabs::Vk {
             };
 
             VkImageView view;
-            CHECK_RESULT(vkCreateImageView(Device, &info, nullptr, &view));
+            VK_CHECK_RESULT(vkCreateImageView(Device, &info, nullptr, &view));
 
             SwapchainViews.push_back(view);
         }

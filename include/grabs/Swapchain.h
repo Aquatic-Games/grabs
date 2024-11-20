@@ -3,22 +3,25 @@
 #include "Common.h"
 #include "Texture.h"
 
-namespace grabs {
-
-    enum class PresentMode {
+namespace grabs
+{
+    enum class PresentMode
+    {
         Immediate,
         Mailbox,
         Fifo
     };
 
-    struct SwapchainDescription {
+    struct SwapchainDescription
+    {
         Size2D Size;
         Format Format;
         uint32_t NumBuffers;
         PresentMode PresentMode;
     };
 
-    class Swapchain {
+    class Swapchain
+    {
     public:
         virtual ~Swapchain() = default;
 
@@ -26,5 +29,4 @@ namespace grabs {
 
         virtual void Present() = 0;
     };
-
 }

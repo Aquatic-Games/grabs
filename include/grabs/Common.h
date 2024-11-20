@@ -3,20 +3,23 @@
 #include <string>
 #include <cstdint>
 
-namespace grabs {
-
-    struct Size2D {
+namespace grabs
+{
+    struct Size2D
+    {
         uint32_t Width;
         uint32_t Height;
     };
 
-    struct Size3D {
+    struct Size3D
+    {
         uint32_t Width;
         uint32_t Height;
         uint32_t Depth;
     };
 
-    enum class Format {
+    enum class Format
+    {
         B5G6R5_UNorm,
         B5G5R5A1_UNorm,
 
@@ -104,18 +107,19 @@ namespace grabs {
         BC7_UNorm_SRGB
     };
 
-    struct AdapterSupports {
+    struct AdapterSupports
+    {
         bool GeometryShader;
 
         bool Anisotropy;
         float MaxAnisotropy;
     };
 
-    struct Adapter {
+    struct Adapter
+    {
         uint32_t Index;
         std::string Name;
         uint64_t Memory;
         AdapterSupports Supports;
     };
-
 }

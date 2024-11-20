@@ -9,20 +9,23 @@
 #include "Device.h"
 #include "Surface.h"
 
-namespace grabs {
-
-    struct InstanceInfo {
+namespace grabs
+{
+    struct InstanceInfo
+    {
         bool Debug;
         std::function<std::vector<const char*>()> GetInstanceExtensions;
     };
 
-    class Instance {
+    class Instance
+    {
     public:
         virtual ~Instance() = default;
 
         virtual std::unique_ptr<Device> CreateDevice(Surface* surface, uint32_t adapterIndex) = 0;
 
-        std::unique_ptr<Device> CreateDevice(Surface* surface) {
+        std::unique_ptr<Device> CreateDevice(Surface* surface)
+        {
             return CreateDevice(surface, 0);
         }
 
@@ -30,5 +33,4 @@ namespace grabs {
 
         static std::unique_ptr<Instance> Create(const InstanceInfo& info = {});
     };
-
 }

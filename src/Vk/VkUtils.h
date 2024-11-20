@@ -8,7 +8,7 @@
 #include "grabs/Common.h"
 #include "grabs/Swapchain.h"
 
-#define CHECK_RESULT(result) \
+#define VK_CHECK_RESULT(result) \
 { \
     VkResult res = (result); \
     if (res != VK_SUCCESS) { \

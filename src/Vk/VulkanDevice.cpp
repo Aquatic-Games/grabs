@@ -98,7 +98,7 @@ namespace grabs::Vk {
             .pEnabledFeatures = &features
         };
 
-        CHECK_RESULT(vkCreateDevice(device, &createInfo, nullptr, &Device));
+        VK_CHECK_RESULT(vkCreateDevice(device, &createInfo, nullptr, &Device));
 
         vkGetDeviceQueue(Device, GraphicsQueueIndex, 0, &GraphicsQueue);
         vkGetDeviceQueue(Device, PresentQueueIndex, 0, &PresentQueue);
@@ -108,7 +108,7 @@ namespace grabs::Vk {
             .queueFamilyIndex = GraphicsQueueIndex
         };
 
-        CHECK_RESULT(vkCreateCommandPool(Device, &commandPoolInfo, nullptr, &CommandPool));
+        VK_CHECK_RESULT(vkCreateCommandPool(Device, &commandPoolInfo, nullptr, &CommandPool));
     }
 
     VulkanDevice::~VulkanDevice() {

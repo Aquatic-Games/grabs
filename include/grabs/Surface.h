@@ -3,15 +3,15 @@
 #include <functional>
 #include <memory>
 
-namespace grabs {
-
+namespace grabs
+{
     class Instance;
 
-    class Surface {
+    class Surface
+    {
     public:
         virtual ~Surface() = default;
 
         static std::unique_ptr<Surface> Vulkan(Instance* instance, const std::function<void*(void* instance)>& createSurfaceFn);
     };
-
 }

@@ -6,9 +6,10 @@
 #include "Swapchain.h"
 #include "CommandList.h"
 
-namespace grabs {
-
-    class Device {
+namespace grabs
+{
+    class Device
+    {
     public:
         virtual ~Device() = default;
 
@@ -16,5 +17,4 @@ namespace grabs {
 
         virtual std::unique_ptr<CommandList> CreateCommandList() = 0;
     };
-
 }

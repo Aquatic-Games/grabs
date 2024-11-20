@@ -14,7 +14,7 @@ namespace grabs::Vk {
             .commandBufferCount = 1
         };
 
-        CHECK_RESULT(vkAllocateCommandBuffers(device, &cbInfo, &CommandBuffer));
+        VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cbInfo, &CommandBuffer));
     }
 
     VulkanCommandList::~VulkanCommandList() {

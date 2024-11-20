@@ -50,7 +50,7 @@ namespace grabs::Vk {
             .ppEnabledExtensionNames = extensions.data()
         };
 
-        CHECK_RESULT(vkCreateInstance(&instanceInfo, nullptr, &Instance));
+        VK_CHECK_RESULT(vkCreateInstance(&instanceInfo, nullptr, &Instance));
 
         if (info.Debug) {
             VkDebugUtilsMessengerCreateInfoEXT createInfo {
@@ -61,7 +61,7 @@ namespace grabs::Vk {
             };
 
             const auto createDebugMessenger = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(Instance, "vkCreateDebugUtilsMessengerEXT"));
-            CHECK_RESULT(createDebugMessenger(Instance, &createInfo, nullptr, &DebugMessenger));
+            VK_CHECK_RESULT(createDebugMessenger(Instance, &createInfo, nullptr, &DebugMessenger));
         }
     }
 
