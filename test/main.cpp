@@ -1,6 +1,7 @@
 ﻿#include <grabs/Instance.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_vulkan.h>
+#include <SDL2/SDL_syswm.h>
 
 #include <iostream>
 
@@ -24,6 +25,7 @@ int main(int argc, char* argv[]) {
 
     InstanceInfo info {
         .Debug = true,
+        .BackendHint = Backend::D3D11,
         .GetInstanceExtensions = [window]() {
             uint32_t numExtensions;
             SDL_Vulkan_GetInstanceExtensions(window, &numExtensions, nullptr);
@@ -41,11 +43,30 @@ int main(int argc, char* argv[]) {
         std::cout << adapter.Name << " - " << adapter.Memory / 1024 / 1024 << "MB" << std::endl;
     }
 
-    /*auto surface = Surface::Vulkan(instance.get(), [window](void* vkInstance) {
-        VkSurfaceKHR surface;
-        SDL_Vulkan_CreateSurface(window, static_cast<VkInstance>(vkInstance), &surface);
-        return surface;
-    });
+    std::unique_ptr<Surface> surface = nullptr;
+    switch (instance->Backend())
+    {
+        case Backend::Vulkan:
+        {
+            surface = Surface::Vulkan(instance.get(), [window](void* vkInstance) {
+                VkSurfaceKHR surface;
+                SDL_Vulkan_CreateSurface(window, static_cast<VkInstance>(vkInstance), &surface);
+                return surface;
+            });
+            break;
+        }
+        case Backend::D3D11:
+        {
+            SDL_SysWMinfo info;
+            SDL_VERSION(&info.version);
+            SDL_GetWindowWMInfo(window, &info);
+
+            surface = Surface::DXGI(reinterpret_cast<size_t>(info.info.win.window));
+            break;
+        }
+        default:
+            throw std::runtime_error("No backend");
+    }
 
     auto device = instance->CreateDevice(surface.get());
 
@@ -55,7 +76,7 @@ int main(int argc, char* argv[]) {
         .NumBuffers = 2,
         .PresentMode = PresentMode::Fifo
     };
-    auto swapchain = device->CreateSwapchain(swapchainDesc, surface.get());
+    /*auto swapchain = device->CreateSwapchain(swapchainDesc, surface.get());
 
     auto cl = device->CreateCommandList();
 

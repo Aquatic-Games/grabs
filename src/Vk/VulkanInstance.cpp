@@ -24,7 +24,7 @@ namespace grabs::Vk
 {
     VulkanInstance::VulkanInstance(const InstanceInfo& info)
     {
-        NULL_CHECK(info.GetInstanceExtensions);
+        GS_NULL_CHECK(info.GetInstanceExtensions);
 
         VkApplicationInfo appInfo
         {
@@ -90,7 +90,7 @@ namespace grabs::Vk
 
     std::unique_ptr<Device> VulkanInstance::CreateDevice(Surface* surface, uint32_t adapterIndex)
     {
-        NULL_CHECK(surface);
+        GS_NULL_CHECK(surface);
 
         auto vkSurface = dynamic_cast<VulkanSurface*>(surface);
 

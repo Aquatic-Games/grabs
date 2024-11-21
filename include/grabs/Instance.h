@@ -14,6 +14,7 @@ namespace grabs
     struct InstanceInfo
     {
         bool Debug;
+        Backend BackendHint;
         std::function<std::vector<const char*>()> GetInstanceExtensions;
     };
 

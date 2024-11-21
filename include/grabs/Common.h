@@ -3,6 +3,10 @@
 #include <string>
 #include <cstdint>
 
+#define GS_FLAGS_ENUM(Enum)\
+    inline Enum operator |(Enum left, Enum right) { return static_cast<Enum>(static_cast<int>(left) | static_cast<int>(right)); }\
+    inline int operator &(Enum left, Enum right) { return static_cast<int>(left) & static_cast<int>(right); }
+
 namespace grabs
 {
     struct Size2D
@@ -20,9 +24,11 @@ namespace grabs
 
     enum class Backend
     {
-        Vulkan,
-        D3D11
+        Unknown = 0,
+        Vulkan = 1 << 0,
+        D3D11 = 1 << 1
     };
+    GS_FLAGS_ENUM(Backend)
 
     inline std::string BackendToFriendlyString(const Backend backend)
     {
@@ -32,6 +38,8 @@ namespace grabs
                 return "Vulkan";
             case Backend::D3D11:
                 return "DirectX 11";
+            case Backend::Unknown:
+                return "None";
         }
 
         return "Unknown";
