@@ -22,6 +22,8 @@ namespace grabs
     public:
         virtual ~Instance() = default;
 
+        [[nodiscard]] virtual Backend Backend() const = 0;
+
         virtual std::unique_ptr<Device> CreateDevice(Surface* surface, uint32_t adapterIndex) = 0;
 
         std::unique_ptr<Device> CreateDevice(Surface* surface)

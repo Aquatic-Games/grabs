@@ -18,6 +18,25 @@ namespace grabs
         uint32_t Depth;
     };
 
+    enum class Backend
+    {
+        Vulkan,
+        D3D11
+    };
+
+    inline std::string BackendToFriendlyString(const Backend backend)
+    {
+        switch (backend)
+        {
+            case Backend::Vulkan:
+                return "Vulkan";
+            case Backend::D3D11:
+                return "DirectX 11";
+        }
+
+        return "Unknown";
+    }
+
     enum class Format
     {
         B5G6R5_UNorm,

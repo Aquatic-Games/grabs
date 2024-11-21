@@ -34,6 +34,7 @@ int main(int argc, char* argv[]) {
     };
 
     auto instance = Instance::Create(info);
+    std::cout << "Backend: " << BackendToFriendlyString(instance->Backend()) << std::endl;
 
     auto adapters = instance->EnumerateAdapters();
     for (const auto& adapter : adapters) {

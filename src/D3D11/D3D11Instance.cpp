@@ -13,6 +13,11 @@ namespace grabs::D3D11
         Factory->Release();
     }
 
+    Backend D3D11Instance::Backend() const
+    {
+        return Backend::D3D11;
+    }
+
     std::unique_ptr<Device> D3D11Instance::CreateDevice(Surface* surface, uint32_t adapterIndex)
     {
         return nullptr;

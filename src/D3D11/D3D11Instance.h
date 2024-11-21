@@ -14,6 +14,8 @@ namespace grabs::D3D11
         explicit D3D11Instance(const InstanceInfo& info);
         ~D3D11Instance() override;
 
+        [[nodiscard]] grabs::Backend Backend() const override;
+
         std::unique_ptr<Device> CreateDevice(Surface* surface, uint32_t adapterIndex) override;
 
         std::vector<Adapter> EnumerateAdapters() override;
