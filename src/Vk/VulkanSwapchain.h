@@ -18,7 +18,7 @@ namespace grabs::Vk {
         VulkanSwapchain(VkInstance instance, VkPhysicalDevice physDevice, VulkanDevice* device, const SwapchainDescription& description, VulkanSurface* surface);
         ~VulkanSwapchain() override;
 
-        Texture* GetNextTexture() override;
+        TextureView* GetNextTexture() override;
 
         void Present() override;
     };

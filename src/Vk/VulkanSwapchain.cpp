@@ -80,7 +80,7 @@ namespace grabs::Vk {
         vkDestroySwapchainKHR(Device, Swapchain, nullptr);
     }
 
-    Texture* VulkanSwapchain::GetNextTexture() {
+    TextureView* VulkanSwapchain::GetNextTexture() {
         return nullptr;
     }
 

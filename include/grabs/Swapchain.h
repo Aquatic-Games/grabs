@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Common.h"
-#include "Texture.h"
+#include "TextureView.h"
 
 namespace grabs
 {

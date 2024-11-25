@@ -1,5 +1,6 @@
 ﻿#include "D3D11Device.h"
 #include "D3D11Utils.h"
+#include "D3D11Swapchain.h"
 #include "../Common.h"
 
 namespace grabs::D3D11
