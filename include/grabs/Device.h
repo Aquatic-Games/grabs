@@ -8,6 +8,7 @@
 #include "CommandList.h"
 #include "Buffer.h"
 #include "ShaderModule.h"
+#include "Pipeline.h"
 
 namespace grabs
 {
@@ -20,6 +21,7 @@ namespace grabs
         virtual std::unique_ptr<CommandList> CreateCommandList() = 0;
         virtual std::unique_ptr<Buffer> CreateBuffer(const BufferDescription& description, void* data) = 0;
         virtual std::unique_ptr<ShaderModule> CreateShaderModule(const ShaderModuleDescription& description) = 0;
+        virtual std::unique_ptr<Pipeline> CreatePipeline(const PipelineDescription& description) = 0;
 
         virtual void SubmitCommandList(CommandList* list) = 0;
     };

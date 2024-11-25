@@ -22,6 +22,7 @@ namespace grabs::D3D11
         std::unique_ptr<CommandList> CreateCommandList() override;
         std::unique_ptr<Buffer> CreateBuffer(const BufferDescription& description, void* data) override;
         std::unique_ptr<ShaderModule> CreateShaderModule(const ShaderModuleDescription& description) override;
+        std::unique_ptr<Pipeline> CreatePipeline(const PipelineDescription& description) override;
 
         void SubmitCommandList(CommandList* list) override;
     };

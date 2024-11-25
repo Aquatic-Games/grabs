@@ -120,6 +120,29 @@ int main(int argc, char* argv[]) {
     auto pixlSpv = ReadFile("Test_p.spv");
     auto pixelShader = device->CreateShaderModule({ .Stage = ShaderStage::Pixel, .Spirv = pixlSpv, .EntryPoint = "PSMain" });
 
+    const PipelineDescription pipelineDesc
+    {
+        .VertexShader = vertexShader.get(),
+        .PixelShader = pixelShader.get(),
+        .InputLayout =
+        {
+            {
+                .Format = Format::R32G32_Float,
+                .Offset = 0,
+                .Slot = 0,
+                .Type = InputType::PerVertex
+            },
+            {
+                .Format = Format::R32G32B32_Float,
+                .Offset = 8,
+                .Slot = 0,
+                .Type = InputType::PerVertex
+            }
+        }
+    };
+
+    const auto pipeline = device->CreatePipeline(pipelineDesc);
+
     bool alive = true;
     while (alive) {
         SDL_Event event;
