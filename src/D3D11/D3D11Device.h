@@ -1,8 +1,9 @@
 ﻿#pragma once
 
-#include "grabs/Device.h"
-
 #include <d3d11.h>
+
+#include "grabs/Device.h"
+#include "D3D11CommandList.h"
 
 namespace grabs::D3D11
 {

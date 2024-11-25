@@ -1,6 +1,7 @@
 ﻿#include "D3D11Device.h"
 #include "D3D11Utils.h"
 #include "D3D11Swapchain.h"
+#include "D3D11CommandList.h"
 #include "../Common.h"
 
 namespace grabs::D3D11
@@ -33,6 +34,6 @@ namespace grabs::D3D11
 
     std::unique_ptr<CommandList> D3D11Device::CreateCommandList()
     {
-        GS_TODO
+        return std::make_unique<D3D11CommandList>(Device);
     }
 }
