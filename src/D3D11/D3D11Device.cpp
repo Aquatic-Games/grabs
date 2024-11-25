@@ -2,6 +2,7 @@
 #include "D3D11Utils.h"
 #include "D3D11Swapchain.h"
 #include "D3D11CommandList.h"
+#include "D3D11ShaderModule.h"
 #include "../Common.h"
 
 namespace grabs::D3D11
@@ -40,6 +41,11 @@ namespace grabs::D3D11
     std::unique_ptr<Buffer> D3D11Device::CreateBuffer(const BufferDescription& description, void* data)
     {
         return std::make_unique<D3D11Buffer>(Device, description, data);
+    }
+
+    std::unique_ptr<ShaderModule> D3D11Device::CreateShaderModule(const ShaderModuleDescription& description)
+    {
+        return std::make_unique<D3D11ShaderModule>(description);
     }
 
     void D3D11Device::SubmitCommandList(CommandList* list)

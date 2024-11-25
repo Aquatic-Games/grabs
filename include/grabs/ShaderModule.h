@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <string>
+#include <vector>
 
 namespace grabs
 {
@@ -15,7 +16,7 @@ namespace grabs
     struct ShaderModuleDescription
     {
         ShaderStage Stage;
-        uint8_t* Spirv;
+        std::vector<uint8_t> Spirv;
         std::string EntryPoint;
     };
 

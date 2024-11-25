@@ -21,6 +21,7 @@ namespace grabs::D3D11
         std::unique_ptr<Swapchain> CreateSwapchain(const SwapchainDescription& description, Surface* surface) override;
         std::unique_ptr<CommandList> CreateCommandList() override;
         std::unique_ptr<Buffer> CreateBuffer(const BufferDescription& description, void* data) override;
+        std::unique_ptr<ShaderModule> CreateShaderModule(const ShaderModuleDescription& description) override;
 
         void SubmitCommandList(CommandList* list) override;
     };

@@ -2,10 +2,27 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_vulkan.h>
 #include <SDL2/SDL_syswm.h>
+#include <vector>
+#include <string>
 
 #include <iostream>
 
 using namespace grabs;
+
+std::vector<uint8_t> ReadFile(const std::string& path)
+{
+    size_t fileSize;
+    auto data = SDL_LoadFile(path.c_str(), &fileSize);
+
+    if (!data)
+        throw std::runtime_error("Failed to load file.");
+
+    std::vector vecData(static_cast<uint8_t*>(data), static_cast<uint8_t*>(data) + fileSize);
+
+    SDL_free(data);
+
+    return vecData;
+}
 
 int main(int argc, char* argv[]) {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0) {
@@ -25,7 +42,7 @@ int main(int argc, char* argv[]) {
 
     InstanceInfo info {
         .Debug = true,
-        .BackendHint = Backend::D3D11,
+        .BackendHint = Backend::Unknown,
         .GetInstanceExtensions = [window]() {
             uint32_t numExtensions;
             SDL_Vulkan_GetInstanceExtensions(window, &numExtensions, nullptr);
@@ -96,6 +113,12 @@ int main(int argc, char* argv[]) {
         1, 2, 3
     };
     auto indexBuffer = device->CreateBuffer({ .Type = BufferType::Index, .Size = sizeof(indices), .Dynamic = false }, (void*) indices);
+
+    auto vertSpv = ReadFile("Test_v.spv");
+    auto vertexShader = device->CreateShaderModule({ .Stage = ShaderStage::Vertex, .Spirv = vertSpv, .EntryPoint = "VSMain" });
+
+    auto pixlSpv = ReadFile("Test_p.spv");
+    auto pixelShader = device->CreateShaderModule({ .Stage = ShaderStage::Pixel, .Spirv = pixlSpv, .EntryPoint = "PSMain" });
 
     bool alive = true;
     while (alive) {
