@@ -5,8 +5,10 @@
 
 namespace grabs::D3D11
 {
-    D3D11Device::D3D11Device(IDXGIAdapter1* adapter, bool debug)
+    D3D11Device::D3D11Device(IDXGIFactory1* factory, IDXGIAdapter1* adapter, bool debug)
     {
+        Factory = factory;
+
         UINT flags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
         if (debug)
             flags |= D3D11_CREATE_DEVICE_DEBUG;
@@ -24,7 +26,9 @@ namespace grabs::D3D11
 
     std::unique_ptr<Swapchain> D3D11Device::CreateSwapchain(const SwapchainDescription& description, Surface* surface)
     {
-        GS_TODO
+        const auto dxgiSurface = dynamic_cast<DXGISurface*>(surface);
+
+        return std::make_unique<D3D11Swapchain>(Factory, Device, dxgiSurface, description);
     }
 
     std::unique_ptr<CommandList> D3D11Device::CreateCommandList()

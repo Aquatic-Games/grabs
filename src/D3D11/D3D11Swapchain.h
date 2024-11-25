@@ -1,15 +1,18 @@
 ﻿#pragma once
 
-#include "grabs/Swapchain.h"
-
 #include <d3d11.h>
+
+#include "grabs/Swapchain.h"
+#include "DXGISurface.h"
 
 namespace grabs::D3D11
 {
     class D3D11Swapchain : public Swapchain
     {
     public:
-        D3D11Swapchain(ID3D11Device);
+        IDXGISwapChain* Swapchain{};
+
+        D3D11Swapchain(IDXGIFactory1* factory, ID3D11Device* device, DXGISurface* surface, const SwapchainDescription& description);
         ~D3D11Swapchain() override;
 
         TextureView* GetNextTexture() override;

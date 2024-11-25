@@ -25,7 +25,7 @@ namespace grabs
     public:
         virtual ~Swapchain() = default;
 
-        virtual Texture* GetNextTexture() = 0;
+        virtual TextureView* GetNextTexture() = 0;
 
         virtual void Present() = 0;
     };

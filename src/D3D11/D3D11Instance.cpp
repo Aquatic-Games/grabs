@@ -25,7 +25,7 @@ namespace grabs::D3D11
     {
         IDXGIAdapter1* adapter;
         D3D11_CHECK_RESULT(Factory->EnumAdapters1(adapterIndex, &adapter));
-        return std::make_unique<D3D11Device>(adapter, Debug);
+        return std::make_unique<D3D11Device>(Factory, adapter, Debug);
     }
 
     std::vector<Adapter> D3D11Instance::EnumerateAdapters()
