@@ -18,7 +18,7 @@ namespace grabs::D3D11
         void Begin() override;
         void End() override;
 
-        void BeginRenderPass(const RenderPassInfo& info) override;
+        void BeginRenderPass(const RenderPassDescription& info) override;
         void EndRenderPass() override;
     };
 }

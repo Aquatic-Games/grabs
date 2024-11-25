@@ -4,6 +4,7 @@
 
 #include "grabs/Device.h"
 #include "D3D11CommandList.h"
+#include "D3D11Buffer.h"
 
 namespace grabs::D3D11
 {
@@ -19,6 +20,7 @@ namespace grabs::D3D11
 
         std::unique_ptr<Swapchain> CreateSwapchain(const SwapchainDescription& description, Surface* surface) override;
         std::unique_ptr<CommandList> CreateCommandList() override;
+        std::unique_ptr<Buffer> CreateBuffer(const BufferDescription& description, void* data) override;
 
         void SubmitCommandList(CommandList* list) override;
     };

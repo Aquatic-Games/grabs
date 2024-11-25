@@ -32,7 +32,7 @@ namespace grabs::D3D11
         D3D11_CHECK_RESULT(Context->FinishCommandList(FALSE, &CommandList));
     }
 
-    void D3D11CommandList::BeginRenderPass(const RenderPassInfo& info)
+    void D3D11CommandList::BeginRenderPass(const RenderPassDescription& info)
     {
         GS_NULL_CHECK(info.Texture);
         auto d3dTexture = dynamic_cast<D3D11Texture*>(info.Texture);

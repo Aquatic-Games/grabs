@@ -37,6 +37,11 @@ namespace grabs::D3D11
         return std::make_unique<D3D11CommandList>(Device);
     }
 
+    std::unique_ptr<Buffer> D3D11Device::CreateBuffer(const BufferDescription& description, void* data)
+    {
+        return std::make_unique<D3D11Buffer>(Device, description, data);
+    }
+
     void D3D11Device::SubmitCommandList(CommandList* list)
     {
         GS_NULL_CHECK(list);

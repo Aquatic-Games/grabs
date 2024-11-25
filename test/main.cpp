@@ -81,6 +81,22 @@ int main(int argc, char* argv[]) {
 
     auto cl = device->CreateCommandList();
 
+    constexpr float vertices[]
+    {
+        -0.5f,  0.5f,    1.0f, 0.0f, 0.0f,
+         0.5f,  0.5f,    0.0f, 1.0f, 0.0f,
+         0.5f, -0.5f,    0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f,    0.0f, 0.0f, 0.0f
+    };
+    auto vertexBuffer = device->CreateBuffer({ .Type = BufferType::Vertex, .Size = sizeof(vertices), .Dynamic = false }, (void*) vertices);
+
+    constexpr uint16_t indices[]
+    {
+        0, 1, 3,
+        1, 2, 3
+    };
+    auto indexBuffer = device->CreateBuffer({ .Type = BufferType::Index, .Size = sizeof(indices), .Dynamic = false }, (void*) indices);
+
     bool alive = true;
     while (alive) {
         SDL_Event event;
@@ -102,7 +118,7 @@ int main(int argc, char* argv[]) {
         auto texture = swapchain->GetNextTexture();
         cl->Begin();
 
-        RenderPassInfo renderPass
+        RenderPassDescription renderPass
         {
             .Texture = texture,
             .ClearColor = { 1.0f, 0.5f, 0.25f, 1.0f }

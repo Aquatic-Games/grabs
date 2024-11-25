@@ -4,7 +4,7 @@
 
 namespace grabs
 {
-    struct RenderPassInfo
+    struct RenderPassDescription
     {
         Texture* Texture;
         float ClearColor[4];
@@ -18,7 +18,7 @@ namespace grabs
         virtual void Begin() = 0;
         virtual void End() = 0;
 
-        virtual void BeginRenderPass(const RenderPassInfo& info) = 0;
+        virtual void BeginRenderPass(const RenderPassDescription& description) = 0;
         virtual void EndRenderPass() = 0;
     };
 }
