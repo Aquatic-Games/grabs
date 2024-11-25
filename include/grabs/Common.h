@@ -5,7 +5,9 @@
 
 #define GS_FLAGS_ENUM(Enum)\
     inline Enum operator |(Enum left, Enum right) { return static_cast<Enum>(static_cast<int>(left) | static_cast<int>(right)); }\
-    inline int operator &(Enum left, Enum right) { return static_cast<int>(left) & static_cast<int>(right); }
+    inline Enum operator &(Enum left, Enum right) { return static_cast<Enum>(static_cast<int>(left) & static_cast<int>(right)); }
+
+#define GS_HAS_FLAG(Value, Flag) (Value & Flag) == Flag
 
 namespace grabs
 {

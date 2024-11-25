@@ -17,12 +17,12 @@ namespace grabs {
                                                : info.BackendHint;
 
 #ifdef GS_ENABLE_VK
-        if (backendHint & Backend::Vulkan)
+        if (GS_HAS_FLAG(backendHint, Backend::Vulkan))
             return std::make_unique<Vk::VulkanInstance>(info);
 #endif
 
 #ifdef GS_ENABLE_D3D11
-        if (backendHint & Backend::D3D11)
+        if (GS_HAS_FLAG(backendHint, Backend::D3D11))
             return std::make_unique<D3D11::D3D11Instance>(info);
 #endif
 

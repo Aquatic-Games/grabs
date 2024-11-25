@@ -9,6 +9,7 @@ namespace grabs::D3D11
     class D3D11Instance : public Instance
     {
     public:
+        bool Debug{};
         IDXGIFactory1* Factory{};
 
         explicit D3D11Instance(const InstanceInfo& info);

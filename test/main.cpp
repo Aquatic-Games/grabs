@@ -76,7 +76,8 @@ int main(int argc, char* argv[]) {
         .NumBuffers = 2,
         .PresentMode = PresentMode::Fifo
     };
-    /*auto swapchain = device->CreateSwapchain(swapchainDesc, surface.get());
+
+    auto swapchain = device->CreateSwapchain(swapchainDesc, surface.get());
 
     auto cl = device->CreateCommandList();
 
@@ -97,7 +98,7 @@ int main(int argc, char* argv[]) {
                 }
             }
         }
-    }*/
+    }
 
     SDL_DestroyWindow(window);
     SDL_Quit();
