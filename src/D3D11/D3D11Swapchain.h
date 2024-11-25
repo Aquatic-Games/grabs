@@ -4,6 +4,7 @@
 
 #include "grabs/Swapchain.h"
 #include "DXGISurface.h"
+#include "D3D11Texture.h"
 
 namespace grabs::D3D11
 {
@@ -11,11 +12,12 @@ namespace grabs::D3D11
     {
     public:
         IDXGISwapChain* Swapchain{};
+        std::unique_ptr<D3D11Texture> SwapchainTexture{};
 
         D3D11Swapchain(IDXGIFactory1* factory, ID3D11Device* device, DXGISurface* surface, const SwapchainDescription& description);
         ~D3D11Swapchain() override;
 
-        TextureView* GetNextTexture() override;
+        Texture* GetNextTexture() override;
 
         void Present() override;
     };

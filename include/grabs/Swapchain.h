@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Common.h"
-#include "TextureView.h"
+#include "Texture.h"
 
 namespace grabs
 {
@@ -25,7 +25,7 @@ namespace grabs
     public:
         virtual ~Swapchain() = default;
 
-        virtual TextureView* GetNextTexture() = 0;
+        virtual Texture* GetNextTexture() = 0;
 
         virtual void Present() = 0;
     };

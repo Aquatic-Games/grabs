@@ -24,6 +24,14 @@ namespace grabs::D3D11
         };
 
         D3D11_CHECK_RESULT(factory->CreateSwapChain(device, &desc, &Swapchain));
+
+        ID3D11Texture2D* texture = nullptr;
+        D3D11_CHECK_RESULT(Swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&texture)));
+
+        ID3D11RenderTargetView* target = nullptr;
+        D3D11_CHECK_RESULT(device->CreateRenderTargetView(texture, nullptr, &target));
+
+        SwapchainTexture = std::make_unique<D3D11Texture>(texture, target);
     }
 
     D3D11Swapchain::~D3D11Swapchain()
@@ -31,13 +39,13 @@ namespace grabs::D3D11
         Swapchain->Release();
     }
 
-    TextureView* D3D11Swapchain::GetNextTexture()
+    Texture* D3D11Swapchain::GetNextTexture()
     {
-        GS_TODO
+        return SwapchainTexture.get();
     }
 
     void D3D11Swapchain::Present()
     {
-        GS_TODO
+        D3D11_CHECK_RESULT(Swapchain->Present(1, 0));
     }
 }

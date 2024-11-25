@@ -14,5 +14,11 @@ namespace grabs::D3D11
 
         explicit D3D11CommandList(ID3D11Device* device);
         ~D3D11CommandList() override;
+
+        void Begin() override;
+        void End() override;
+
+        void BeginRenderPass(const RenderPassInfo& info) override;
+        void EndRenderPass() override;
     };
 }

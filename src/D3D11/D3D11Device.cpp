@@ -36,4 +36,14 @@ namespace grabs::D3D11
     {
         return std::make_unique<D3D11CommandList>(Device);
     }
+
+    void D3D11Device::SubmitCommandList(CommandList* list)
+    {
+        GS_NULL_CHECK(list);
+
+        const auto d3dList = dynamic_cast<D3D11CommandList*>(list);
+
+        GS_NULL_CHECK(d3dList->CommandList);
+        Context->ExecuteCommandList(d3dList->CommandList, false);
+    }
 }

@@ -98,6 +98,22 @@ int main(int argc, char* argv[]) {
                 }
             }
         }
+
+        auto texture = swapchain->GetNextTexture();
+        cl->Begin();
+
+        RenderPassInfo renderPass
+        {
+            .Texture = texture,
+            .ClearColor = { 1.0f, 0.5f, 0.25f, 1.0f }
+        };
+        cl->BeginRenderPass(renderPass);
+        cl->EndRenderPass();
+
+        cl->End();
+        device->SubmitCommandList(cl.get());
+
+        swapchain->Present();
     }
 
     SDL_DestroyWindow(window);

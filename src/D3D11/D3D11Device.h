@@ -7,7 +7,7 @@
 
 namespace grabs::D3D11
 {
-    class D3D11Device : public Device
+    class D3D11Device final : public Device
     {
     public:
         IDXGIFactory1* Factory{};
@@ -19,5 +19,7 @@ namespace grabs::D3D11
 
         std::unique_ptr<Swapchain> CreateSwapchain(const SwapchainDescription& description, Surface* surface) override;
         std::unique_ptr<CommandList> CreateCommandList() override;
+
+        void SubmitCommandList(CommandList* list) override;
     };
 }
