@@ -38,6 +38,8 @@ endif()
 # ---------- D3D11 ----------
 if (GS_COMPILE_D3D11)
     target_link_libraries(grabs PUBLIC d3d11 dxgi d3dcompiler)
+    add_subdirectory(lib/SPIRV-Cross)
+    target_link_libraries(grabs PUBLIC spirv-cross-cpp)
     add_compile_definitions(GS_ENABLE_D3D11)
 endif()
 
