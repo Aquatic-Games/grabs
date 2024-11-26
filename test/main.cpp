@@ -170,6 +170,13 @@ int main(int argc, char* argv[]) {
             .ClearColor = { 1.0f, 0.5f, 0.25f, 1.0f }
         };
         cl->BeginRenderPass(renderPass);
+        cl->SetViewport({ .X = 0, .Y = 0, .Width = width, .Height = height, .MinDepth = 0, .MaxDepth = 1 });
+
+        cl->SetPipeline(pipeline.get());
+        cl->SetVertexBuffer(0, vertexBuffer.get(), 5 * sizeof(float), 0);
+        cl->SetIndexBuffer(indexBuffer.get(), Format::R16_UInt);
+        cl->DrawIndexed(6);
+
         cl->EndRenderPass();
 
         cl->End();

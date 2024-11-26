@@ -24,6 +24,16 @@ namespace grabs
         uint32_t Depth;
     };
 
+    struct Viewport
+    {
+        int32_t X;
+        int32_t Y;
+        uint32_t Width;
+        uint32_t Height;
+        float MinDepth;
+        float MaxDepth;
+    };
+
     enum class Backend
     {
         Unknown = 0,

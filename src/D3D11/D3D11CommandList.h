@@ -20,5 +20,14 @@ namespace grabs::D3D11
 
         void BeginRenderPass(const RenderPassDescription& info) override;
         void EndRenderPass() override;
+
+        void SetViewport(const Viewport& viewport) override;
+
+        void SetPipeline(Pipeline* pipeline) override;
+
+        void SetVertexBuffer(uint32_t slot, Buffer* buffer, uint32_t stride, uint32_t offset) override;
+        void SetIndexBuffer(Buffer* buffer, Format format) override;
+
+        void DrawIndexed(uint32_t numElements) override;
     };
 }
