@@ -25,11 +25,12 @@ namespace grabs
 
         [[nodiscard]] virtual Backend Backend() const = 0;
 
-        virtual std::unique_ptr<Device> CreateDevice(Surface* surface, uint32_t adapterIndex) = 0;
+        virtual std::unique_ptr<Device> CreateDevice(Surface* surface, const Adapter& adapter) = 0;
 
         std::unique_ptr<Device> CreateDevice(Surface* surface)
         {
-            return CreateDevice(surface, 0);
+            const auto adapters = EnumerateAdapters();
+            return CreateDevice(surface, adapters[0]);
         }
 
         virtual std::vector<Adapter> EnumerateAdapters() = 0;

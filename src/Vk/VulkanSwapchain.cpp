@@ -4,8 +4,10 @@
 
 #include "VkUtils.h"
 
-namespace grabs::Vk {
-    VulkanSwapchain::VulkanSwapchain(VkInstance instance, VkPhysicalDevice physDevice, VulkanDevice* device, const SwapchainDescription& description, VulkanSurface* surface) {
+namespace grabs::Vk
+{
+    VulkanSwapchain::VulkanSwapchain(VkInstance instance, VkPhysicalDevice physDevice, VulkanDevice* device, const SwapchainDescription& description, VulkanSurface* surface)
+    {
         Device = device->Device;
 
         VkSurfaceCapabilitiesKHR surfaceCapabilities;
@@ -16,12 +18,14 @@ namespace grabs::Vk {
         VkFormat format = Utils::FormatToVk(description.Format);
         VkPresentModeKHR presentMode = Utils::PresentModeToVk(description.PresentMode);
 
-        VkExtent2D extent {
+        VkExtent2D extent
+        {
             description.Size.Width,
             description.Size.Height
         };
 
-        VkSwapchainCreateInfoKHR swapchainCreateInfo {
+        VkSwapchainCreateInfoKHR swapchainCreateInfo
+        {
             .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
             .surface = surface->Surface,
             .minImageCount = minImages,
@@ -44,19 +48,23 @@ namespace grabs::Vk {
         std::vector<VkImage> swapchainImages(numImages);
         VK_CHECK_RESULT(vkGetSwapchainImagesKHR(Device, Swapchain, &numImages, swapchainImages.data()));
 
-        for (const auto image : swapchainImages) {
-            VkImageViewCreateInfo info {
+        for (const auto image : swapchainImages)
+        {
+            VkImageViewCreateInfo info
+            {
                 .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
                 .image = image,
                 .viewType = VK_IMAGE_VIEW_TYPE_2D,
                 .format = swapchainCreateInfo.imageFormat,
-                .components = {
+                .components =
+                {
                     .r = VK_COMPONENT_SWIZZLE_IDENTITY,
                     .g = VK_COMPONENT_SWIZZLE_IDENTITY,
                     .b = VK_COMPONENT_SWIZZLE_IDENTITY,
                     .a = VK_COMPONENT_SWIZZLE_IDENTITY
                 },
-                .subresourceRange = {
+                .subresourceRange =
+                {
                     .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
                     .baseMipLevel = 0,
                     .levelCount = 1,
@@ -72,19 +80,21 @@ namespace grabs::Vk {
         }
     }
 
-    VulkanSwapchain::~VulkanSwapchain() {
-        for (const auto view : SwapchainViews) {
+    VulkanSwapchain::~VulkanSwapchain()
+    {
+        for (const auto view : SwapchainViews)
             vkDestroyImageView(Device, view, nullptr);
-        }
 
         vkDestroySwapchainKHR(Device, Swapchain, nullptr);
     }
 
-    TextureView* VulkanSwapchain::GetNextTexture() {
+    Texture* VulkanSwapchain::GetNextTexture()
+    {
         return nullptr;
     }
 
-    void VulkanSwapchain::Present() {
+    void VulkanSwapchain::Present()
+    {
 
     }
 }

@@ -21,11 +21,11 @@ namespace grabs::D3D11
         return Backend::D3D11;
     }
 
-    std::unique_ptr<Device> D3D11Instance::CreateDevice(Surface* surface, uint32_t adapterIndex)
+    std::unique_ptr<Device> D3D11Instance::CreateDevice(Surface* surface, const Adapter& adapter)
     {
-        IDXGIAdapter1* adapter;
-        D3D11_CHECK_RESULT(Factory->EnumAdapters1(adapterIndex, &adapter));
-        return std::make_unique<D3D11Device>(Factory, adapter, Debug);
+        IDXGIAdapter1* d3dAdapter;
+        D3D11_CHECK_RESULT(Factory->EnumAdapters1(adapter.Index, &d3dAdapter));
+        return std::make_unique<D3D11Device>(Factory, d3dAdapter, Debug);
     }
 
     std::vector<Adapter> D3D11Instance::EnumerateAdapters()

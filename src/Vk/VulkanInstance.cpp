@@ -88,13 +88,13 @@ namespace grabs::Vk
         return Backend::Vulkan;
     }
 
-    std::unique_ptr<Device> VulkanInstance::CreateDevice(Surface* surface, uint32_t adapterIndex)
+    std::unique_ptr<Device> VulkanInstance::CreateDevice(Surface* surface, const Adapter& adapter)
     {
         GS_NULL_CHECK(surface);
 
         auto vkSurface = dynamic_cast<VulkanSurface*>(surface);
 
-        return std::make_unique<VulkanDevice>(Instance, vkSurface, adapterIndex);
+        return std::make_unique<VulkanDevice>(Instance, vkSurface, adapter.Index);
     }
 
     std::vector<Adapter> VulkanInstance::EnumerateAdapters()

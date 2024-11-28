@@ -2,10 +2,11 @@
 
 #include "grabs/Texture.h"
 
-namespace grabs::Vk {
-
-    class VulkanTexture : public Texture {
-
+namespace grabs::Vk
+{
+    class VulkanTexture final : public Texture
+    {
+    public:
         ~VulkanTexture() override;
 
         Size3D Size() const override;

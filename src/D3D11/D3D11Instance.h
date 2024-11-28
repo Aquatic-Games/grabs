@@ -17,7 +17,7 @@ namespace grabs::D3D11
 
         [[nodiscard]] grabs::Backend Backend() const override;
 
-        std::unique_ptr<Device> CreateDevice(Surface* surface, uint32_t adapterIndex) override;
+        std::unique_ptr<Device> CreateDevice(Surface* surface, const Adapter& adapter) override;
 
         std::vector<Adapter> EnumerateAdapters() override;
     };

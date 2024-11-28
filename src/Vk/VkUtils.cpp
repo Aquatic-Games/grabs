@@ -2,10 +2,12 @@
 
 #define VK_STRCASE(vkValue) case VK_##vkValue: return #vkValue;
 
-namespace grabs::Vk::Utils {
-
-    std::string ResultToString(VkResult result) {
-        switch (result) {
+namespace grabs::Vk::Utils
+{
+    std::string ResultToString(VkResult result)
+    {
+        switch (result)
+        {
             VK_STRCASE(SUCCESS)
             VK_STRCASE(NOT_READY)
             VK_STRCASE(TIMEOUT)
@@ -31,8 +33,10 @@ namespace grabs::Vk::Utils {
         }
     }
 
-    VkFormat FormatToVk(Format format) {
-        switch (format) {
+    VkFormat FormatToVk(Format format)
+    {
+        switch (format)
+        {
             case Format::B5G6R5_UNorm:
                 return VK_FORMAT_B5G6R5_UNORM_PACK16;
             case Format::B5G5R5A1_UNorm:
@@ -168,8 +172,10 @@ namespace grabs::Vk::Utils {
         return VK_FORMAT_UNDEFINED;
     }
 
-    VkPresentModeKHR PresentModeToVk(PresentMode mode) {
-        switch (mode) {
+    VkPresentModeKHR PresentModeToVk(PresentMode mode)
+    {
+        switch (mode)
+        {
             case PresentMode::Immediate:
                 return VK_PRESENT_MODE_IMMEDIATE_KHR;
             case PresentMode::Mailbox:

@@ -16,7 +16,8 @@
     } \
 }
 
-namespace grabs::Vk::Utils {
+namespace grabs::Vk::Utils
+{
     std::string ResultToString(VkResult result);
 
     VkFormat FormatToVk(Format format);

@@ -9,8 +9,10 @@
 #include "VulkanCommandList.h"
 #include "VulkanSwapchain.h"
 
-namespace grabs::Vk {
-    VulkanDevice::VulkanDevice(VkInstance instance, VulkanSurface* surface, uint32_t adapterIndex) {
+namespace grabs::Vk
+{
+    VulkanDevice::VulkanDevice(VkInstance instance, VulkanSurface* surface, uint32_t adapterIndex)
+    {
         Instance = instance;
 
         uint32_t numDevices;
@@ -31,32 +33,30 @@ namespace grabs::Vk {
 
         auto surfaceKhr = surface->Surface;
 
-        for (auto i = 0; i < numFamilies; i++) {
-            if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+        for (auto i = 0; i < numFamilies; i++)
+        {
+            if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
                 graphicsQueue = i;
-            }
 
             VkBool32 supported;
             vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surfaceKhr, &supported);
 
-            if (supported) {
+            if (supported)
                 presentQueue = i;
-            }
 
-            if (graphicsQueue.has_value() && presentQueue.has_value()) {
+            if (graphicsQueue.has_value() && presentQueue.has_value())
                 break;
-            }
         }
 
-        if (!graphicsQueue.has_value() || !presentQueue.has_value()) {
+        if (!graphicsQueue.has_value() || !presentQueue.has_value())
+        {
             std::string unavailableQueue;
-            if (!graphicsQueue.has_value()) {
+            if (!graphicsQueue.has_value())
                 unavailableQueue = "Graphics";
-            }
-            if (!presentQueue.has_value()) {
-                if (!unavailableQueue.empty()) {
+            if (!presentQueue.has_value())
+            {
+                if (!unavailableQueue.empty())
                     unavailableQueue += " and ";
-                }
 
                 unavailableQueue += "Present";
             }
@@ -72,8 +72,10 @@ namespace grabs::Vk {
         std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 
         float queuePriority = 1.0f;
-        for (const auto family : uniqueFamilies) {
-            VkDeviceQueueCreateInfo createInfo {
+        for (const auto family : uniqueFamilies)
+        {
+            VkDeviceQueueCreateInfo createInfo
+            {
                 .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
                 .queueFamilyIndex = family,
                 .queueCount = 1,
@@ -89,7 +91,8 @@ namespace grabs::Vk {
         std::vector<const char*> extensions;
         extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
-        VkDeviceCreateInfo createInfo {
+        VkDeviceCreateInfo createInfo
+        {
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
             .queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size()),
             .pQueueCreateInfos = queueCreateInfos.data(),
@@ -103,7 +106,8 @@ namespace grabs::Vk {
         vkGetDeviceQueue(Device, GraphicsQueueIndex, 0, &GraphicsQueue);
         vkGetDeviceQueue(Device, PresentQueueIndex, 0, &PresentQueue);
 
-        VkCommandPoolCreateInfo commandPoolInfo {
+        VkCommandPoolCreateInfo commandPoolInfo
+        {
             .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
             .queueFamilyIndex = GraphicsQueueIndex
         };
@@ -111,16 +115,19 @@ namespace grabs::Vk {
         VK_CHECK_RESULT(vkCreateCommandPool(Device, &commandPoolInfo, nullptr, &CommandPool));
     }
 
-    VulkanDevice::~VulkanDevice() {
+    VulkanDevice::~VulkanDevice()
+    {
         vkDestroyCommandPool(Device, CommandPool, nullptr);
         vkDestroyDevice(Device, nullptr);
     }
 
-    std::unique_ptr<Swapchain> VulkanDevice::CreateSwapchain(const SwapchainDescription& description, Surface* surface) {
+    std::unique_ptr<Swapchain> VulkanDevice::CreateSwapchain(const SwapchainDescription& description, Surface* surface)
+    {
         return std::make_unique<VulkanSwapchain>(Instance, PhysicalDevice, this, description, dynamic_cast<VulkanSurface*>(surface));
     }
 
-    std::unique_ptr<CommandList> VulkanDevice::CreateCommandList() {
+    std::unique_ptr<CommandList> VulkanDevice::CreateCommandList()
+    {
         return std::make_unique<VulkanCommandList>(Device, CommandPool);
     }
 }

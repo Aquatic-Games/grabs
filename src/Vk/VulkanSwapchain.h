@@ -6,9 +6,10 @@
 #include "VulkanSurface.h"
 #include "VulkanDevice.h"
 
-namespace grabs::Vk {
-
-    class VulkanSwapchain : public Swapchain {
+namespace grabs::Vk
+{
+    class VulkanSwapchain final : public Swapchain
+    {
     public:
         VkDevice Device;
         VkSwapchainKHR Swapchain;
@@ -18,7 +19,7 @@ namespace grabs::Vk {
         VulkanSwapchain(VkInstance instance, VkPhysicalDevice physDevice, VulkanDevice* device, const SwapchainDescription& description, VulkanSurface* surface);
         ~VulkanSwapchain() override;
 
-        TextureView* GetNextTexture() override;
+        Texture* GetNextTexture() override;
 
         void Present() override;
     };

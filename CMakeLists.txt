@@ -4,7 +4,7 @@ project(grabs)
 set(CMAKE_CXX_STANDARD 20)
 
 set(GS_BUILD_TEST ON)
-set(GS_COMPILE_VK OFF)
+set(GS_COMPILE_VK ON)
 set(GS_COMPILE_D3D11 OFF)
 
 if (WIN32)
