@@ -9,8 +9,8 @@ namespace grabs::Vk
     class VulkanSurface final : public Surface
     {
     public:
-        VkInstance Instance;
-        VkSurfaceKHR Surface;
+        VkInstance Instance{};
+        VkSurfaceKHR Surface{};
 
         explicit VulkanSurface(VkInstance instance, const std::function<void*(void* instance)>& createSurfaceFn)
         {
@@ -23,5 +23,4 @@ namespace grabs::Vk
             vkDestroySurfaceKHR(Instance, Surface, nullptr);
         }
     };
-
 }

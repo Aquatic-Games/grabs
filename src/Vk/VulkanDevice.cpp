@@ -8,6 +8,7 @@
 #include "VkUtils.h"
 #include "VulkanCommandList.h"
 #include "VulkanSwapchain.h"
+#include "../Common.h"
 
 namespace grabs::Vk
 {
@@ -129,5 +130,25 @@ namespace grabs::Vk
     std::unique_ptr<CommandList> VulkanDevice::CreateCommandList()
     {
         return std::make_unique<VulkanCommandList>(Device, CommandPool);
+    }
+
+    std::unique_ptr<Buffer> VulkanDevice::CreateBuffer(const BufferDescription& description, void* data)
+    {
+        GS_TODO
+    }
+
+    std::unique_ptr<ShaderModule> VulkanDevice::CreateShaderModule(const ShaderModuleDescription& description)
+    {
+        GS_TODO
+    }
+
+    std::unique_ptr<Pipeline> VulkanDevice::CreatePipeline(const PipelineDescription& description)
+    {
+        GS_TODO
+    }
+
+    void VulkanDevice::SubmitCommandList(CommandList* list)
+    {
+        GS_TODO
     }
 }

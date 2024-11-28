@@ -10,17 +10,17 @@ namespace grabs::Vk
     class VulkanDevice final : public Device
     {
     public:
-        VkInstance Instance;
-        VkPhysicalDevice PhysicalDevice;
-        VkDevice Device;
+        VkInstance Instance{};
+        VkPhysicalDevice PhysicalDevice{};
+        VkDevice Device{};
 
-        uint32_t GraphicsQueueIndex;
-        uint32_t PresentQueueIndex;
+        uint32_t GraphicsQueueIndex{};
+        uint32_t PresentQueueIndex{};
 
-        VkQueue GraphicsQueue;
-        VkQueue PresentQueue;
+        VkQueue GraphicsQueue{};
+        VkQueue PresentQueue{};
 
-        VkCommandPool CommandPool;
+        VkCommandPool CommandPool{};
 
         VulkanDevice(VkInstance instance, VulkanSurface* surface, uint32_t adapterIndex);
         ~VulkanDevice() override;

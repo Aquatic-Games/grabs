@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
 
     auto cl = device->CreateCommandList();
 
-    constexpr float vertices[]
+    /*constexpr float vertices[]
     {
         -0.5f,  0.5f,    1.0f, 0.0f, 0.0f,
          0.5f,  0.5f,    0.0f, 1.0f, 0.0f,
@@ -141,7 +141,7 @@ int main(int argc, char* argv[]) {
         }
     };
 
-    const auto pipeline = device->CreatePipeline(pipelineDesc);
+    const auto pipeline = device->CreatePipeline(pipelineDesc);*/
 
     bool alive = true;
     while (alive) {
@@ -164,7 +164,7 @@ int main(int argc, char* argv[]) {
         auto texture = swapchain->GetNextTexture();
         cl->Begin();
 
-        RenderPassDescription renderPass
+        /*RenderPassDescription renderPass
         {
             .Texture = texture,
             .ClearColor = { 1.0f, 0.5f, 0.25f, 1.0f }
@@ -177,7 +177,7 @@ int main(int argc, char* argv[]) {
         cl->SetIndexBuffer(indexBuffer.get(), Format::R16_UInt);
         cl->DrawIndexed(6);
 
-        cl->EndRenderPass();
+        cl->EndRenderPass();*/
 
         cl->End();
         device->SubmitCommandList(cl.get());

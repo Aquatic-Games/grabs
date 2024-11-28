@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "VkUtils.h"
+#include "../Common.h"
 
 namespace grabs::Vk
 {
@@ -76,25 +77,25 @@ namespace grabs::Vk
             VkImageView view;
             VK_CHECK_RESULT(vkCreateImageView(Device, &info, nullptr, &view));
 
-            SwapchainViews.push_back(view);
+            SwapchainTextures.push_back(std::make_unique<VulkanTexture>(Device, view));
         }
     }
 
     VulkanSwapchain::~VulkanSwapchain()
     {
-        for (const auto view : SwapchainViews)
-            vkDestroyImageView(Device, view, nullptr);
-
         vkDestroySwapchainKHR(Device, Swapchain, nullptr);
     }
 
     Texture* VulkanSwapchain::GetNextTexture()
     {
-        return nullptr;
+        uint32_t imageIndex{};
+        vkAcquireNextImageKHR(Device, Swapchain, UINT64_MAX, nullptr, nullptr, &imageIndex);
+
+        return SwapchainTextures[imageIndex].get();
     }
 
     void VulkanSwapchain::Present()
     {
-
+        GS_TODO
     }
 }

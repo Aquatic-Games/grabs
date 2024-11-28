@@ -9,9 +9,9 @@ namespace grabs::Vk
     class VulkanCommandList final : public CommandList
     {
     public:
-        VkDevice Device;
-        VkCommandPool Pool;
-        VkCommandBuffer CommandBuffer;
+        VkDevice Device{};
+        VkCommandPool Pool{};
+        VkCommandBuffer CommandBuffer{};
 
         explicit VulkanCommandList(VkDevice device, VkCommandPool pool);
         ~VulkanCommandList() override;
