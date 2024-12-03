@@ -1,0 +1,19 @@
+﻿namespace grabs.Graphics;
+
+public readonly record struct Adapter
+{
+    /// <summary>
+    /// The index, determined by the enumeration order.
+    /// </summary>
+    public readonly uint Index;
+    
+    /// <summary>
+    /// The adapter's name.
+    /// </summary>
+    public readonly string Name;
+
+    /// <summary>
+    /// The dedicated memory in bytes.
+    /// </summary>
+    public readonly ulong DedicatedMemory;
+}
