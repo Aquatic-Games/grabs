@@ -1,5 +1,8 @@
 ﻿namespace grabs.Graphics;
 
+/// <summary>
+/// A graphics adapter, usually representing a physical device present in the system.
+/// </summary>
 public readonly record struct Adapter
 {
     /// <summary>
