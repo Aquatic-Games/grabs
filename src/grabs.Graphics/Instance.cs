@@ -8,7 +8,7 @@ public abstract class Instance : IDisposable
     /// <summary>
     /// Check to see if this <see cref="Instance"/> is disposed.
     /// </summary>
-    public abstract bool IsDisposed { get; }
+    public abstract bool IsDisposed { get; protected set; }
     
     /// <summary>
     /// The current <see cref="grabs.Graphics.Backend"/> for this <see cref="Instance"/>.
