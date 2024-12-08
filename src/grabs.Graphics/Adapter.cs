@@ -19,4 +19,14 @@ public readonly record struct Adapter
     /// The dedicated memory in bytes.
     /// </summary>
     public readonly ulong DedicatedMemory;
+
+    public readonly AdapterType Type;
+
+    public Adapter(uint index, string name, ulong dedicatedMemory, AdapterType type)
+    {
+        Index = index;
+        Name = name;
+        DedicatedMemory = dedicatedMemory;
+        Type = type;
+    }
 }

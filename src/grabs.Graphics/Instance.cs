@@ -1,4 +1,4 @@
-﻿using grabs.Graphics.Vulkan;
+﻿using grabs.Graphics.D3D11;
 
 namespace grabs.Graphics;
 
@@ -25,7 +25,17 @@ public abstract class Instance : IDisposable
 
     public static Instance Create(ref readonly InstanceDescription description, IWindowProvider windowProvider)
     {
-        return new VkInstance(description.Debug, windowProvider);
+        Backend backendHint = description.BackendHint == Backend.Unknown
+            ? Backend.Vulkan | Backend.D3D11
+            : description.BackendHint;
+
+        if (OperatingSystem.IsWindows())
+        {
+            if (backendHint.HasFlag(Backend.D3D11))
+                return new D3D11Instance(description.Debug);
+        }
+
+        throw new NotSupportedException("No backend available!");
     }
     
     public abstract void Dispose();
