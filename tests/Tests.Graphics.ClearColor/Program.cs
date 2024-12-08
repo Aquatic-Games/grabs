@@ -58,6 +58,8 @@ public static class Program
 
         using Swapchain swapchain = device.CreateSwapchain(surface, in swapchainDesc);
 
+        using CommandList cl = device.CreateCommandList();
+
         bool alive = true;
         while (alive)
         {
@@ -81,6 +83,11 @@ public static class Program
             }
 
             Texture texture = swapchain.GetNextTexture();
+            
+            cl.Begin();
+            
+            cl.End();
+            device.ExecuteCommandList(cl);
             
             swapchain.Present();
         }

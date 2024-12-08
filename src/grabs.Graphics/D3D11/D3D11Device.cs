@@ -43,6 +43,18 @@ internal sealed unsafe class D3D11Device : Device
         return new D3D11Swapchain(_factory, Device, (D3D11Surface) surface, in description);
     }
 
+    public override CommandList CreateCommandList()
+    {
+        return new D3D11CommandList(Device);
+    }
+
+    public override void ExecuteCommandList(CommandList cl)
+    {
+        D3D11CommandList d3dList = (D3D11CommandList) cl;
+
+        Context->ExecuteCommandList(d3dList.CommandList, false);
+    }
+
     public override void Dispose()
     {
         Context->Release();
