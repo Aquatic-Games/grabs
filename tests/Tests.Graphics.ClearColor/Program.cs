@@ -51,5 +51,38 @@ public static class Program
         }
 
         using Device device = instance.CreateDevice(surface);
+
+        SwapchainDescription swapchainDesc =
+            new SwapchainDescription(new Size2D(width, height), Format.B8G8R8A8_UNorm, 2, PresentMode.Fifo);
+
+        using Swapchain swapchain = device.CreateSwapchain(surface, in swapchainDesc);
+
+        bool alive = true;
+        while (alive)
+        {
+            Event winEvent;
+            while (sdl.PollEvent(&winEvent) != 0)
+            {
+                switch ((EventType) winEvent.Type)
+                {
+                    case EventType.Windowevent:
+                    {
+                        switch ((WindowEventID) winEvent.Window.Event)
+                        {
+                            case WindowEventID.Close:
+                                alive = false;
+                                break;
+                        }
+
+                        break;
+                    }
+                }
+            }
+            
+            swapchain.Present();
+        }
+        
+        sdl.DestroyWindow(window);
+        sdl.Quit();
     }
 }

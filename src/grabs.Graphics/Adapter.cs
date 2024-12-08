@@ -20,6 +20,11 @@ public readonly record struct Adapter
     /// </summary>
     public readonly ulong DedicatedMemory;
 
+    /// <summary>
+    /// The adapter's type.
+    /// </summary>
+    /// <remarks>In some backends, an integrated GPU may show up as <see cref="AdapterType.Dedicated"/>, as these
+    /// backends do not differentiate between the two.</remarks>
     public readonly AdapterType Type;
 
     public Adapter(uint index, string name, ulong dedicatedMemory, AdapterType type)
