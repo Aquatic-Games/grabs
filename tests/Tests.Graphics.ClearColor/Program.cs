@@ -2,6 +2,7 @@
 using grabs.Graphics.D3D11;
 using Silk.NET.SDL;
 using Surface = grabs.Graphics.Surface;
+using Texture = grabs.Graphics.Texture;
 
 public static class Program
 {
@@ -78,6 +79,8 @@ public static class Program
                     }
                 }
             }
+
+            Texture texture = swapchain.GetNextTexture();
             
             swapchain.Present();
         }

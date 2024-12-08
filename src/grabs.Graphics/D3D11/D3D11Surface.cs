@@ -2,7 +2,7 @@
 
 public sealed class D3D11Surface : Surface
 {
-    public nint Hwnd;
+    public readonly nint Hwnd;
 
     public D3D11Surface(nint hwnd)
     {
