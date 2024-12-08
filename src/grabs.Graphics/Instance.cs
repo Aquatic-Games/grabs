@@ -1,4 +1,6 @@
-﻿namespace grabs.Graphics;
+﻿using grabs.Graphics.Vulkan;
+
+namespace grabs.Graphics;
 
 /// <summary>
 /// An instance contains the base methods to create and manage <see cref="Device"/>s.
@@ -23,7 +25,7 @@ public abstract class Instance : IDisposable
 
     public static Instance Create(ref readonly InstanceDescription description, IWindowProvider windowProvider)
     {
-        throw new NotImplementedException();
+        return new VkInstance(description.Debug, windowProvider);
     }
     
     public abstract void Dispose();

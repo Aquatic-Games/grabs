@@ -15,4 +15,10 @@ public record struct InstanceDescription
     /// automatically pick a backend.
     /// </summary>
     public Backend BackendHint;
+
+    public InstanceDescription(bool debug, Backend backendHint)
+    {
+        Debug = debug;
+        BackendHint = backendHint;
+    }
 }
