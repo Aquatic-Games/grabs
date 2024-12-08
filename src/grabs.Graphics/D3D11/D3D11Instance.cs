@@ -11,6 +11,8 @@ namespace grabs.Graphics.D3D11;
 [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
 internal sealed unsafe class D3D11Instance : Instance
 {
+    private bool _debug;
+    
     public readonly IDXGIFactory1* Factory;
     
     public override bool IsDisposed { get; protected set; }
@@ -19,6 +21,8 @@ internal sealed unsafe class D3D11Instance : Instance
 
     public D3D11Instance(bool debug)
     {
+        _debug = debug;
+        
         fixed (IDXGIFactory1** factory = &Factory)
             CheckResult(CreateDXGIFactory1(__uuidof<IDXGIFactory1>(), (void**) factory), "Create DXGI factory");
     }
@@ -51,7 +55,7 @@ internal sealed unsafe class D3D11Instance : Instance
         IDXGIAdapter1* dxgiAdapter;
         Factory->EnumAdapters1(adapter?.Index ?? 0, &dxgiAdapter);
 
-        return new D3D11Device(Factory, dxgiAdapter);
+        return new D3D11Device(_debug, Factory, dxgiAdapter);
     }
 
     public override void Dispose()
