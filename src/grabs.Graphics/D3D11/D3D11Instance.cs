@@ -46,6 +46,14 @@ internal sealed unsafe class D3D11Instance : Instance
         return adapters.ToArray();
     }
 
+    public override Device CreateDevice(Surface surface, Adapter? adapter = null)
+    {
+        IDXGIAdapter1* dxgiAdapter;
+        Factory->EnumAdapters1(adapter?.Index ?? 0, &dxgiAdapter);
+
+        return new D3D11Device(Factory, dxgiAdapter);
+    }
+
     public override void Dispose()
     {
         Factory->Release();

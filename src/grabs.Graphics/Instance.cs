@@ -23,6 +23,8 @@ public abstract class Instance : IDisposable
     /// <returns>A list of <see cref="Adapter"/>s.</returns>
     public abstract Adapter[] EnumerateAdapters();
 
+    public abstract Device CreateDevice(Surface surface, Adapter? adapter = null);
+
     public static Instance Create(ref readonly InstanceDescription description, IWindowProvider windowProvider)
     {
         Backend backendHint = description.BackendHint == Backend.Unknown
