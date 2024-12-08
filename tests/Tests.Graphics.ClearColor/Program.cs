@@ -85,6 +85,11 @@ public static class Program
             Texture texture = swapchain.GetNextTexture();
             
             cl.Begin();
+
+            RenderPassDescription pass =
+                new RenderPassDescription(new ColorAttachmentDescription(texture, new Color4(1.0f, 0.5f, 0.25f, 1.0f)));
+            cl.BeginRenderPass(in pass);
+            cl.EndRenderPass();
             
             cl.End();
             device.ExecuteCommandList(cl);

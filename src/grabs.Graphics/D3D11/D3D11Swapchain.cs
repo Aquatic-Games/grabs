@@ -59,7 +59,7 @@ internal sealed unsafe class D3D11Swapchain : Swapchain
 
     public override void Present()
     {
-        Swapchain->Present(1, DXGI_PRESENT_ALLOW_TEARING);
+        CheckResult(Swapchain->Present(1, 0), "Present");
     }
 
     public override void Dispose()
