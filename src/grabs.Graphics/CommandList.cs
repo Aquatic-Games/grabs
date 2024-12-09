@@ -12,6 +12,18 @@ public abstract class CommandList : IDisposable
     public abstract void BeginRenderPass(ref readonly RenderPassDescription description);
 
     public abstract void EndRenderPass();
+
+    public abstract void SetViewport(ref readonly Viewport viewport);
+
+    public abstract void SetPipeline(Pipeline pipeline);
+
+    public abstract void SetVertexBuffer(uint slot, Buffer buffer, uint stride, uint offset);
+
+    public abstract void SetIndexBuffer(Buffer buffer, Format format);
+
+    public abstract void Draw(uint numVertices);
+
+    public abstract void DrawIndexed(uint numIndices);
     
     public abstract void Dispose();
 }

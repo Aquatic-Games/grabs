@@ -61,6 +61,56 @@ internal sealed unsafe class D3D11CommandList : CommandList
         // Does nothing
     }
 
+    public override void SetViewport(ref readonly Viewport viewport)
+    {
+        D3D11_VIEWPORT d3dViewport = new()
+        {
+            TopLeftX = viewport.X,
+            TopLeftY = viewport.Y,
+            Width = viewport.Width,
+            Height = viewport.Height,
+            MinDepth = viewport.MinDepth,
+            MaxDepth = viewport.MaxDepth
+        };
+
+        Context->RSSetViewports(1, &d3dViewport);
+    }
+
+    public override void SetPipeline(Pipeline pipeline)
+    {
+        D3D11Pipeline d3dPipeline = (D3D11Pipeline) pipeline;
+
+        Context->VSSetShader(d3dPipeline.VertexShader, null, 0);
+        Context->PSSetShader(d3dPipeline.PixelShader, null, 0);
+        Context->IASetInputLayout(d3dPipeline.InputLayout);
+        Context->IASetPrimitiveTopology(d3dPipeline.PrimitiveTopology);
+    }
+
+    public override void SetVertexBuffer(uint slot, Buffer buffer, uint stride, uint offset)
+    {
+        D3D11Buffer d3dBuffer = (D3D11Buffer) buffer;
+        ID3D11Buffer* buf = d3dBuffer.Buffer;
+
+        Context->IASetVertexBuffers(slot, 1, &buf, &stride, &offset);
+    }
+
+    public override void SetIndexBuffer(Buffer buffer, Format format)
+    {
+        D3D11Buffer d3dBuffer = (D3D11Buffer) buffer;
+
+        Context->IASetIndexBuffer(d3dBuffer.Buffer, format.ToD3D(), 0);
+    }
+
+    public override void Draw(uint numVertices)
+    {
+        Context->Draw(numVertices, 0);
+    }
+
+    public override void DrawIndexed(uint numIndices)
+    {
+        Context->DrawIndexed(numIndices, 0, 0);
+    }
+
     public override void Dispose()
     {
         if (CommandList != null)

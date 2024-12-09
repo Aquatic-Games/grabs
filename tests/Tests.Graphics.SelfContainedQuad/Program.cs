@@ -125,11 +125,19 @@ public static class Program
             RenderPassDescription pass =
                 new RenderPassDescription(new ColorAttachmentDescription(texture, new Color4(1.0f, 0.5f, 0.25f, 1.0f)));
             cl.BeginRenderPass(in pass);
+
+            Viewport vp = new Viewport(0, 0, width, height);
+            cl.SetViewport(in vp);
+            
+            cl.SetPipeline(pipeline);
+            cl.SetVertexBuffer(0, vertexBuffer, 5 * sizeof(float), 0);
+            cl.SetIndexBuffer(indexBuffer, Format.R16_UInt);
+            cl.DrawIndexed(6);
+            
             cl.EndRenderPass();
-            
             cl.End();
-            device.ExecuteCommandList(cl);
             
+            device.ExecuteCommandList(cl);
             swapchain.Present();
         }
         
