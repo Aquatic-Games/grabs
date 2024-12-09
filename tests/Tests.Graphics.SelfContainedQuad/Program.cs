@@ -86,6 +86,16 @@ public static class Program
         using ShaderModule vertModule = device.CreateShaderModule(ShaderStage.Vertex, vertSpv, "VSMain");
         using ShaderModule pixlModule = device.CreateShaderModule(ShaderStage.Pixel, pixlSpv, "PSMain");
 
+        ReadOnlySpan<InputLayoutDescription> inputLayout =
+        [
+            new InputLayoutDescription(Format.R32G32_Float, 0, 0, InputType.PerVertex),
+            new InputLayoutDescription(Format.R32G32B32_Float, 8, 0, InputType.PerVertex)
+        ];
+
+        PipelineDescription pipelineDesc = new PipelineDescription(vertModule, pixlModule, in inputLayout);
+
+        using Pipeline pipeline = device.CreatePipeline(in pipelineDesc);
+
         bool alive = true;
         while (alive)
         {

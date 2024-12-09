@@ -1,4 +1,5 @@
 ﻿using grabs.Graphics.D3D11;
+using grabs.Graphics.Exceptions;
 
 namespace grabs.Graphics;
 
@@ -37,7 +38,7 @@ public abstract class Instance : IDisposable
                 return new D3D11Instance(description.Debug);
         }
 
-        throw new NotSupportedException("No backend available!");
+        throw new NoBackendException();
     }
     
     public abstract void Dispose();

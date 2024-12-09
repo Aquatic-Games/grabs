@@ -42,15 +42,6 @@ public abstract class Device : IDisposable
         fixed (void* pData = data)
             return CreateBuffer(ref description, pData);
     }
-
-    public abstract ShaderModule CreateShaderModule(ShaderStage stage, ref readonly ReadOnlySpan<byte> spirv,
-        string entryPoint);
-
-    public ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint)
-    {
-        ReadOnlySpan<byte> spanSpv = spirv.AsSpan();
-        return CreateShaderModule(stage, in spanSpv, entryPoint);
-    }
     
     public unsafe Buffer CreateBuffer<T>(BufferType type, T[] data, bool dynamic = false) where T : unmanaged
     {
@@ -59,6 +50,17 @@ public abstract class Device : IDisposable
         fixed (void* pData = data)
             return CreateBuffer(ref description, pData);
     }
+    
+    public abstract ShaderModule CreateShaderModule(ShaderStage stage, ref readonly ReadOnlySpan<byte> spirv,
+        string entryPoint);
+
+    public ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint)
+    {
+        ReadOnlySpan<byte> spanSpv = spirv.AsSpan();
+        return CreateShaderModule(stage, in spanSpv, entryPoint);
+    }
+
+    public abstract Pipeline CreatePipeline(ref readonly PipelineDescription description);
 
     public abstract void ExecuteCommandList(CommandList cl);
     
