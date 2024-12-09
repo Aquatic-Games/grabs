@@ -16,4 +16,17 @@
       <PackageReference Include="Silk.NET.SDL" Version="2.22.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ClCompile Include="Test.hlsl" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Test_v.spv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Test_p.spv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

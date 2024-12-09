@@ -1,6 +1,7 @@
 ﻿using grabs.Graphics;
 using grabs.Graphics.D3D11;
 using Silk.NET.SDL;
+using Buffer = grabs.Graphics.Buffer;
 using Surface = grabs.Graphics.Surface;
 using Texture = grabs.Graphics.Texture;
 
@@ -61,6 +62,29 @@ public static class Program
         using Swapchain swapchain = device.CreateSwapchain(surface, in swapchainDesc);
 
         using CommandList cl = device.CreateCommandList();
+
+        ReadOnlySpan<float> vertices =
+        [
+            -0.5f, +0.5f,    1.0f, 0.0f, 0.0f,
+            +0.5f, +0.5f,    0.0f, 1.0f, 0.0f,
+            +0.5f, -0.5f,    0.0f, 0.0f, 1.0f,
+            -0.5f, -0.5f,    0.0f, 0.0f, 0.0f
+        ];
+
+        ReadOnlySpan<ushort> indices = 
+        [
+            0, 1, 3, 
+            1, 2, 3
+        ];
+
+        using Buffer vertexBuffer = device.CreateBuffer(BufferType.Vertex, in vertices);
+        using Buffer indexBuffer = device.CreateBuffer(BufferType.Index, in indices);
+
+        byte[] vertSpv = File.ReadAllBytes("Test_v.spv");
+        byte[] pixlSpv = File.ReadAllBytes("Test_p.spv");
+
+        using ShaderModule vertModule = device.CreateShaderModule(ShaderStage.Vertex, vertSpv, "VSMain");
+        using ShaderModule pixlModule = device.CreateShaderModule(ShaderStage.Pixel, pixlSpv, "PSMain");
 
         bool alive = true;
         while (alive)

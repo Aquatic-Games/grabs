@@ -53,6 +53,11 @@ internal sealed unsafe class D3D11Device : Device
         return new D3D11Buffer(Device, in description, data);
     }
 
+    public override ShaderModule CreateShaderModule(ShaderStage stage, ref readonly ReadOnlySpan<byte> spirv, string entryPoint)
+    {
+        return new D3D11ShaderModule(stage, in spirv, entryPoint);
+    }
+
     public override void ExecuteCommandList(CommandList cl)
     {
         D3D11CommandList d3dList = (D3D11CommandList) cl;

@@ -18,8 +18,11 @@ public unsafe struct PinnedString : IDisposable
 
     public PinnedString(string @string) : this(@string, Encoding.UTF8) { }
 
-    public static explicit operator byte*(in PinnedString @string)
+    public static implicit operator byte*(in PinnedString @string)
         => (byte*) @string.Handle;
+
+    public static implicit operator sbyte*(in PinnedString @string)
+        => (sbyte*) @string.Handle;
 
     public override string ToString()
     {

@@ -43,6 +43,15 @@ public abstract class Device : IDisposable
             return CreateBuffer(ref description, pData);
     }
 
+    public abstract ShaderModule CreateShaderModule(ShaderStage stage, ref readonly ReadOnlySpan<byte> spirv,
+        string entryPoint);
+
+    public ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint)
+    {
+        ReadOnlySpan<byte> spanSpv = spirv.AsSpan();
+        return CreateShaderModule(stage, in spanSpv, entryPoint);
+    }
+    
     public unsafe Buffer CreateBuffer<T>(BufferType type, T[] data, bool dynamic = false) where T : unmanaged
     {
         BufferDescription description = new BufferDescription(type, (uint) (sizeof(T) * data.Length), dynamic);
