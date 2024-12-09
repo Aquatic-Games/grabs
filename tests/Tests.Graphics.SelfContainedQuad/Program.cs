@@ -4,6 +4,8 @@ using Silk.NET.SDL;
 using Surface = grabs.Graphics.Surface;
 using Texture = grabs.Graphics.Texture;
 
+namespace Tests.Graphics.SelfContainedQuad;
+
 public static class Program
 {
     public static unsafe void Main(string[] args)
@@ -16,7 +18,7 @@ public static class Program
         const int width = 1280;
         const int height = 720;
 
-        Window* window = sdl.CreateWindow("Clear Color test", Sdl.WindowposCentered, Sdl.WindowposCentered, width,
+        Window* window = sdl.CreateWindow("Test", Sdl.WindowposCentered, Sdl.WindowposCentered, width,
             height, (uint) WindowFlags.Vulkan);
 
         if (window == null)

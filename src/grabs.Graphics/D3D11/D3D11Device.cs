@@ -48,6 +48,11 @@ internal sealed unsafe class D3D11Device : Device
         return new D3D11CommandList(Device);
     }
 
+    public override Buffer CreateBuffer(ref readonly BufferDescription description, void* data)
+    {
+        return new D3D11Buffer(Device, in description, data);
+    }
+
     public override void ExecuteCommandList(CommandList cl)
     {
         D3D11CommandList d3dList = (D3D11CommandList) cl;

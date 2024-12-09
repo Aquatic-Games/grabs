@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Core", "src\grabs.Cor
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{31DFBDED-56EA-4B0F-BD11-E2DA5A6043BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Graphics.ClearColor", "tests\Tests.Graphics.ClearColor\Tests.Graphics.ClearColor.csproj", "{E1FB1953-A930-42FE-B2E1-7FB394773776}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Graphics.SelfContainedQuad", "tests\Tests.Graphics.SelfContainedQuad\Tests.Graphics.SelfContainedQuad.csproj", "{E1FB1953-A930-42FE-B2E1-7FB394773776}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
