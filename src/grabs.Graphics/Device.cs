@@ -7,7 +7,7 @@ namespace grabs.Graphics;
 /// </summary>
 public abstract class Device : IDisposable
 {
-    public abstract Swapchain CreateSwapchain(Surface surface, ref readonly SwapchainDescription description);
+    public abstract Swapchain CreateSwapchain(Surface surface, in SwapchainDescription description);
 
     public abstract CommandList CreateCommandList();
 
@@ -18,14 +18,14 @@ public abstract class Device : IDisposable
     /// <param name="data">The data the buffer should contain. Must be <b>at least</b> as large as
     /// <see cref="BufferDescription.Size"/>. Can be null.</param>
     /// <returns>The created buffer.</returns>
-    public abstract unsafe Buffer CreateBuffer(ref readonly BufferDescription description, void* data);
+    public abstract unsafe Buffer CreateBuffer(in BufferDescription description, void* data);
 
     /// <summary>
     /// Create an empty GPU buffer from the description.
     /// </summary>
     /// <param name="description">The buffer's description.</param>
     /// <returns>The created buffer.</returns>
-    public unsafe Buffer CreateBuffer(ref readonly BufferDescription description)
+    public unsafe Buffer CreateBuffer(in BufferDescription description)
         => CreateBuffer(in description, null);
 
     public unsafe Buffer CreateBuffer<T>(BufferType type, T data, bool dynamic = false) where T : unmanaged
@@ -34,7 +34,7 @@ public abstract class Device : IDisposable
         return CreateBuffer(ref description, Unsafe.AsPointer(ref data));
     }
 
-    public unsafe Buffer CreateBuffer<T>(BufferType type, ref readonly ReadOnlySpan<T> data, bool dynamic = false)
+    public unsafe Buffer CreateBuffer<T>(BufferType type, in ReadOnlySpan<T> data, bool dynamic = false)
         where T : unmanaged
     {
         BufferDescription description = new BufferDescription(type, (uint) (sizeof(T) * data.Length), dynamic);
@@ -51,7 +51,7 @@ public abstract class Device : IDisposable
             return CreateBuffer(ref description, pData);
     }
     
-    public abstract ShaderModule CreateShaderModule(ShaderStage stage, ref readonly ReadOnlySpan<byte> spirv,
+    public abstract ShaderModule CreateShaderModule(ShaderStage stage, in ReadOnlySpan<byte> spirv,
         string entryPoint);
 
     public ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint)
@@ -60,7 +60,7 @@ public abstract class Device : IDisposable
         return CreateShaderModule(stage, in spanSpv, entryPoint);
     }
 
-    public abstract Pipeline CreatePipeline(ref readonly PipelineDescription description);
+    public abstract Pipeline CreatePipeline(in PipelineDescription description);
 
     public abstract void ExecuteCommandList(CommandList cl);
     

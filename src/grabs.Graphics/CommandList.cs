@@ -9,11 +9,11 @@ public abstract class CommandList : IDisposable
 
     public abstract void End();
 
-    public abstract void BeginRenderPass(ref readonly RenderPassDescription description);
+    public abstract void BeginRenderPass(in RenderPassDescription description);
 
     public abstract void EndRenderPass();
 
-    public abstract void SetViewport(ref readonly Viewport viewport);
+    public abstract void SetViewport(in Viewport viewport);
 
     public abstract void SetPipeline(Pipeline pipeline);
 

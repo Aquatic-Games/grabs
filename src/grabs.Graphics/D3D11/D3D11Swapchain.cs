@@ -16,7 +16,7 @@ internal sealed unsafe class D3D11Swapchain : Swapchain
     
     public readonly IDXGISwapChain* Swapchain;
 
-    public D3D11Swapchain(IDXGIFactory1* factory, ID3D11Device* device, D3D11Surface surface, ref readonly SwapchainDescription description)
+    public D3D11Swapchain(IDXGIFactory1* factory, ID3D11Device* device, D3D11Surface surface, in SwapchainDescription description)
     {
         DXGI_SWAP_CHAIN_DESC desc = new()
         {
@@ -26,8 +26,8 @@ internal sealed unsafe class D3D11Swapchain : Swapchain
             BufferCount = description.NumBuffers,
             BufferDesc = new DXGI_MODE_DESC
             {
-                Width = description.Size.Width,
-                Height = description.Size.Height,
+                Width =  description.Width,
+                Height = description.Height,
                 Format = description.Format.ToD3D()
             },
             BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT,

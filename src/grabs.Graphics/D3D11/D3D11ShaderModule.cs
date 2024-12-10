@@ -13,7 +13,7 @@ internal sealed unsafe class D3D11ShaderModule : ShaderModule
 {
     public readonly ID3DBlob* Blob;
 
-    public D3D11ShaderModule(ShaderStage stage, ref readonly ReadOnlySpan<byte> spirv, string entryPoint)
+    public D3D11ShaderModule(ShaderStage stage, in ReadOnlySpan<byte> spirv, string entryPoint)
     {
         string hlsl = SpirvToHLSL(stage, in spirv, entryPoint);
         Console.WriteLine(hlsl);
@@ -57,7 +57,7 @@ internal sealed unsafe class D3D11ShaderModule : ShaderModule
         _spirv = Cross.GetApi();
     }
 
-    private static string SpirvToHLSL(ShaderStage stage, ref readonly ReadOnlySpan<byte> spirv, string entryPoint)
+    private static string SpirvToHLSL(ShaderStage stage, in ReadOnlySpan<byte> spirv, string entryPoint)
     {
         Context* context;
         _spirv.ContextCreate(&context);

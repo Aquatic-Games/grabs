@@ -1,4 +1,6 @@
-﻿namespace grabs.Graphics;
+﻿using System.Drawing;
+
+namespace grabs.Graphics;
 
 public struct Color4
 {
@@ -17,4 +19,7 @@ public struct Color4
         B = b;
         A = a;
     }
+
+    public static explicit operator Color4(in Color color)
+        => new Color4(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f);
 }

@@ -26,7 +26,7 @@ public abstract class Instance : IDisposable
 
     public abstract Device CreateDevice(Surface surface, Adapter? adapter = null);
 
-    public static Instance Create(ref readonly InstanceDescription description, IWindowProvider windowProvider)
+    public static Instance Create(in InstanceDescription description, IWindowProvider windowProvider)
     {
         Backend backendHint = description.BackendHint == Backend.Unknown
             ? Backend.Vulkan | Backend.D3D11

@@ -8,7 +8,7 @@ public ref struct PipelineDescription
 
     public ReadOnlySpan<InputLayoutDescription> InputLayout;
 
-    public PipelineDescription(ShaderModule vertexShader, ShaderModule pixelShader, ref readonly ReadOnlySpan<InputLayoutDescription> inputLayout)
+    public PipelineDescription(ShaderModule vertexShader, ShaderModule pixelShader, in ReadOnlySpan<InputLayoutDescription> inputLayout)
     {
         VertexShader = vertexShader;
         PixelShader = pixelShader;

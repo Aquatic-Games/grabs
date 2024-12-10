@@ -6,9 +6,14 @@
 public record struct SwapchainDescription
 {
     /// <summary>
-    /// The size, in pixels, of the swapchain textures.
+    /// The width, in pixels, of the swapchain textures.
     /// </summary>
-    public Size2D Size;
+    public uint Width;
+
+    /// <summary>
+    /// The height, in pixels, of the swapchain textures.
+    /// </summary>
+    public uint Height;
 
     /// <summary>
     /// The <see cref="grabs.Graphics.Format"/> that the swapchain textures should use.
@@ -27,9 +32,10 @@ public record struct SwapchainDescription
     /// </summary>
     public PresentMode PresentMode;
 
-    public SwapchainDescription(Size2D size, Format format, uint numBuffers, PresentMode presentMode)
+    public SwapchainDescription(uint width, uint height, Format format, uint numBuffers, PresentMode presentMode)
     {
-        Size = size;
+        Width = width;
+        Height = height;
         Format = format;
         NumBuffers = numBuffers;
         PresentMode = presentMode;

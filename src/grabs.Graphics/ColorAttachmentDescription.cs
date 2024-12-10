@@ -1,4 +1,6 @@
-﻿namespace grabs.Graphics;
+﻿using System.Drawing;
+
+namespace grabs.Graphics;
 
 public struct ColorAttachmentDescription
 {
@@ -14,4 +16,7 @@ public struct ColorAttachmentDescription
         ClearColor = clearColor;
         LoadOp = loadOp;
     }
+
+    public ColorAttachmentDescription(Texture texture, Color clearColor, LoadOp loadOp = LoadOp.Clear)
+        : this(texture, (Color4) clearColor, loadOp) { }
 }

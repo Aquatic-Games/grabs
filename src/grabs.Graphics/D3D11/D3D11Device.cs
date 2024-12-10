@@ -38,7 +38,7 @@ internal sealed unsafe class D3D11Device : Device
         }
     }
 
-    public override Swapchain CreateSwapchain(Surface surface, ref readonly SwapchainDescription description)
+    public override Swapchain CreateSwapchain(Surface surface, in SwapchainDescription description)
     {
         return new D3D11Swapchain(_factory, Device, (D3D11Surface) surface, in description);
     }
@@ -48,17 +48,17 @@ internal sealed unsafe class D3D11Device : Device
         return new D3D11CommandList(Device);
     }
 
-    public override Buffer CreateBuffer(ref readonly BufferDescription description, void* data)
+    public override Buffer CreateBuffer(in BufferDescription description, void* data)
     {
         return new D3D11Buffer(Device, in description, data);
     }
 
-    public override ShaderModule CreateShaderModule(ShaderStage stage, ref readonly ReadOnlySpan<byte> spirv, string entryPoint)
+    public override ShaderModule CreateShaderModule(ShaderStage stage, in ReadOnlySpan<byte> spirv, string entryPoint)
     {
         return new D3D11ShaderModule(stage, in spirv, entryPoint);
     }
 
-    public override Pipeline CreatePipeline(ref readonly PipelineDescription description)
+    public override Pipeline CreatePipeline(in PipelineDescription description)
     {
         return new D3D11Pipeline(Device, in description);
     }

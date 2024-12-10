@@ -18,7 +18,7 @@ internal sealed unsafe class D3D11Pipeline : Pipeline
 
     public D3D_PRIMITIVE_TOPOLOGY PrimitiveTopology;
 
-    public D3D11Pipeline(ID3D11Device* device, ref readonly PipelineDescription description)
+    public D3D11Pipeline(ID3D11Device* device, in PipelineDescription description)
     {
         D3D11ShaderModule vertexModule = (D3D11ShaderModule) description.VertexShader;
         void* vertexData = vertexModule.Blob->GetBufferPointer();

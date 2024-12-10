@@ -11,7 +11,7 @@ internal sealed unsafe class D3D11Buffer : Buffer
 {
     public readonly ID3D11Buffer* Buffer;
 
-    public D3D11Buffer(ID3D11Device* device, ref readonly BufferDescription description, void* data)
+    public D3D11Buffer(ID3D11Device* device, in BufferDescription description, void* data)
     {
         D3D11_BIND_FLAG bindFlags = description.Type switch
         {

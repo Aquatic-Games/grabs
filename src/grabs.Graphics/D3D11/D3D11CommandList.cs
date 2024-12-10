@@ -34,7 +34,7 @@ internal sealed unsafe class D3D11CommandList : CommandList
             CheckResult(Context->FinishCommandList(false, commandList), "Finish command list");
     }
 
-    public override void BeginRenderPass(ref readonly RenderPassDescription description)
+    public override void BeginRenderPass(in RenderPassDescription description)
     {
         int numRenderTargets = description.ColorAttachments.Length;
         
@@ -61,7 +61,7 @@ internal sealed unsafe class D3D11CommandList : CommandList
         // Does nothing
     }
 
-    public override void SetViewport(ref readonly Viewport viewport)
+    public override void SetViewport(in Viewport viewport)
     {
         D3D11_VIEWPORT d3dViewport = new()
         {
