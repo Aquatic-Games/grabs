@@ -25,15 +25,14 @@ using Swapchain swapchain2 = device.CreateSwapchain(surface2, in swapchainDesc);
 
 using CommandList cl = device.CreateCommandList();
 
-bool alive = true;
-while (alive)
+while (Window.WindowCount > 0)
 {
-    while (window1.PollEvent(out IWindowEvent? winEvent))
+    while (Window.PollEvent(out WindowEvent winEvent))
     {
-        switch (winEvent)
+        switch (winEvent.Type)
         {
-            case QuitEvent:
-                alive = false;
+            case EventType.Quit:
+                winEvent.Window.Dispose();
                 break;
         }
     }

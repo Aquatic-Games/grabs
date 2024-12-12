@@ -19,11 +19,11 @@ using CommandList cl = device.CreateCommandList();
 bool alive = true;
 while (alive)
 {
-    while (window.PollEvent(out IWindowEvent? winEvent))
+    while (Window.PollEvent(out WindowEvent winEvent))
     {
-        switch (winEvent)
+        switch (winEvent.Type)
         {
-            case QuitEvent:
+            case EventType.Quit:
                 alive = false;
                 break;
         }
