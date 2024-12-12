@@ -1,5 +1,6 @@
 ﻿using grabs.Graphics.D3D11;
 using grabs.Graphics.Exceptions;
+using grabs.Graphics.Vulkan;
 
 namespace grabs.Graphics;
 
@@ -37,6 +38,9 @@ public abstract class Instance : IDisposable
             if (backendHint.HasFlag(Backend.D3D11))
                 return new D3D11Instance(description.Debug);
         }
+
+        if (backendHint.HasFlag(Backend.Vulkan))
+            return new VulkanInstance(description.Debug, windowProvider);
 
         throw new NoBackendException();
     }

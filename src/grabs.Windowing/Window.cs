@@ -42,9 +42,16 @@ public unsafe class Window : IWindowProvider, IDisposable
         }
     }
     
-    public string[] GetInstanceExtensions()
+    public string[] GetVulkanInstanceExtensions()
     {
-        throw new NotImplementedException();
+        uint numExtensions;
+        if (_sdl.VulkanGetInstanceExtensions(_window, &numExtensions, (byte**) null) == SdlBool.False)
+            throw new Exception($"Failed to get instance extensions: {_sdl.GetErrorS()}");
+
+        string[] extensions = new string[numExtensions];
+        _sdl.VulkanGetInstanceExtensions(_window, &numExtensions, extensions);
+
+        return extensions;
     }
     
     public void Dispose()
@@ -79,8 +86,10 @@ public unsafe class Window : IWindowProvider, IDisposable
         int x = description.X ?? Sdl.WindowposCentered;
         int y = description.Y ?? Sdl.WindowposCentered;
 
+        WindowFlags flags = WindowFlags.Vulkan;
+
         SdlWindow* window =
-            _sdl.CreateWindow(description.Title, x, y, (int) description.Width, (int) description.Height, 0);
+            _sdl.CreateWindow(description.Title, x, y, (int) description.Width, (int) description.Height, (uint) flags);
 
         if (window == null)
         {

@@ -8,7 +8,7 @@ const uint height = 720;
 
 using Window window = Window.Create(new WindowDescription(width, height, "Test Window"));
 
-using Instance instance = Instance.Create(new InstanceDescription(true, Backend.Unknown), window);
+using Instance instance = Instance.Create(new InstanceDescription(true, Backend.Vulkan), window);
 using Surface surface = window.CreateSurface(instance);
 
 using Device device = instance.CreateDevice(surface);

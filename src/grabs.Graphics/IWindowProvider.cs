@@ -6,5 +6,5 @@
 /// </summary>
 public interface IWindowProvider
 {
-    public string[] GetInstanceExtensions();
+    public string[] GetVulkanInstanceExtensions();
 }
