@@ -14,6 +14,13 @@ public unsafe struct PinnedStringArray : IDisposable
 
     public PinnedStringArray(params ReadOnlySpan<string> strings)
     {
+        if (strings.Length == 0)
+        {
+            Length = 0;
+            _array = null;
+            return;
+        }
+        
         Length = (uint) strings.Length;
         _array = (byte**) NativeMemory.Alloc((uint) (Length * sizeof(byte*)));
         

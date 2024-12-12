@@ -1,17 +1,22 @@
 ﻿global using VkInstance = Silk.NET.Vulkan.Instance;
 using grabs.Core;
 using Silk.NET.Vulkan;
+using Silk.NET.Vulkan.Extensions.EXT;
 using static grabs.Graphics.Vulkan.VulkanResult;
 
 namespace grabs.Graphics.Vulkan;
 
 internal sealed unsafe class VulkanInstance : Instance
 {
-    public override bool IsDisposed { get; protected set; }
+    private readonly ExtDebugUtils? _debugUtils;
 
+    private readonly DebugUtilsMessengerEXT _debugMessenger;
+    
     public readonly Vk Vk;
     
     public readonly VkInstance Instance;
+    
+    public override bool IsDisposed { get; protected set; }
     
     public override Backend Backend => Backend.Vulkan;
 
@@ -36,7 +41,18 @@ internal sealed unsafe class VulkanInstance : Instance
         };
 
         string[] instanceExtensions = provider.GetVulkanInstanceExtensions();
+        string[] layers = [];
+
+        if (debug)
+        {
+            Array.Resize(ref instanceExtensions, instanceExtensions.Length + 1);
+            instanceExtensions[^1] = ExtDebugUtils.ExtensionName;
+
+            layers = ["VK_LAYER_KHRONOS_validation"];
+        }
+        
         using PinnedStringArray pInstanceExtensions = new PinnedStringArray(instanceExtensions);
+        using PinnedStringArray pLayers = new PinnedStringArray(layers);
 
         InstanceCreateInfo instanceInfo = new InstanceCreateInfo()
         {
@@ -45,12 +61,41 @@ internal sealed unsafe class VulkanInstance : Instance
             PpEnabledExtensionNames = pInstanceExtensions,
             EnabledExtensionCount = pInstanceExtensions.Length,
             
+            PpEnabledLayerNames = pLayers,
+            EnabledLayerCount = pLayers.Length,
+            
             PApplicationInfo = &appInfo
         };
         
         CheckResult(Vk.CreateInstance(&instanceInfo, null, out Instance), "Create instance");
+
+        _debugUtils = null;
+        _debugMessenger = default;
+
+        if (debug)
+        {
+            if (!Vk.TryGetInstanceExtension(Instance, out _debugUtils!))
+                throw new Exception("Failed to get debug utils extension.");
+
+            DebugUtilsMessengerCreateInfoEXT messengerInfo = new DebugUtilsMessengerCreateInfoEXT()
+            {
+                SType = StructureType.DebugUtilsMessengerCreateInfoExt,
+                MessageSeverity = DebugUtilsMessageSeverityFlagsEXT.ErrorBitExt |
+                                  DebugUtilsMessageSeverityFlagsEXT.InfoBitExt |
+                                  DebugUtilsMessageSeverityFlagsEXT.WarningBitExt |
+                                  DebugUtilsMessageSeverityFlagsEXT.VerboseBitExt,
+                MessageType = DebugUtilsMessageTypeFlagsEXT.GeneralBitExt |
+                              DebugUtilsMessageTypeFlagsEXT.PerformanceBitExt |
+                              DebugUtilsMessageTypeFlagsEXT.ValidationBitExt |
+                              DebugUtilsMessageTypeFlagsEXT.DeviceAddressBindingBitExt,
+                PfnUserCallback = new PfnDebugUtilsMessengerCallbackEXT(DebugMessage)
+            };
+
+            CheckResult(_debugUtils.CreateDebugUtilsMessenger(Instance, &messengerInfo, null, out _debugMessenger),
+                "Create debug messenger");
+        }
     }
-    
+
     public override Adapter[] EnumerateAdapters()
     {
         uint numDevices;
@@ -95,7 +140,33 @@ internal sealed unsafe class VulkanInstance : Instance
 
     public override void Dispose()
     {
+        if (IsDisposed)
+            return;
+        IsDisposed = true;
+
+        if (_debugUtils != null)
+        {
+            _debugUtils.DestroyDebugUtilsMessenger(Instance, _debugMessenger, null);
+            _debugUtils.Dispose();
+        }
+        
         Vk.DestroyInstance(Instance, null);
         Vk.Dispose();
+    }
+    
+    private static uint DebugMessage(DebugUtilsMessageSeverityFlagsEXT messageSeverity,
+        DebugUtilsMessageTypeFlagsEXT messageTypes, DebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
+    {
+        string message = new string((sbyte*) pCallbackData->PMessage);
+
+        string type = messageTypes.ToString()[..^"BitExt".Length];
+        if (messageSeverity.HasFlag(DebugUtilsMessageSeverityFlagsEXT.ErrorBitExt))
+            throw new Exception($"{type} error: {message}");
+
+        string severity = messageSeverity.ToString()[..^"BitExt".Length];
+        
+        Console.WriteLine($"{severity} | {type}: {message}");
+
+        return Vk.True;
     }
 }
