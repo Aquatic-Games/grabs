@@ -1,9 +1,14 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using grabs.Graphics;
 using grabs.Graphics.D3D11;
+using grabs.Graphics.Vulkan;
 using grabs.Windowing.Events;
+using Silk.NET.Core.Native;
 using Silk.NET.SDL;
+using Silk.NET.Vulkan;
+using Event = Silk.NET.SDL.Event;
 using EventType = Silk.NET.SDL.EventType;
+using Instance = grabs.Graphics.Instance;
 using SdlWindow = Silk.NET.SDL.Window;
 using Surface = grabs.Graphics.Surface;
 using WindowEvent = grabs.Windowing.Events.WindowEvent;
@@ -25,9 +30,16 @@ public unsafe class Window : IWindowProvider, IDisposable
     {
         switch (instance.Backend)
         {
-            case Backend.Unknown:
             case Backend.Vulkan:
-                throw new NotImplementedException();
+            {
+                return new VulkanSurface(vkInstance =>
+                {
+                    VkNonDispatchableHandle surfaceHandle;
+                    _sdl.VulkanCreateSurface(_window, new VkHandle(vkInstance.Handle), &surfaceHandle);
+
+                    return new SurfaceKHR(surfaceHandle.Handle);
+                });
+            }
 
             case Backend.D3D11:
             {
@@ -37,6 +49,7 @@ public unsafe class Window : IWindowProvider, IDisposable
                 return new D3D11Surface(info.Info.Win.Hwnd);
             }
 
+            case Backend.Unknown:
             default:
                 throw new ArgumentOutOfRangeException();
         }
