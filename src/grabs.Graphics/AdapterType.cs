@@ -18,5 +18,10 @@ public enum AdapterType
     /// <summary>
     /// Software GPU. This may be provided by drivers present on the system.
     /// </summary>
-    Software
+    Software,
+    
+    /// <summary>
+    /// It's not known what type this GPU is.
+    /// </summary>
+    Unknown
 }
