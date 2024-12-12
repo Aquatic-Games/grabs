@@ -13,10 +13,12 @@ namespace grabs.Windowing;
 public unsafe class Window : IWindowProvider, IDisposable
 {
     private SdlWindow* _window;
+    private uint _windowId;
     
-    private Window(SdlWindow* window)
+    private Window(SdlWindow* window, uint windowId)
     {
         _window = window;
+        _windowId = windowId;
     }
 
     public Surface CreateSurface(Instance instance)
@@ -90,11 +92,14 @@ public unsafe class Window : IWindowProvider, IDisposable
     
     public static Window Create(in WindowDescription description)
     {
-        if (_sdl.Init(Sdl.InitVideo | Sdl.InitEvents) < 0)
+        if (_sdl.Init(Sdl.InitVideo) < 0)
             throw new Exception($"Failed to initialize SDL: {_sdl.GetErrorS()}");
 
-        SdlWindow* window = _sdl.CreateWindow(description.Title, Sdl.WindowposCentered, Sdl.WindowposCentered,
-            (int) description.Width, (int) description.Height, 0);
+        int x = description.X ?? Sdl.WindowposCentered;
+        int y = description.Y ?? Sdl.WindowposCentered;
+
+        SdlWindow* window =
+            _sdl.CreateWindow(description.Title, x, y, (int) description.Width, (int) description.Height, 0);
 
         if (window == null)
         {
@@ -102,6 +107,8 @@ public unsafe class Window : IWindowProvider, IDisposable
             throw new Exception($"Failed to create SDL window: {_sdl.GetErrorS()}");
         }
 
-        return new Window(window);
+        uint windowId = _sdl.GetWindowID(window);
+
+        return new Window(window, windowId);
     }
 }
