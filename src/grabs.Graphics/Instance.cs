@@ -1,5 +1,6 @@
 ﻿using grabs.Graphics.D3D11;
 using grabs.Graphics.Exceptions;
+using grabs.Graphics.LegacyGL;
 using grabs.Graphics.Vulkan;
 
 namespace grabs.Graphics;
@@ -41,6 +42,9 @@ public abstract class Instance : IDisposable
 
         if (backendHint.HasFlag(Backend.Vulkan))
             return new VulkanInstance(description.Debug, windowProvider);
+
+        if (backendHint.HasFlag(Backend.LegacyGL))
+            return new GLInstance(windowProvider.GetGLProcAddress);
 
         throw new NoBackendException();
     }

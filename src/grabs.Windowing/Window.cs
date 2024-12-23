@@ -66,7 +66,12 @@ public unsafe class Window : IWindowProvider, IDisposable
 
         return extensions;
     }
-    
+
+    public IntPtr GetGLProcAddress(string name)
+    {
+        throw new NotImplementedException();
+    }
+
     public void Dispose()
     {
         _sdl.DestroyWindow(_window);

@@ -19,15 +19,20 @@ public static class Program
         const int width = 1280;
         const int height = 720;
 
+        sdl.GLSetAttribute(GLattr.ContextProfileMask, (int) GLprofile.Core);
+
         Window* window = sdl.CreateWindow("Test", Sdl.WindowposCentered, Sdl.WindowposCentered, width,
-            height, (uint) WindowFlags.Vulkan);
+            height, (uint) WindowFlags.Opengl);
 
         if (window == null)
             throw new Exception($"Failed to create window: {sdl.GetErrorS()}");
-        
-        InstanceDescription desc = new InstanceDescription();
 
-        using Instance instance = Instance.Create(in desc, null);
+        void* glContext = sdl.GLCreateContext(window);
+        sdl.GLMakeCurrent(window, glContext);
+        
+        InstanceDescription desc = new InstanceDescription(true, Backend.LegacyGL);
+
+        using Instance instance = Instance.Create(in desc, new WindowProvider(null, s => (nint) sdl.GLGetProcAddress(s)));
 
         Adapter[] adapters = instance.EnumerateAdapters();
         foreach (Adapter adapter in adapters)
@@ -143,5 +148,28 @@ public static class Program
         
         sdl.DestroyWindow(window);
         sdl.Quit();
+    }
+}
+
+class WindowProvider : IWindowProvider
+{
+    public readonly Func<string[]> GetVulkanInstanceExtensionsFunc;
+
+    public readonly Func<string, nint> GetGLProcAddressFunc;
+
+    public WindowProvider(Func<string[]> getVulkanInstanceExtensionsFunc, Func<string, IntPtr> getGlProcAddressFunc)
+    {
+        GetVulkanInstanceExtensionsFunc = getVulkanInstanceExtensionsFunc;
+        GetGLProcAddressFunc = getGlProcAddressFunc;
+    }
+
+    public string[] GetVulkanInstanceExtensions()
+    {
+        throw new NotImplementedException();
+    }
+
+    public nint GetGLProcAddress(string name)
+    {
+        return GetGLProcAddressFunc(name);
     }
 }

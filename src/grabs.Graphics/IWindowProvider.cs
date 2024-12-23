@@ -7,4 +7,6 @@
 public interface IWindowProvider
 {
     public string[] GetVulkanInstanceExtensions();
+
+    public nint GetGLProcAddress(string name);
 }

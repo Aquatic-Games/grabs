@@ -7,7 +7,7 @@
 public enum Backend
 {
     /// <summary>
-    /// Unknown/Auto backend. In <see cref="Instance.Create()"/>, a backend will automatically be selected based on
+    /// Unknown/Auto backend. In <see cref="Instance.Create"/>, a backend will automatically be selected based on
     /// what the system supports. This value could also mean private API backends, and could be returned from
     /// <see cref="Instance.Backend"/>.
     /// </summary>
@@ -21,5 +21,10 @@ public enum Backend
     /// <summary>
     /// Direct3D 11.1 backend.
     /// </summary>
-    D3D11 = 1 << 1
+    D3D11 = 1 << 1,
+    
+    /// <summary>
+    /// Legacy OpenGL backend.
+    /// </summary>
+    LegacyGL = 1 << 2
 }
