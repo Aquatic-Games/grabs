@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_library(grabs STATIC
         include/grabs/Instance.h
-        src/Instance.cpp)
+        src/Instance.cpp
+        include/grabs/Common.h)
 
 target_include_directories(grabs PUBLIC include)
