@@ -18,8 +18,10 @@ namespace grabs
     class Instance
     {
     public:
-        std::vector<Adapter> EnumerateAdapters();
+        virtual ~Instance() = default;
 
-        static std::unique_ptr<Instance> Create();
+        virtual std::vector<Adapter> EnumerateAdapters() = 0;
+
+        static std::unique_ptr<Instance> Create(const InstanceInfo& info);
     };
 }
