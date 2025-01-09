@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.30)
+project(grabs)
+
+set(CMAKE_CXX_STANDARD 20)
+
+add_library(grabs STATIC
+        include/grabs/Instance.h
+        src/Instance.cpp)
+
+target_include_directories(grabs PUBLIC include)
