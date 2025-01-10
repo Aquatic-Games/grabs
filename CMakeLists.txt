@@ -18,6 +18,12 @@ target_include_directories(GRABS PUBLIC include)
 find_package(Vulkan REQUIRED)
 target_link_libraries(GRABS PUBLIC ${Vulkan_LIBRARY})
 
+if (UNIX)
+find_package(X11 REQUIRED)
+target_link_libraries(GRABS PUBLIC ${X11_LIBRARIES})
+target_include_directories(GRABS PUBLIC ${X11_INCLUDE_DIR})
+endif ()
+
 
 # ----- TEST -----
 add_executable(GRABStest test/main.cpp)

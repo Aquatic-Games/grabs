@@ -27,6 +27,8 @@ int main(int argc, char* argv[])
     };
 
     auto instance = grabs::Instance::Create(info);
+    for (const auto& adapter : instance->EnumerateAdapters())
+        std::cout << adapter.Name << std::endl;
 
     bool alive = true;
     while (alive)

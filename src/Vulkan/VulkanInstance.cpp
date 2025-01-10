@@ -5,8 +5,9 @@
 #if defined(_WIN32)
 #include <vulkan/vulkan_win32.h>
 #elif defined(__unix__)
-//#include <vulkan/vulkan_xlib.h>
-//#include <vulkan/vulkan_xcb.h>
+#include <X11/Xlib-xcb.h>
+#include <vulkan/vulkan_xlib.h>
+#include <vulkan/vulkan_xcb.h>
 #include <vulkan/vulkan_wayland.h>
 #endif
 
@@ -22,8 +23,9 @@ namespace grabs::Vulkan
 #if defined(_WIN32)
         extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 #elif defined(__unix__)
-        //extensions.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
-        //extensions.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
+        // TODO: For some reason X11 causes compile issues. Likely a missing library during compilation.
+        extensions.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
+        extensions.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
         extensions.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
 #else
 #error "Unsupported OS"
@@ -65,6 +67,52 @@ namespace grabs::Vulkan
 
     std::vector<Adapter> VulkanInstance::EnumerateAdapters()
     {
-        return {};
+        std::vector<Adapter> adapters;
+
+        uint32_t numDevices;
+        vkEnumeratePhysicalDevices(Instance, &numDevices, nullptr);
+        std::vector<VkPhysicalDevice> physDevices(numDevices);
+        vkEnumeratePhysicalDevices(Instance, &numDevices, physDevices.data());
+
+        int i = 0;
+        for (VkPhysicalDevice device : physDevices)
+        {
+            VkPhysicalDeviceProperties properties;
+            vkGetPhysicalDeviceProperties(device, &properties);
+
+            VkPhysicalDeviceMemoryProperties memoryProps;
+            vkGetPhysicalDeviceMemoryProperties(device, &memoryProps);
+
+            AdapterType type;
+            switch (properties.deviceType)
+            {
+                case VK_PHYSICAL_DEVICE_TYPE_OTHER:
+                    type = AdapterType::Unknown;
+                    break;
+                case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
+                    type = AdapterType::Integrated;
+                    break;
+                case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
+                    type = AdapterType::Discrete;
+                    break;
+                case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
+                    type = AdapterType::Unknown;
+                    break;
+                case VK_PHYSICAL_DEVICE_TYPE_CPU:
+                    type = AdapterType::Software;
+                    break;
+                default:
+                    type = AdapterType::Unknown;
+            }
+
+            adapters.push_back({
+                .Index = i++,
+                .Name = properties.deviceName,
+                .Type = type,
+                .DedicatedMemory = memoryProps.memoryHeaps[0].size // TODO: Make this more robust
+            });
+        }
+
+        return adapters;
     }
 }

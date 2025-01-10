@@ -12,6 +12,7 @@ namespace grabs
 
     enum class AdapterType
     {
+        Unknown,
         Software,
         Integrated,
         Discrete
