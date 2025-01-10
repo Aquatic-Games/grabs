@@ -2,9 +2,10 @@
 
 #include <vector>
 
-#if defined(_WIN32)
+#ifdef GS_OS_WINDOWS
 #include <vulkan/vulkan_win32.h>
-#elif defined(__unix__)
+#endif
+#ifdef GS_OS_LINUX
 #include <X11/Xlib-xcb.h>
 #include <vulkan/vulkan_xlib.h>
 #include <vulkan/vulkan_xcb.h>
@@ -12,6 +13,7 @@
 #endif
 
 #include "VulkanUtils.h"
+#include "VulkanSurface.h"
 
 namespace grabs::Vulkan
 {
@@ -20,10 +22,9 @@ namespace grabs::Vulkan
         std::vector extensions { VK_KHR_SURFACE_EXTENSION_NAME };
         std::vector<const char*> layers;
 
-#if defined(_WIN32)
+#if defined(GS_OS_WINDOWS)
         extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
-#elif defined(__unix__)
-        // TODO: For some reason X11 causes compile issues. Likely a missing library during compilation.
+#elif defined(GS_OS_LINUX)
         extensions.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
         extensions.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
         extensions.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
@@ -114,5 +115,10 @@ namespace grabs::Vulkan
         }
 
         return adapters;
+    }
+
+    std::unique_ptr<Surface> VulkanInstance::CreateSurface(const SurfaceDescription& description)
+    {
+        return std::make_unique<VulkanSurface>(Instance, description);
     }
 }

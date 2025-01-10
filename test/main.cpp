@@ -30,6 +30,22 @@ int main(int argc, char* argv[])
     for (const auto& adapter : instance->EnumerateAdapters())
         std::cout << adapter.Name << std::endl;
 
+    grabs::SurfaceDescription surfaceDesc{};
+
+
+
+    if (SDL_strcmp(SDL_GetCurrentVideoDriver(), "x11") == 0)
+    {
+        Display* display = (Display*) SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_X11_DISPLAY_POINTER, nullptr);
+        Window xwindow = (Window) SDL_GetNumberProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0);
+
+        surfaceDesc.Type = grabs::SurfaceType::Xlib;
+        surfaceDesc.Display.Xlib = display;
+        surfaceDesc.Window.Xlib = xwindow;
+    }
+
+    auto surface = instance->CreateSurface(surfaceDesc);
+
     bool alive = true;
     while (alive)
     {

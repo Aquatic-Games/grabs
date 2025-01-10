@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Common.h"
+#include "Surface.h"
 
 namespace grabs
 {
@@ -21,6 +22,8 @@ namespace grabs
         virtual ~Instance() = default;
 
         virtual std::vector<Adapter> EnumerateAdapters() = 0;
+
+        virtual std::unique_ptr<Surface> CreateSurface(const SurfaceDescription& description) = 0;
 
         static std::unique_ptr<Instance> Create(const InstanceInfo& info);
     };

@@ -16,5 +16,10 @@ namespace grabs::Vulkan
         ~VulkanInstance() override;
 
         std::vector<Adapter> EnumerateAdapters() override;
+
+        // TODO: Better way of doing this?
+        // I'm not overly a fan of this solution, I'd much prefer Surface::Xlib(...) but this is the only way I can
+        // think of doing this right now.
+        std::unique_ptr<Surface> CreateSurface(const SurfaceDescription& description) override;
     };
 }

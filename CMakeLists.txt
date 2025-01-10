@@ -10,6 +10,9 @@ add_library(GRABS STATIC
         src/Vulkan/VulkanInstance.cpp
         src/Vulkan/VulkanInstance.h
         src/Vulkan/VulkanUtils.h
+        include/grabs/Surface.h
+        src/Vulkan/VulkanSurface.cpp
+        src/Vulkan/VulkanSurface.h
 )
 
 target_include_directories(GRABS PUBLIC include)
@@ -18,10 +21,13 @@ target_include_directories(GRABS PUBLIC include)
 find_package(Vulkan REQUIRED)
 target_link_libraries(GRABS PUBLIC ${Vulkan_LIBRARY})
 
-if (UNIX)
-find_package(X11 REQUIRED)
-target_link_libraries(GRABS PUBLIC ${X11_LIBRARIES})
-target_include_directories(GRABS PUBLIC ${X11_INCLUDE_DIR})
+if (WIN32)
+    add_compile_definitions(GS_OS_WINDOWS)
+elseif (UNIX)
+    find_package(X11 REQUIRED)
+    target_link_libraries(GRABS PUBLIC ${X11_LIBRARIES})
+    target_include_directories(GRABS PUBLIC ${X11_INCLUDE_DIR})
+    add_compile_definitions(GS_OS_LINUX)
 endif ()
 
 
