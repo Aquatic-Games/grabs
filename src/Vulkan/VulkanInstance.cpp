@@ -3,6 +3,7 @@
 #include <vector>
 
 #ifdef GS_OS_WINDOWS
+#include <windows.h>
 #include <vulkan/vulkan_win32.h>
 #endif
 #ifdef GS_OS_LINUX

@@ -32,8 +32,14 @@ int main(int argc, char* argv[])
 
     grabs::SurfaceDescription surfaceDesc{};
 
+#ifdef GS_OS_WINDOWS
+    HINSTANCE hinstance = (HINSTANCE) SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_INSTANCE_POINTER, nullptr);
+    HWND hwnd = (HWND) SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
 
-
+    surfaceDesc.Display.Windows = hinstance;
+    surfaceDesc.Window.Windows = hwnd;
+#endif
+#ifdef GS_OS_LINUX
     if (SDL_strcmp(SDL_GetCurrentVideoDriver(), "x11") == 0)
     {
         Display* display = (Display*) SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_X11_DISPLAY_POINTER, nullptr);
@@ -43,6 +49,7 @@ int main(int argc, char* argv[])
         surfaceDesc.Display.Xlib = display;
         surfaceDesc.Window.Xlib = xwindow;
     }
+#endif
 
     auto surface = instance->CreateSurface(surfaceDesc);
 

@@ -2,6 +2,10 @@
 
 #include <stdexcept>
 
+#ifdef GS_OS_WINDOWS
+#include <windows.h>
+#include <vulkan/vulkan_win32.h>
+#endif
 #ifdef GS_OS_LINUX
 #include <X11/Xlib-xcb.h>
 #include <vulkan/vulkan_xlib.h>
@@ -21,7 +25,17 @@ namespace grabs::Vulkan
         {
 #ifdef GS_OS_WINDOWS
             case SurfaceType::Windows:
+            {
+                VkWin32SurfaceCreateInfoKHR win32Info
+                {
+                    .sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
+                    .hinstance = description.Display.Windows,
+                    .hwnd = description.Window.Windows
+                };
+
+                VK_CHECK_RESULT(vkCreateWin32SurfaceKHR(instance, &win32Info, nullptr, &Surface));
                 break;
+            }
 #endif
 #ifdef GS_OS_LINUX
             case SurfaceType::Xlib:

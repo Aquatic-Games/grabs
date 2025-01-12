@@ -19,7 +19,8 @@ target_include_directories(GRABS PUBLIC include)
 
 # ---------- VULKAN ----------
 find_package(Vulkan REQUIRED)
-target_link_libraries(GRABS PUBLIC ${Vulkan_LIBRARY})
+target_link_libraries(GRABS PUBLIC ${Vulkan_LIBRARIES})
+target_include_directories(GRABS PUBLIC ${Vulkan_INCLUDE_DIR})
 
 if (WIN32)
     add_compile_definitions(GS_OS_WINDOWS)
@@ -34,5 +35,14 @@ endif ()
 # ----- TEST -----
 add_executable(GRABStest test/main.cpp)
 target_link_libraries(GRABStest PRIVATE GRABS)
-find_package(SDL3 REQUIRED)
+#find_package(SDL3 REQUIRED)
+add_subdirectory(lib/SDL)
 target_link_libraries(GRABStest PRIVATE SDL3::SDL3)
+
+if (WIN32)
+    add_custom_command(
+            TARGET GRABStest POST_BUILD
+            COMMAND "${CMAKE_COMMAND}" -E copy $<TARGET_FILE:SDL3::SDL3-shared> $<TARGET_FILE_DIR:GRABStest>
+            VERBATIM
+    )
+endif ()

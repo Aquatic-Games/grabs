@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef GS_OS_WINDOWS
+#include <windows.h>
+#endif
+
 #ifdef GS_OS_LINUX
 #include <X11/Xlib-xcb.h>
 #endif
@@ -16,6 +20,9 @@ namespace grabs
 
     union SurfaceDisplay
     {
+#ifdef GS_OS_WINDOWS
+        HINSTANCE Windows;
+#endif
 #ifdef GS_OS_LINUX
         Display* Xlib;
         xcb_connection_t* XCB;
@@ -26,6 +33,9 @@ namespace grabs
 
     union SurfaceWindow
     {
+#ifdef GS_OS_WINDOWS
+        HWND Windows;
+#endif
 #ifdef GS_OS_LINUX
         Window Xlib;
         xcb_window_t XCB;
