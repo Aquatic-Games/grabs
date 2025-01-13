@@ -14,6 +14,8 @@ namespace grabs
         bool Debug;
         Backend BackendHint;
         std::string AppName;
+        GrabsDebugCallback DebugCallback;
+        void* DebugCallbackData;
     };
 
     class Instance

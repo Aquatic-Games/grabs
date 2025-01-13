@@ -18,6 +18,12 @@
 #include "VulkanUtils.h"
 #include "VulkanSurface.h"
 
+struct CallbackData
+{
+    grabs::GrabsDebugCallback Callback;
+    void* Data;
+};
+
 VkBool32 DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
                        VkDebugUtilsMessageTypeFlagsEXT messageTypes,
                        const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
@@ -27,47 +33,52 @@ VkBool32 DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
     if (GS_HAS_FLAG(messageSeverity, VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT))
         throw std::runtime_error(std::format("Debug error: {}", message));
 
-    std::string severity;
-    switch (messageSeverity)
-    {
-        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
-            severity = "Verbose";
-            break;
-        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
-            severity = "Info";
-            break;
-        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
-            severity = "Warning";
-            break;
-        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
-            severity = "Error";
-            break;
-        default:
-            severity = "Unknown";
-            break;
-    }
+    auto callbackData = *static_cast<CallbackData*>(pUserData);
 
-    std::string type;
-    switch (messageTypes)
+    if (callbackData.Callback)
     {
-        case VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT:
-            type = "General";
-            break;
-        case VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT:
-            type = "Validation";
-            break;
-        case VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT:
-            type = "Performance";
-            break;
-        case VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT:
-            type = "Device Address Binding";
-            break;
-        default:
-            type = "Unknown";
-            break;
-    }
+        grabs::DebugSeverity severity;
+        switch (messageSeverity)
+        {
+            case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
+                severity = grabs::DebugSeverity::Verbose;
+                break;
+            case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
+                severity = grabs::DebugSeverity::Info;
+                break;
+            case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
+                severity = grabs::DebugSeverity::Warning;
+                break;
+            case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
+                severity = grabs::DebugSeverity::Error;
+                break;
+            default:
+                severity = grabs::DebugSeverity::Verbose;
+                break;
+        }
 
-    std::cout << severity << " - " << type << " - " << message << std::endl;
+        grabs::DebugType type;
+        switch (messageTypes)
+        {
+            case VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT:
+                type = grabs::DebugType::General;
+                break;
+            case VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT:
+                type = grabs::DebugType::Validation;
+                break;
+            case VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT:
+                type = grabs::DebugType::General;
+                break;
+            case VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT:
+                type = grabs::DebugType::General;
+                break;
+            default:
+                type = grabs::DebugType::General;
+                break;
+        }
+
+        callbackData.Callback(severity, type, message, callbackData.Data);
+    }
 
     return VK_TRUE;
 }
@@ -124,6 +135,12 @@ namespace grabs::Vulkan
             if (!createDebugMessenger)
                 throw std::runtime_error("Failed to get debug messenger proc address - Is the SDK installed?");
 
+            CallbackData callbackData
+            {
+                .Callback = info.DebugCallback,
+                .Data = info.DebugCallbackData
+            };
+
             VkDebugUtilsMessengerCreateInfoEXT messengerInfo
             {
                 .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
@@ -136,6 +153,7 @@ namespace grabs::Vulkan
                                VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT |
                                VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT,
                 .pfnUserCallback = DebugCallback,
+                .pUserData = static_cast<void*>(&callbackData)
             };
 
             VK_CHECK_RESULT(createDebugMessenger(Instance, &messengerInfo, nullptr, &DebugMessenger));

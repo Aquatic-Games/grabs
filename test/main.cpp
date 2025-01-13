@@ -23,8 +23,14 @@ int main(int argc, char* argv[])
     {
         .Debug = true,
         .BackendHint = grabs::Backend::Unknown,
-        .AppName = "GRABS test"
+        .AppName = "GRABS test",
+        .DebugCallback = [](grabs::DebugSeverity severity, grabs::DebugType type, const std::string& message, void* userData)
+        {
+            std::cout << DebugSeverityToString(severity) << " - " << DebugTypeToString(type) << " - " << message << std::endl;
+        }
     };
+
+    std::cout << "Create instance" << std::endl;
 
     auto instance = grabs::Instance::Create(info);
     for (const auto& adapter : instance->EnumerateAdapters())
