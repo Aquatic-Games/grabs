@@ -9,8 +9,8 @@ namespace grabs::Vulkan
     class VulkanSurface : public Surface
     {
     public:
-        VkInstance Instance;
-        VkSurfaceKHR Surface;
+        VkInstance Instance{};
+        VkSurfaceKHR Surface{};
 
         VulkanSurface(VkInstance instance, const SurfaceDescription& description);
         ~VulkanSurface() override;

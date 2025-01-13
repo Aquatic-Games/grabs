@@ -9,8 +9,8 @@ namespace grabs::Vulkan
     class VulkanInstance final : public Instance
     {
     public:
-        VkInstance Instance;
-        VkDebugUtilsMessengerEXT DebugMessenger;
+        VkInstance Instance{};
+        VkDebugUtilsMessengerEXT DebugMessenger{};
 
         explicit VulkanInstance(const InstanceInfo& info);
         ~VulkanInstance() override;

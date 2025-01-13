@@ -23,14 +23,13 @@ namespace grabs::Vulkan
         std::vector extensions { VK_KHR_SURFACE_EXTENSION_NAME };
         std::vector<const char*> layers;
 
-#if defined(GS_OS_WINDOWS)
+#ifdef GS_OS_WINDOWS
         extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
-#elif defined(GS_OS_LINUX)
+#endif
+#ifdef GS_OS_LINUX
         extensions.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
         extensions.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
         extensions.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
-#else
-#error "Unsupported OS"
 #endif
 
         if (info.Debug)
@@ -60,6 +59,8 @@ namespace grabs::Vulkan
         };
 
         VK_CHECK_RESULT(vkCreateInstance(&instanceInfo, nullptr, &Instance));
+
+
     }
 
     VulkanInstance::~VulkanInstance()
