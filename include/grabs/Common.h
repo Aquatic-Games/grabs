@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#define GS_HAS_FLAG(Enum, Value) (Enum & Value) == Value
+
 namespace grabs
 {
     enum class Backend

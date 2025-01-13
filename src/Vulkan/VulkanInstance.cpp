@@ -1,6 +1,8 @@
 #include "VulkanInstance.h"
 
 #include <vector>
+#include <format>
+#include <iostream>
 
 #ifdef GS_OS_WINDOWS
 #include <windows.h>
@@ -15,6 +17,60 @@
 
 #include "VulkanUtils.h"
 #include "VulkanSurface.h"
+
+VkBool32 DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+                       VkDebugUtilsMessageTypeFlagsEXT messageTypes,
+                       const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
+{
+    auto message = pCallbackData->pMessage;
+
+    if (GS_HAS_FLAG(messageSeverity, VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT))
+        throw std::runtime_error(std::format("Debug error: {}", message));
+
+    std::string severity;
+    switch (messageSeverity)
+    {
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
+            severity = "Verbose";
+            break;
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
+            severity = "Info";
+            break;
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
+            severity = "Warning";
+            break;
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
+            severity = "Error";
+            break;
+        default:
+            severity = "Unknown";
+            break;
+    }
+
+    std::string type;
+    switch (messageTypes)
+    {
+        case VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT:
+            type = "General";
+            break;
+        case VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT:
+            type = "Validation";
+            break;
+        case VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT:
+            type = "Performance";
+            break;
+        case VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT:
+            type = "Device Address Binding";
+            break;
+        default:
+            type = "Unknown";
+            break;
+    }
+
+    std::cout << severity << " - " << type << " - " << message << std::endl;
+
+    return VK_TRUE;
+}
 
 namespace grabs::Vulkan
 {
@@ -60,11 +116,42 @@ namespace grabs::Vulkan
 
         VK_CHECK_RESULT(vkCreateInstance(&instanceInfo, nullptr, &Instance));
 
+        if (info.Debug)
+        {
+            auto createDebugMessenger = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(
+                Instance, "vkCreateDebugUtilsMessengerEXT"));
 
+            if (!createDebugMessenger)
+                throw std::runtime_error("Failed to get debug messenger proc address - Is the SDK installed?");
+
+            VkDebugUtilsMessengerCreateInfoEXT messengerInfo
+            {
+                .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+                .messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+                                   VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
+                                   VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                                   VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+                .messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                               VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                               VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT |
+                               VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT,
+                .pfnUserCallback = DebugCallback,
+            };
+
+            VK_CHECK_RESULT(createDebugMessenger(Instance, &messengerInfo, nullptr, &DebugMessenger));
+        }
     }
 
     VulkanInstance::~VulkanInstance()
     {
+        if (DebugMessenger)
+        {
+            auto destroyDebugMessenger = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(
+                Instance, "vkDestroyDebugUtilsMessengerEXT"));
+
+            destroyDebugMessenger(Instance, DebugMessenger, nullptr);
+        }
+
         vkDestroyInstance(Instance, nullptr);
     }
 

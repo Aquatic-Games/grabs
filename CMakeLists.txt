@@ -35,8 +35,11 @@ endif ()
 # ----- TEST -----
 add_executable(GRABStest test/main.cpp)
 target_link_libraries(GRABStest PRIVATE GRABS)
-#find_package(SDL3 REQUIRED)
-add_subdirectory(lib/SDL)
+if (WIN32)
+    add_subdirectory(lib/SDL)
+else ()
+    find_package(SDL3 REQUIRED)
+endif ()
 target_link_libraries(GRABStest PRIVATE SDL3::SDL3)
 
 if (WIN32)
