@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs", "src\grabs\grabs.csproj", "{6CFB8ED2-5FD6-4461-8292-A2C737E35CE8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Core", "src\grabs.Core\grabs.Core.csproj", "{350F33EE-5987-4F06-BAC7-014002D888CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{6CFB8ED2-5FD6-4461-8292-A2C737E35CE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CFB8ED2-5FD6-4461-8292-A2C737E35CE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6CFB8ED2-5FD6-4461-8292-A2C737E35CE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{350F33EE-5987-4F06-BAC7-014002D888CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{350F33EE-5987-4F06-BAC7-014002D888CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{350F33EE-5987-4F06-BAC7-014002D888CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{350F33EE-5987-4F06-BAC7-014002D888CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
