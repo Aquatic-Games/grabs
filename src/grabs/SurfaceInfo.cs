@@ -29,21 +29,21 @@ public readonly struct SurfaceInfo
     public static SurfaceInfo Wayland(nint display, nint surface)
         => new SurfaceInfo(SurfaceType.Wayland, new() { Wayland = display }, new() { Wayland = surface });
     
-    [StructLayout(LayoutKind.Explicit)]
+    //[StructLayout(LayoutKind.Explicit)]
     public struct SurfaceDisplay
     {
-        [FieldOffset(0)] public nint Windows;
-        [FieldOffset(0)] public nint Xlib;
-        [FieldOffset(0)] public nint Xcb;
-        [FieldOffset(0)] public nint Wayland;
+        /*[FieldOffset(0)]*/ public nint Windows;
+        /*[FieldOffset(0)]*/ public nint Xlib;
+        /*[FieldOffset(0)]*/ public nint Xcb;
+        /*[FieldOffset(0)]*/ public nint Wayland;
     }
     
-    [StructLayout(LayoutKind.Explicit)]
+    //[StructLayout(LayoutKind.Explicit)]
     public struct SurfaceWindow
     {
-        [FieldOffset(0)] public nint Windows;
-        [FieldOffset(0)] public nint Xlib;
-        [FieldOffset(0)] public nint Xcb;
-        [FieldOffset(0)] public nint Wayland;
+        /*[FieldOffset(0)]*/ public nint Windows;
+        /*[FieldOffset(0)]*/ public nint Xlib;
+        /*[FieldOffset(0)]*/ public nint Xcb;
+        /*[FieldOffset(0)]*/ public nint Wayland;
     }
 }

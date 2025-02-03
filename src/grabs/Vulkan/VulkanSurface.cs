@@ -43,12 +43,10 @@ internal sealed unsafe class VulkanSurface : Surface
             }
             case SurfaceType.Xlib:
             {
-                IntPtr display = info.Display.Xlib;
-
                 XlibSurfaceCreateInfoKHR surfaceInfo = new XlibSurfaceCreateInfoKHR()
                 {
                     SType = StructureType.XlibSurfaceCreateInfoKhr,
-                    Dpy = &display,
+                    Dpy = (IntPtr*) info.Display.Xlib,
                     Window = info.Window.Xlib
                 };
 
@@ -63,12 +61,10 @@ internal sealed unsafe class VulkanSurface : Surface
             }
             case SurfaceType.Xcb:
             {
-                IntPtr connection = info.Display.Xcb;
-
                 XcbSurfaceCreateInfoKHR xcbSurface = new XcbSurfaceCreateInfoKHR()
                 {
                     SType = StructureType.XcbSurfaceCreateInfoKhr,
-                    Connection = &connection,
+                    Connection = (IntPtr*) info.Display.Xcb,
                     Window = info.Window.Xcb
                 };
 
@@ -83,14 +79,11 @@ internal sealed unsafe class VulkanSurface : Surface
             }
             case SurfaceType.Wayland:
             {
-                IntPtr display = info.Display.Wayland;
-                IntPtr surface = info.Window.Wayland;
-
                 WaylandSurfaceCreateInfoKHR waylandSurface = new WaylandSurfaceCreateInfoKHR()
                 {
                     SType = StructureType.WaylandSurfaceCreateInfoKhr,
-                    Display = &display,
-                    Surface = &surface
+                    Display = (IntPtr*) info.Display.Wayland,
+                    Surface = (IntPtr*) info.Window.Wayland
                 };
 
                 if (!vk.TryGetInstanceExtension(instance, out _waylandSurface))
