@@ -6,10 +6,12 @@ using Silk.NET.Vulkan.Extensions.KHR;
 
 namespace grabs.Vulkan;
 
-internal unsafe class VulkanInstance : Instance
+internal sealed unsafe class VulkanInstance : Instance
 {
     private readonly ExtDebugUtils? _debugUtils;
     private readonly DebugUtilsMessengerEXT _debugMessenger;
+
+    private readonly KhrSurface _khrSurface;
     
     public readonly Vk Vk;
     
@@ -109,6 +111,9 @@ internal unsafe class VulkanInstance : Instance
             _debugUtils!.CreateDebugUtilsMessenger(Instance, &debugInfo, null, out _debugMessenger)
                 .Check("Create debug messenger");
         }
+
+        if (!Vk.TryGetInstanceExtension(Instance, out _khrSurface))
+            throw new Exception("Failed to get Surface extension.");
     }
 
     private uint DebugCallback(DebugUtilsMessageSeverityFlagsEXT messageSeverity,
@@ -182,8 +187,15 @@ internal unsafe class VulkanInstance : Instance
         return adapters;
     }
 
+    public override Surface CreateSurface(in SurfaceInfo info)
+    {
+        return new VulkanSurface(Vk, Instance, _khrSurface, in info);
+    }
+
     public override void Dispose()
     {
+        _khrSurface.Dispose();
+        
         if (_debugUtils != null)
         {
             _debugUtils.DestroyDebugUtilsMessenger(Instance, _debugMessenger, null);
