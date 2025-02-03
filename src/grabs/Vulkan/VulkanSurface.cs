@@ -1,3 +1,4 @@
+using grabs.Core;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.KHR;
 
@@ -34,6 +35,7 @@ internal sealed unsafe class VulkanSurface : Surface
                 if (!vk.TryGetInstanceExtension(instance, out _win32Surface))
                     throw new Exception("Failed to get Win32 extension.");
 
+                GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.General, "Creating Win32 surface.");
                 _win32Surface!.CreateWin32Surface(instance, &surfaceInfo, null, out Surface)
                     .Check("Create Win32 surface");
                 
@@ -53,6 +55,7 @@ internal sealed unsafe class VulkanSurface : Surface
                 if (!vk.TryGetInstanceExtension(instance, out _xlibSurface))
                     throw new Exception("Failed to get Xlib extension.");
 
+                GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.General, "Creating Xlib surface.");
                 _xlibSurface!.CreateXlibSurface(instance, &surfaceInfo, null, out Surface)
                     .Check("Create Xlib surface");
                 
@@ -72,6 +75,7 @@ internal sealed unsafe class VulkanSurface : Surface
                 if (!vk.TryGetInstanceExtension(instance, out _xcbSurface))
                     throw new Exception("Failed to get XCB extension.");
 
+                GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.General, "Creating XCB surface.");
                 _xcbSurface!.CreateXcbSurface(instance, &xcbSurface, null, out Surface)
                     .Check("Create XCB surface");
                 
@@ -80,18 +84,19 @@ internal sealed unsafe class VulkanSurface : Surface
             case SurfaceType.Wayland:
             {
                 IntPtr display = info.Display.Wayland;
-                IntPtr window = info.Window.Wayland;
+                IntPtr surface = info.Window.Wayland;
 
                 WaylandSurfaceCreateInfoKHR waylandSurface = new WaylandSurfaceCreateInfoKHR()
                 {
                     SType = StructureType.WaylandSurfaceCreateInfoKhr,
                     Display = &display,
-                    Surface = &window
+                    Surface = &surface
                 };
 
                 if (!vk.TryGetInstanceExtension(instance, out _waylandSurface))
                     throw new Exception("Failed to get Wayland extension.");
 
+                GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.General, "Creating Wayland surface.");
                 _waylandSurface!.CreateWaylandSurface(instance, &waylandSurface, null, out Surface)
                     .Check("Create Wayland surface");
                 

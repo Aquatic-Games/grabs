@@ -26,8 +26,8 @@ public readonly struct SurfaceInfo
     public static SurfaceInfo Xcb(nint display, nint window)
         => new SurfaceInfo(SurfaceType.Xcb, new() { Xcb = display }, new() { Xcb = window });
 
-    public static SurfaceInfo Wayland(nint display, nint window)
-        => new SurfaceInfo(SurfaceType.Wayland, new() { Wayland = display }, new() { Wayland = window });
+    public static SurfaceInfo Wayland(nint display, nint surface)
+        => new SurfaceInfo(SurfaceType.Wayland, new() { Wayland = display }, new() { Wayland = surface });
     
     [StructLayout(LayoutKind.Explicit)]
     public struct SurfaceDisplay
