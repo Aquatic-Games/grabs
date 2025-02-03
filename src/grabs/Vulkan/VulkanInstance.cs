@@ -70,6 +70,7 @@ internal unsafe class VulkanInstance : Instance
             EnabledLayerCount = layers.Length,
         };
 
+        GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.Trace, "Creating instance");
         Vk.CreateInstance(&instanceInfo, null, out Instance).Check("Create instance");
     }
     
