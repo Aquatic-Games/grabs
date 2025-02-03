@@ -27,8 +27,10 @@ public static class GrabsLog
 
     public enum Source
     {
+        General,
         Validation,
-        Trace
+        Performance,
+        Other
     }
 
     public delegate void OnLogMessage(Severity severity, Source source, string message, string file, int line);
