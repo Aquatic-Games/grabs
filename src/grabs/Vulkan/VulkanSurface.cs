@@ -79,6 +79,8 @@ internal sealed unsafe class VulkanSurface : Surface
             }
             case SurfaceType.Wayland:
             {
+                // Silk.NET "bug", types are IntPtr* but you must cast the existing pointer to this type, NOT take the
+                // address of it.
                 WaylandSurfaceCreateInfoKHR waylandSurface = new WaylandSurfaceCreateInfoKHR()
                 {
                     SType = StructureType.WaylandSurfaceCreateInfoKhr,
