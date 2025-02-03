@@ -145,6 +145,43 @@ internal unsafe class VulkanInstance : Instance
         return Vk.True;
     }
 
+    public override Adapter[] EnumerateAdapters()
+    {
+        uint numDevices;
+        Vk.EnumeratePhysicalDevices(Instance, &numDevices, null);
+        PhysicalDevice* devices = stackalloc PhysicalDevice[(int) numDevices];
+        Vk.EnumeratePhysicalDevices(Instance, &numDevices, devices);
+
+        Adapter[] adapters = new Adapter[numDevices];
+
+        for (uint i = 0; i < numDevices; i++)
+        {
+            PhysicalDeviceProperties props;
+            Vk.GetPhysicalDeviceProperties(devices[i], &props);
+            
+            PhysicalDeviceMemoryProperties memProps;
+            Vk.GetPhysicalDeviceMemoryProperties(devices[i], &memProps);
+
+            string name = new string((sbyte*) props.DeviceName);
+
+            AdapterType type = props.DeviceType switch
+            {
+                PhysicalDeviceType.Other => AdapterType.Other,
+                PhysicalDeviceType.IntegratedGpu => AdapterType.Integrated,
+                PhysicalDeviceType.DiscreteGpu => AdapterType.Dedicated,
+                PhysicalDeviceType.VirtualGpu => AdapterType.Other,
+                PhysicalDeviceType.Cpu => AdapterType.Software,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            ulong dedicatedMemory = memProps.MemoryHeaps[0].Size;
+            
+            adapters[i] = new Adapter(i, name, type, dedicatedMemory);
+        }
+
+        return adapters;
+    }
+
     public override void Dispose()
     {
         if (_debugUtils != null)
