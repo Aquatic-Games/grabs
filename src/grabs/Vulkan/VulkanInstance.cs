@@ -8,10 +8,14 @@ namespace grabs.Vulkan;
 
 internal unsafe class VulkanInstance : Instance
 {
+    public readonly Vk Vk;
+    
     public readonly VkInstance Instance;
 
     public VulkanInstance(ref readonly InstanceInfo info)
     {
+        Vk = Vk.GetApi();
+        
         using PinnedString appName = info.AppName;
         using PinnedString engineName = "GRABS";
 
@@ -52,17 +56,27 @@ internal unsafe class VulkanInstance : Instance
 
         using PinnedStringArray extensions = new PinnedStringArray(instanceExtensions);
         using PinnedStringArray layers = new PinnedStringArray(layersList);
-        
+
         InstanceCreateInfo instanceInfo = new InstanceCreateInfo()
         {
             SType = StructureType.InstanceCreateInfo,
-            
+
             PApplicationInfo = &appInfo,
-        }
+
+            PpEnabledExtensionNames = extensions,
+            EnabledExtensionCount = extensions.Length,
+
+            PpEnabledLayerNames = layers,
+            EnabledLayerCount = layers.Length,
+        };
+
+        Vk.CreateInstance(&instanceInfo, null, out Instance).Check("Create instance");
     }
     
     public override void Dispose()
     {
-        throw new NotImplementedException();
+        Vk.DestroyInstance(Instance, null);
+        
+        Vk.Dispose();
     }
 }
