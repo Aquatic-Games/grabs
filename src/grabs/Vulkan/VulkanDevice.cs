@@ -95,7 +95,7 @@ internal sealed unsafe class VulkanDevice : Device
         _vk.GetDeviceQueue(Device, _presentQueueIndex, 0, out PresentQueue);
     }
 
-    public override Swapchain CreateSwapchain(in SwapchainInfo info)
+    public override Swapchain CreateSwapchain(Surface surface, in SwapchainInfo info)
     {
         throw new NotImplementedException();
     }
