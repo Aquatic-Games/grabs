@@ -85,12 +85,21 @@ internal sealed unsafe class VulkanDevice : Device
             EnabledExtensionCount = extensions.Length
         };
 
+        GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.General, "Creating device.");
         _vk.CreateDevice(physicalDevice, &deviceInfo, null, out Device).Check("Create device");
 
+        GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.General, "Get graphics queue");
         _vk.GetDeviceQueue(Device, _graphicsQueueIndex, 0, out GraphicsQueue);
+        
+        GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.General, "Get present queue");
         _vk.GetDeviceQueue(Device, _presentQueueIndex, 0, out PresentQueue);
     }
-    
+
+    public override Swapchain CreateSwapchain(in SwapchainInfo info)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void Dispose()
     {
         _vk.DestroyDevice(Device, null);
