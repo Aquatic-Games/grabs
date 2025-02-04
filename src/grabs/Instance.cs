@@ -8,7 +8,7 @@ public abstract class Instance : IDisposable
     
     public abstract Adapter[] EnumerateAdapters();
     
-    public abstract Device CreateDevice(Adapter? adapter = null);
+    public abstract Device CreateDevice(Surface surface, Adapter? adapter = null);
 
     public abstract Surface CreateSurface(in SurfaceInfo info);
     

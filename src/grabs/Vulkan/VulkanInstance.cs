@@ -189,7 +189,7 @@ internal sealed unsafe class VulkanInstance : Instance
         return adapters;
     }
 
-    public override Device CreateDevice(Adapter? adapter = null)
+    public override Device CreateDevice(Surface surface, Adapter? adapter = null)
     {
         uint index = adapter?.Index ?? 0;
 
@@ -206,7 +206,7 @@ internal sealed unsafe class VulkanInstance : Instance
 
         PhysicalDevice physicalDevice = physicalDevices[index];
 
-        return new VulkanDevice(Vk, Instance, physicalDevice);
+        return new VulkanDevice(Vk, Instance, physicalDevice, (VulkanSurface) surface, _khrSurface);
     }
 
     public override Surface CreateSurface(in SurfaceInfo info)
