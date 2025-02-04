@@ -4,7 +4,11 @@ namespace grabs;
 
 public abstract class Instance : IDisposable
 {
+    public abstract Backend Backend { get; }
+    
     public abstract Adapter[] EnumerateAdapters();
+    
+    public abstract Device CreateDevice(Adapter? adapter = null);
 
     public abstract Surface CreateSurface(in SurfaceInfo info);
     

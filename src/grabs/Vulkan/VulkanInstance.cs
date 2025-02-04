@@ -17,6 +17,8 @@ internal sealed unsafe class VulkanInstance : Instance
     
     public readonly VkInstance Instance;
 
+    public override Backend Backend => Backend.Vulkan;
+
     public VulkanInstance(ref readonly InstanceInfo info)
     {
         Vk = Vk.GetApi();
@@ -185,6 +187,26 @@ internal sealed unsafe class VulkanInstance : Instance
         }
 
         return adapters;
+    }
+
+    public override Device CreateDevice(Adapter? adapter = null)
+    {
+        uint index = adapter?.Index ?? 0;
+
+        uint numPhysicalDevices;
+        Vk.EnumeratePhysicalDevices(Instance, &numPhysicalDevices, null);
+        PhysicalDevice* physicalDevices = stackalloc PhysicalDevice[(int) numPhysicalDevices];
+        Vk.EnumeratePhysicalDevices(Instance, &numPhysicalDevices, physicalDevices);
+
+        if (index > numPhysicalDevices)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index), index,
+                $"Valid adapter indexes are between 0 and {numPhysicalDevices}.");
+        }
+
+        PhysicalDevice physicalDevice = physicalDevices[index];
+
+        return new VulkanDevice(Vk, Instance, physicalDevice);
     }
 
     public override Surface CreateSurface(in SurfaceInfo info)
