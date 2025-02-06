@@ -163,6 +163,9 @@ internal sealed unsafe class VulkanInstance : Instance
 
         for (uint i = 0; i < numDevices; i++)
         {
+            if (!CheckPhysicalDeviceSupported(devices[i]))
+                continue;
+            
             PhysicalDeviceProperties props;
             Vk.GetPhysicalDeviceProperties(devices[i], &props);
             
@@ -185,6 +188,9 @@ internal sealed unsafe class VulkanInstance : Instance
             
             adapters[i] = new Adapter(i, name, type, dedicatedMemory);
         }
+        
+        if (adapters.Length == 0)
+            throw new NotSupportedException("No adapters supporting Vulkan 1.3 or VK_KHR_dynamic_rendering are present.");
 
         return adapters;
     }
@@ -204,7 +210,15 @@ internal sealed unsafe class VulkanInstance : Instance
                 $"Valid adapter indexes are between 0 and {numPhysicalDevices}.");
         }
 
-        PhysicalDevice physicalDevice = physicalDevices[index];
+        PhysicalDevice physicalDevice;
+
+        do
+        {
+            physicalDevice = physicalDevices[index++];
+            
+            if (index >= numPhysicalDevices)
+                throw new NotSupportedException("No adapters supporting Vulkan 1.3 or VK_KHR_dynamic_rendering are present.");
+        } while (!CheckPhysicalDeviceSupported(physicalDevice));
 
         return new VulkanDevice(Vk, Instance, physicalDevice, (VulkanSurface) surface, _khrSurface);
     }
@@ -212,6 +226,27 @@ internal sealed unsafe class VulkanInstance : Instance
     public override Surface CreateSurface(in SurfaceInfo info)
     {
         return new VulkanSurface(Vk, Instance, _khrSurface, in info);
+    }
+
+    private bool CheckPhysicalDeviceSupported(PhysicalDevice device)
+    {
+        uint numProperties;
+        Vk.EnumerateDeviceExtensionProperties(device, (byte*) null, &numProperties, null);
+        ExtensionProperties[] extensions = new ExtensionProperties[numProperties];
+        fixed (ExtensionProperties* pProperties = extensions)
+            Vk.EnumerateDeviceExtensionProperties(device, (byte*) null, &numProperties, pProperties);
+
+        bool supported = false;
+        foreach (ExtensionProperties property in extensions)
+        {
+            if (new string((sbyte*) property.ExtensionName) == "VK_KHR_dynamic_rendering")
+            {
+                supported = true;
+                break;
+            }
+        }
+        
+        return supported;
     }
 
     public override void Dispose()
