@@ -21,7 +21,9 @@ unsafe
 
     Instance instance = Instance.Create(info);
 
-    foreach (Adapter adapter in instance.EnumerateAdapters())
+    Adapter[] adapters = instance.EnumerateAdapters();
+
+    foreach (Adapter adapter in adapters)
         Console.WriteLine(adapter.ToString());
 
     SysWMInfo wmInfo = new SysWMInfo();
@@ -54,6 +56,8 @@ unsafe
     Swapchain swapchain =
         device.CreateSwapchain(surface, new SwapchainInfo(1280, 720, Format.B8G8R8A8_UNorm, PresentMode.Fifo, 2));
 
+    CommandList cl = device.CreateCommandList();
+    
     bool alive = true;
     while (alive)
     {
@@ -75,8 +79,19 @@ unsafe
                 }
             }
         }
+        
+        swapchain.GetNextTexture();
+        
+        cl.Begin();
+        Console.WriteLine("Begin");
+        cl.End();
+        Console.WriteLine("end");
+        
+        device.ExecuteCommandList(cl);
+        Console.WriteLine("HUH?");
     }
     
+    cl.Dispose();
     swapchain.Dispose();
     device.Dispose();
     surface.Dispose();

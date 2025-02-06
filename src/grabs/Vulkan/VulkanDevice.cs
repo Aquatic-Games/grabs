@@ -10,9 +10,12 @@ namespace grabs.Vulkan;
 internal sealed unsafe class VulkanDevice : Device
 {
     private readonly Vk _vk;
-    private readonly PhysicalDevice _physicalDevice;
-    private readonly KhrSurface _khrSurface;
-    private readonly KhrSwapchain _khrSwapchain;
+    
+    public readonly PhysicalDevice PhysicalDevice;
+    
+    public readonly KhrSurface KhrSurface;
+    
+    public readonly KhrSwapchain KhrSwapchain;
     
     public readonly VkDevice Device;
 
@@ -22,16 +25,18 @@ internal sealed unsafe class VulkanDevice : Device
 
     // TODO: Better names
     private bool _alternateSemaphore;
+    
+    public readonly Semaphore ImageAvailableSemaphore;
+    
     public readonly Semaphore Semaphore1;
-    public readonly Semaphore Semaphore2;
 
-    public Semaphore HeadSemaphore => _alternateSemaphore ? Semaphore2 : Semaphore1;
+    public Semaphore HeadSemaphore => _alternateSemaphore ? Semaphore1 : ImageAvailableSemaphore;
 
     public VulkanDevice(Vk vk, VkInstance instance, PhysicalDevice physicalDevice, VulkanSurface surface, KhrSurface khrSurface)
     {
         _vk = vk;
-        _physicalDevice = physicalDevice;
-        _khrSurface = khrSurface;
+        PhysicalDevice = physicalDevice;
+        KhrSurface = khrSurface;
 
         uint? graphicsQueueIndex = null;
         uint? presentQueueIndex = null;
@@ -105,7 +110,7 @@ internal sealed unsafe class VulkanDevice : Device
         GrabsLog.Log("Get present queue");
         _vk.GetDeviceQueue(Device, Queues.PresentIndex, 0, out Queues.Present);
 
-        if (!_vk.TryGetDeviceExtension(instance, Device, out _khrSwapchain))
+        if (!_vk.TryGetDeviceExtension(instance, Device, out KhrSwapchain))
             throw new Exception("Failed to get Swapchain extension.");
 
         CommandPoolCreateInfo commandPoolInfo = new CommandPoolCreateInfo()
@@ -124,20 +129,53 @@ internal sealed unsafe class VulkanDevice : Device
         };
         
         GrabsLog.Log("Creating semaphores");
+        _vk.CreateSemaphore(Device, &semaphoreInfo, null, out ImageAvailableSemaphore).Check("Create semaphore");
         _vk.CreateSemaphore(Device, &semaphoreInfo, null, out Semaphore1).Check("Create semaphore");
-        _vk.CreateSemaphore(Device, &semaphoreInfo, null, out Semaphore2).Check("Create semaphore");
     }
 
     public override Swapchain CreateSwapchain(Surface surface, in SwapchainInfo info)
     {
-        return new VulkanSwapchain(_khrSwapchain, _physicalDevice, Device, _khrSurface, in Queues,
-            (VulkanSurface) surface, in info);
+        return new VulkanSwapchain(this, (VulkanSurface) surface, in info);
+    }
+
+    public override CommandList CreateCommandList()
+    {
+        return new VulkanCommandList(_vk, Device, CommandPool);
+    }
+
+    public override void ExecuteCommandList(CommandList list)
+    {
+        VulkanCommandList vkList = (VulkanCommandList) list;
+        CommandBuffer buffer = vkList.Buffer;
+        
+        Semaphore semaphore1 = ImageAvailableSemaphore;
+        Semaphore semaphore2 = Semaphore1;
+
+        PipelineStageFlags stageFlags = PipelineStageFlags.ColorAttachmentOutputBit;
+
+        SubmitInfo submitInfo = new SubmitInfo()
+        {
+            SType = StructureType.SubmitInfo,
+            
+            PWaitDstStageMask = &stageFlags,
+
+            CommandBufferCount = 1,
+            PCommandBuffers = &buffer,
+
+            WaitSemaphoreCount = 1,
+            PWaitSemaphores = &semaphore1,
+
+            SignalSemaphoreCount = 1,
+            PSignalSemaphores = &semaphore2
+        };
+
+        _vk.QueueSubmit(Queues.Graphics, 1, &submitInfo, new Fence()).Check("Submit queue");
     }
 
     public override void Dispose()
     {
-        _vk.DestroySemaphore(Device, Semaphore2, null);
         _vk.DestroySemaphore(Device, Semaphore1, null);
+        _vk.DestroySemaphore(Device, ImageAvailableSemaphore, null);
         
         _vk.DestroyCommandPool(Device, CommandPool, null);
         

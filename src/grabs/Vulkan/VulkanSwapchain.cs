@@ -7,17 +7,17 @@ namespace grabs.Vulkan;
 internal sealed unsafe class VulkanSwapchain : Swapchain
 {
     private readonly KhrSwapchain _khrSwapchain;
-    private readonly VkDevice _device;
-    private readonly Queue _presentQueue;
+    private readonly VulkanDevice _device;
     
     public readonly SwapchainKHR Swapchain;
 
-    public VulkanSwapchain(KhrSwapchain khrSwapchain, PhysicalDevice physicalDevice, VkDevice device,
-        KhrSurface khrSurface, ref readonly Queues queues, VulkanSurface surface, ref readonly SwapchainInfo info)
+    public VulkanSwapchain(VulkanDevice device, VulkanSurface surface, ref readonly SwapchainInfo info)
     {
-        _khrSwapchain = khrSwapchain;
         _device = device;
-        _presentQueue = queues.Present;
+        _khrSwapchain = _device.KhrSwapchain;
+
+        PhysicalDevice physicalDevice = _device.PhysicalDevice;
+        KhrSurface khrSurface = _device.KhrSurface;
         
         SurfaceCapabilitiesKHR surfaceCapabilities;
         khrSurface.GetPhysicalDeviceSurfaceCapabilities(physicalDevice, surface.Surface, &surfaceCapabilities);
@@ -118,23 +118,31 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
             Flags = SwapchainCreateFlagsKHR.None
         };
 
-        if (queues.PresentIndex == queues.GraphicsIndex)
+        if (_device.Queues.PresentIndex == _device.Queues.GraphicsIndex)
             swapchainInfo.ImageSharingMode = SharingMode.Exclusive;
         else
             throw new NotImplementedException("GRABS does not yet support separate graphics and present queues.");
 
         GrabsLog.Log("Creating swapchain.");
-        khrSwapchain.CreateSwapchain(device, &swapchainInfo, null, out Swapchain)
+        _khrSwapchain.CreateSwapchain(_device.Device, &swapchainInfo, null, out Swapchain)
             .Check("Create swapchain");
+    }
+
+    public override void GetNextTexture()
+    {
+        uint index;
+        _khrSwapchain
+            .AcquireNextImage(_device.Device, Swapchain, ulong.MaxValue, _device.ImageAvailableSemaphore, new Fence(),
+                &index).Check("Acquire next image");
     }
 
     public override void Present()
     {
-        //_khrSwapchain.QueuePresent(_presentQueue);
+        _khrSwapchain.QueuePresent(_presentQueue);
     }
 
     public override void Dispose()
     {
-        _khrSwapchain.DestroySwapchain(_device, Swapchain, null);
+        _khrSwapchain.DestroySwapchain(_device.Device, Swapchain, null);
     }
 }
