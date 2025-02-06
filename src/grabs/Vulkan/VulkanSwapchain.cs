@@ -1,18 +1,27 @@
 using grabs.Core;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.KHR;
+using Semaphore = Silk.NET.Vulkan.Semaphore;
 
 namespace grabs.Vulkan;
 
 internal sealed unsafe class VulkanSwapchain : Swapchain
 {
+    private readonly Vk _vk;
     private readonly KhrSwapchain _khrSwapchain;
     private readonly VulkanDevice _device;
+
+    private readonly Image[] _swapchainImages;
+    private readonly ImageView[] _imageViews;
+    private uint _currentImage;
+
+    private readonly Fence _fence;
     
     public readonly SwapchainKHR Swapchain;
 
-    public VulkanSwapchain(VulkanDevice device, VulkanSurface surface, ref readonly SwapchainInfo info)
+    public VulkanSwapchain(Vk vk, VulkanDevice device, VulkanSurface surface, ref readonly SwapchainInfo info)
     {
+        _vk = vk;
         _device = device;
         _khrSwapchain = _device.KhrSwapchain;
 
@@ -126,19 +135,69 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         GrabsLog.Log("Creating swapchain.");
         _khrSwapchain.CreateSwapchain(_device.Device, &swapchainInfo, null, out Swapchain)
             .Check("Create swapchain");
+
+        GrabsLog.Log("Getting swapchain images");
+        uint numImages;
+        _khrSwapchain.GetSwapchainImages(_device.Device, Swapchain, &numImages, null);
+        _swapchainImages = new Image[numImages];
+        fixed (Image* pImages = _swapchainImages)
+            _khrSwapchain.GetSwapchainImages(_device.Device, Swapchain, &numImages, pImages);
+
+        GrabsLog.Log("Creating swapchain image views.");
+        _imageViews = new ImageView[numImages];
+        for (int i = 0; i < numImages; i++)
+        {
+            ImageViewCreateInfo imageViewInfo = new ImageViewCreateInfo()
+            {
+                SType = StructureType.ImageViewCreateInfo,
+                Image = _swapchainImages[i],
+
+                Format = desiredFormat,
+                ViewType = ImageViewType.Type2D,
+                Components = new ComponentMapping(ComponentSwizzle.R, ComponentSwizzle.G, ComponentSwizzle.B, ComponentSwizzle.A),
+
+                SubresourceRange = new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1)
+            };
+            
+            _vk.CreateImageView(_device.Device, &imageViewInfo, null, out _imageViews[i])
+                .Check("Create image view");
+        }
+
+        FenceCreateInfo fenceInfo = new FenceCreateInfo()
+        {
+            SType = StructureType.FenceCreateInfo,
+        };
+        
+        GrabsLog.Log("Creating fence");
+        _vk.CreateFence(_device.Device, &fenceInfo, null, out _fence).Check("Create fence");
     }
 
     public override void GetNextTexture()
     {
-        uint index;
-        _khrSwapchain
-            .AcquireNextImage(_device.Device, Swapchain, ulong.MaxValue, _device.ImageAvailableSemaphore, new Fence(),
-                &index).Check("Acquire next image");
+        _khrSwapchain.AcquireNextImage(_device.Device, Swapchain, ulong.MaxValue, new Semaphore(), _fence, ref _currentImage)
+            .Check("Acquire next image");
+        
+        _vk.WaitForFences(_device.Device, 1, in _fence, true, ulong.MaxValue)
+            .Check("Wait for fence");
+        _vk.ResetFences(_device.Device, 1, in _fence);
     }
 
     public override void Present()
     {
-        _khrSwapchain.QueuePresent(_presentQueue);
+        SwapchainKHR swapchain = Swapchain;
+        uint currentImage = _currentImage;
+
+        PresentInfoKHR presentInfo = new PresentInfoKHR()
+        {
+            SType = StructureType.PresentInfoKhr,
+
+            SwapchainCount = 1,
+            PSwapchains = &swapchain,
+
+            PImageIndices = &currentImage,
+        };
+        
+        _khrSwapchain.QueuePresent(_device.Queues.Present, &presentInfo);
     }
 
     public override void Dispose()

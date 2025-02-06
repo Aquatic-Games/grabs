@@ -82,13 +82,15 @@ unsafe
         
         swapchain.GetNextTexture();
         
-        cl.Begin();
+        /*cl.Begin();
         Console.WriteLine("Begin");
         cl.End();
         Console.WriteLine("end");
         
         device.ExecuteCommandList(cl);
-        Console.WriteLine("HUH?");
+        Console.WriteLine("execute");*/
+        
+        swapchain.Present();
     }
     
     cl.Dispose();

@@ -30,8 +30,6 @@ internal sealed unsafe class VulkanDevice : Device
     
     public readonly Semaphore Semaphore1;
 
-    public Semaphore HeadSemaphore => _alternateSemaphore ? Semaphore1 : ImageAvailableSemaphore;
-
     public VulkanDevice(Vk vk, VkInstance instance, PhysicalDevice physicalDevice, VulkanSurface surface, KhrSurface khrSurface)
     {
         _vk = vk;
@@ -101,6 +99,15 @@ internal sealed unsafe class VulkanDevice : Device
             EnabledExtensionCount = extensions.Length
         };
 
+        // We must manually enable dynamic rendering.
+        PhysicalDeviceDynamicRenderingFeatures dynamicRenderingFeatures = new PhysicalDeviceDynamicRenderingFeatures()
+        {
+            SType = StructureType.PhysicalDeviceDynamicRenderingFeatures,
+            DynamicRendering = true
+        };
+        
+        deviceInfo.PNext = &dynamicRenderingFeatures;
+
         GrabsLog.Log("Creating device.");
         _vk.CreateDevice(physicalDevice, &deviceInfo, null, out Device).Check("Create device");
 
@@ -135,7 +142,7 @@ internal sealed unsafe class VulkanDevice : Device
 
     public override Swapchain CreateSwapchain(Surface surface, in SwapchainInfo info)
     {
-        return new VulkanSwapchain(this, (VulkanSurface) surface, in info);
+        return new VulkanSwapchain(_vk, this, (VulkanSurface) surface, in info);
     }
 
     public override CommandList CreateCommandList()
