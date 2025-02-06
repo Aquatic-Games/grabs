@@ -123,14 +123,14 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         else
             throw new NotImplementedException("GRABS does not yet support separate graphics and present queues.");
 
-        GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.General, "Creating swapchain.");
+        GrabsLog.Log("Creating swapchain.");
         khrSwapchain.CreateSwapchain(device, &swapchainInfo, null, out Swapchain)
             .Check("Create swapchain");
     }
 
     public override void Present()
     {
-        _khrSwapchain.QueuePresent(_presentQueue);
+        //_khrSwapchain.QueuePresent(_presentQueue);
     }
 
     public override void Dispose()

@@ -67,7 +67,7 @@ internal sealed unsafe class VulkanInstance : Instance
         GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.General,
             $"Instance exts: [{string.Join(", ", instanceExtensions)}]");
 
-        GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.General, $"Layers: [{string.Join(", ", layersList)}]");
+        GrabsLog.Log($"Layers: [{string.Join(", ", layersList)}]");
 
         using PinnedStringArray extensions = new PinnedStringArray(instanceExtensions);
         using PinnedStringArray layers = new PinnedStringArray(layersList);
@@ -85,7 +85,7 @@ internal sealed unsafe class VulkanInstance : Instance
             EnabledLayerCount = layers.Length,
         };
 
-        GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.General, "Creating instance");
+        GrabsLog.Log("Creating instance");
         Vk.CreateInstance(&instanceInfo, null, out Instance).Check("Create instance");
 
         if (info.Debug)
@@ -109,7 +109,7 @@ internal sealed unsafe class VulkanInstance : Instance
                 PfnUserCallback = new PfnDebugUtilsMessengerCallbackEXT(DebugCallback)
             };
 
-            GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.General, "Creating debug messenger.");
+            GrabsLog.Log("Creating debug messenger.");
             _debugUtils!.CreateDebugUtilsMessenger(Instance, &debugInfo, null, out _debugMessenger)
                 .Check("Create debug messenger");
         }
