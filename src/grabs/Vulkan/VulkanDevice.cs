@@ -9,18 +9,19 @@ namespace grabs.Vulkan;
 internal sealed unsafe class VulkanDevice : Device
 {
     private readonly Vk _vk;
-
-    private readonly uint _graphicsQueueIndex;
-    private readonly uint _presentQueueIndex;
+    private readonly PhysicalDevice _physicalDevice;
+    private readonly KhrSurface _khrSurface;
+    private readonly KhrSwapchain _khrSwapchain;
 
     public readonly VkDevice Device;
 
-    public readonly Queue GraphicsQueue;
-    public readonly Queue PresentQueue;
+    public readonly Queues Queues;
 
     public VulkanDevice(Vk vk, VkInstance instance, PhysicalDevice physicalDevice, VulkanSurface surface, KhrSurface khrSurface)
     {
         _vk = vk;
+        _physicalDevice = physicalDevice;
+        _khrSurface = khrSurface;
 
         uint? graphicsQueueIndex = null;
         uint? presentQueueIndex = null;
@@ -47,10 +48,10 @@ internal sealed unsafe class VulkanDevice : Device
         if (!graphicsQueueIndex.HasValue || !presentQueueIndex.HasValue)
             throw new Exception("Graphics/present queue not found.");
 
-        _graphicsQueueIndex = graphicsQueueIndex.Value;
-        _presentQueueIndex = presentQueueIndex.Value;
+        Queues.GraphicsIndex = graphicsQueueIndex.Value;
+        Queues.PresentIndex = presentQueueIndex.Value;
 
-        HashSet<uint> uniqueQueueFamilies = [_graphicsQueueIndex, _presentQueueIndex];
+        HashSet<uint> uniqueQueueFamilies = Queues.UniqueQueues;
 
         DeviceQueueCreateInfo* queueInfos = stackalloc DeviceQueueCreateInfo[uniqueQueueFamilies.Count];
 
@@ -89,15 +90,19 @@ internal sealed unsafe class VulkanDevice : Device
         _vk.CreateDevice(physicalDevice, &deviceInfo, null, out Device).Check("Create device");
 
         GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.General, "Get graphics queue");
-        _vk.GetDeviceQueue(Device, _graphicsQueueIndex, 0, out GraphicsQueue);
+        _vk.GetDeviceQueue(Device, Queues.GraphicsIndex, 0, out Queues.Graphics);
         
         GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.General, "Get present queue");
-        _vk.GetDeviceQueue(Device, _presentQueueIndex, 0, out PresentQueue);
+        _vk.GetDeviceQueue(Device, Queues.PresentIndex, 0, out Queues.Present);
+
+        if (!_vk.TryGetDeviceExtension(instance, Device, out _khrSwapchain))
+            throw new Exception("Failed to get Swapchain extension.");
     }
 
     public override Swapchain CreateSwapchain(Surface surface, in SwapchainInfo info)
     {
-        throw new NotImplementedException();
+        return new VulkanSwapchain(_khrSwapchain, _physicalDevice, Device, _khrSurface, in Queues,
+            (VulkanSurface) surface, in info);
     }
 
     public override void Dispose()

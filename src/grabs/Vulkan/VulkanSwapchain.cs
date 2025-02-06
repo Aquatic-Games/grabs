@@ -6,14 +6,18 @@ namespace grabs.Vulkan;
 
 internal sealed unsafe class VulkanSwapchain : Swapchain
 {
-    private readonly Vk _vk;
+    private readonly KhrSwapchain _khrSwapchain;
+    private readonly VkDevice _device;
+    private readonly Queue _presentQueue;
     
     public readonly SwapchainKHR Swapchain;
 
-    public VulkanSwapchain(Vk vk, PhysicalDevice physicalDevice, VkDevice device, KhrSurface khrSurface,
-        KhrSwapchain khrSwapchain, VulkanSurface surface, ref readonly SwapchainInfo info)
+    public VulkanSwapchain(KhrSwapchain khrSwapchain, PhysicalDevice physicalDevice, VkDevice device,
+        KhrSurface khrSurface, ref readonly Queues queues, VulkanSurface surface, ref readonly SwapchainInfo info)
     {
-        _vk = vk;
+        _khrSwapchain = khrSwapchain;
+        _device = device;
+        _presentQueue = queues.Present;
         
         SurfaceCapabilitiesKHR surfaceCapabilities;
         khrSurface.GetPhysicalDeviceSurfaceCapabilities(physicalDevice, surface.Surface, &surfaceCapabilities);
@@ -41,7 +45,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         uint numPresentModes;
         khrSurface.GetPhysicalDeviceSurfacePresentModes(physicalDevice, surface.Surface, &numPresentModes, null);
         PresentModeKHR* presentModes = stackalloc PresentModeKHR[(int) numPresentModes];
-        khrSurface.GetPhysicalDeviceSurfacePresentModes(physicalDevice, surface.Surface, &numPresentModes, null);
+        khrSurface.GetPhysicalDeviceSurfacePresentModes(physicalDevice, surface.Surface, &numPresentModes, presentModes);
 
         PresentModeKHR desiredPresentMode = info.PresentMode switch
         {
@@ -89,27 +93,48 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
 
         // TODO: Compare desiredExtent vs the Min and Max extents.
         Extent2D desiredExtent = new Extent2D(info.Width, info.Height);
-        
+
         SwapchainCreateInfoKHR swapchainInfo = new SwapchainCreateInfoKHR()
         {
             SType = StructureType.SwapchainCreateInfoKhr,
-            
+
             Surface = surface.Surface,
-            
+
             MinImageCount = desiredNumImages,
             PresentMode = desiredPresentMode,
-            
+
             ImageFormat = desiredFormat,
             ImageColorSpace = ColorSpaceKHR.SpaceSrgbNonlinearKhr,
-            
+
             ImageExtent = desiredExtent,
-            
-            
-        }
+
+            ImageUsage = ImageUsageFlags.ColorAttachmentBit,
+            ImageArrayLayers = 1,
+
+            Clipped = true,
+            CompositeAlpha = CompositeAlphaFlagsKHR.OpaqueBitKhr,
+            PreTransform = SurfaceTransformFlagsKHR.IdentityBitKhr,
+
+            Flags = SwapchainCreateFlagsKHR.None
+        };
+
+        if (queues.PresentIndex == queues.GraphicsIndex)
+            swapchainInfo.ImageSharingMode = SharingMode.Exclusive;
+        else
+            throw new NotImplementedException("GRABS does not yet support separate graphics and present queues.");
+
+        GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.General, "Creating swapchain.");
+        khrSwapchain.CreateSwapchain(device, &swapchainInfo, null, out Swapchain)
+            .Check("Create swapchain");
     }
-    
+
+    public override void Present()
+    {
+        _khrSwapchain.QueuePresent(_presentQueue);
+    }
+
     public override void Dispose()
     {
-        
+        _khrSwapchain.DestroySwapchain(_device, Swapchain, null);
     }
 }
