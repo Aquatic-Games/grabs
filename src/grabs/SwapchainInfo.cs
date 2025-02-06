@@ -8,13 +8,16 @@ public record struct SwapchainInfo
 
     public Format Format;
 
+    public PresentMode PresentMode;
+
     public uint NumBuffers;
 
-    public SwapchainInfo(uint width, uint height, Format format, uint numBuffers)
+    public SwapchainInfo(uint width, uint height, Format format, PresentMode presentMode, uint numBuffers)
     {
         Width = width;
         Height = height;
         Format = format;
+        PresentMode = presentMode;
         NumBuffers = numBuffers;
     }
 }
