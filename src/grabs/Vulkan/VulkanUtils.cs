@@ -80,4 +80,14 @@ internal static class VulkanUtils
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
         };
     }
+
+    public static AttachmentLoadOp ToVk(this LoadOp loadOp)
+    {
+        return loadOp switch
+        {
+            LoadOp.Clear => AttachmentLoadOp.Clear,
+            LoadOp.Load => AttachmentLoadOp.Load,
+            _ => throw new ArgumentOutOfRangeException(nameof(loadOp), loadOp, null)
+        };
+    }
 }

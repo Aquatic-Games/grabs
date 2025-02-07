@@ -10,7 +10,7 @@ public record struct ColorAttachmentInfo
 
     public LoadOp LoadOp;
 
-    public ColorAttachmentInfo(Texture texture, ColorF clearColor, LoadOp loadOp)
+    public ColorAttachmentInfo(Texture texture, ColorF clearColor, LoadOp loadOp = LoadOp.Clear)
     {
         Texture = texture;
         ClearColor = clearColor;

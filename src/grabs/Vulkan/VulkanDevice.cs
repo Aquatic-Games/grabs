@@ -157,6 +157,8 @@ internal sealed unsafe class VulkanDevice : Device
             PCommandBuffers = &buffer,
         };
 
+        // TODO: It goes without saying that relying on a fence for sync is bad and slow.
+        //       This should use semaphores instead once things are figured out.
         _vk.QueueSubmit(Queues.Graphics, 1, &submitInfo, _fence).Check("Submit queue");
 
         _vk.WaitForFences(Device, 1, in _fence, true, ulong.MaxValue);

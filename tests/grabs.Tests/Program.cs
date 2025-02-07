@@ -4,7 +4,7 @@ using Silk.NET.SDL;
 using Surface = grabs.Surface;
 using Texture = grabs.Texture;
 
-//GrabsLog.LogMessage += (severity, source, message, _, _) => Console.WriteLine($"{severity} - {source}: {message}");
+GrabsLog.LogMessage += (severity, source, message, _, _) => Console.WriteLine($"{severity} - {source}: {message}");
 
 unsafe
 {
@@ -58,6 +58,8 @@ unsafe
         device.CreateSwapchain(surface, new SwapchainInfo(1280, 720, Format.B8G8R8A8_UNorm, PresentMode.Fifo, 2));
 
     CommandList cl = device.CreateCommandList();
+
+    float h = 0;
     
     bool alive = true;
     while (alive)
@@ -85,10 +87,26 @@ unsafe
         
         cl.Begin();
 
-        ColorAttachmentInfo attachmentInfo =
-            new ColorAttachmentInfo(texture, new ColorF(1.0f, 0.5f, 0.25f), LoadOp.Clear);
+        float x = 1 - float.Abs((h / 60.0f) % 2.0f - 1);
+
+        (float r, float g, float b) = h switch
+        {
+            >= 0 and < 60 => (1, x, 0),
+            >= 60 and < 120 => (x, 1, 0),
+            >= 120 and < 180 => (0, 1, x),
+            >= 180 and < 240 => (0, x, 1),
+            >= 240 and < 300 => (x, 0, 1),
+            >= 300 and < 360 => (1, 0, x),
+            _ => (0.0f, 0.0f, 0.0f)
+        };
         
-        cl.BeginRenderPass(new RenderPassInfo() { ColorAttachments = new Span<ColorAttachmentInfo>(ref attachmentInfo) });
+        Console.WriteLine($"h: {h}, r: {r}, g: {g}, b: {b}");
+
+        h += 1;
+        if (h >= 360)
+            h = 0;
+        
+        cl.BeginRenderPass(new RenderPassInfo(new ColorAttachmentInfo(texture, new ColorF(r, g, b))));
         cl.EndRenderPass();
         
         cl.End();

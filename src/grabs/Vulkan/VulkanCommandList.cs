@@ -50,7 +50,7 @@ internal sealed unsafe class VulkanCommandList : CommandList
 
         for (int i = 0; i < info.ColorAttachments.Length; i++)
         {
-            ref ColorAttachmentInfo attachmentInfo = ref info.ColorAttachments[i];
+            ref readonly ColorAttachmentInfo attachmentInfo = ref info.ColorAttachments[i];
             ColorF clearColor = attachmentInfo.ClearColor;
 
             VulkanTexture texture = (VulkanTexture) attachmentInfo.Texture;
@@ -62,8 +62,8 @@ internal sealed unsafe class VulkanCommandList : CommandList
                 ImageLayout = ImageLayout.ColorAttachmentOptimal,
                 ClearValue = new ClearValue(new ClearColorValue(clearColor.R, clearColor.G, clearColor.B, clearColor.A)),
                 
-                LoadOp = AttachmentLoadOp.Clear,
-                StoreOp = AttachmentStoreOp.None
+                LoadOp = attachmentInfo.LoadOp.ToVk(),
+                StoreOp = AttachmentStoreOp.Store
             };
         }
         
