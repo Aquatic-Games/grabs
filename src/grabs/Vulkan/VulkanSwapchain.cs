@@ -200,54 +200,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
 
         _vk.BeginCommandBuffer(_commandBuffer, &beginInfo).Check("Begin command buffer");
 
-        ImageMemoryBarrier memoryBarrier = new ImageMemoryBarrier()
-        {
-            SType = StructureType.ImageMemoryBarrier,
-            Image = _swapchainImages[_currentImage],
-            OldLayout = ImageLayout.Undefined,
-            NewLayout = ImageLayout.ColorAttachmentOptimal,
-            DstAccessMask = AccessFlags.ColorAttachmentWriteBit,
-            SubresourceRange = new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1)
-        };
-
-        _vk.CmdPipelineBarrier(_commandBuffer, PipelineStageFlags.TopOfPipeBit,
-            PipelineStageFlags.ColorAttachmentOutputBit, 0, 0, null, 0, null, 1, &memoryBarrier);
-
-        RenderingAttachmentInfo attachmentInfo = new RenderingAttachmentInfo()
-        {
-            SType = StructureType.RenderingAttachmentInfo,
-            ImageView = _imageViews[_currentImage],
-            ImageLayout = ImageLayout.ColorAttachmentOptimal,
-            LoadOp = AttachmentLoadOp.Clear,
-            StoreOp = AttachmentStoreOp.Store,
-            ClearValue = new ClearValue(new ClearColorValue(1.0f, 0.5f, 0.25f, 1.0f))
-        };
-
-        RenderingInfo info = new RenderingInfo()
-        {
-            SType = StructureType.RenderingInfo,
-            RenderArea = new Rect2D(extent: new Extent2D(1280, 720)),
-            LayerCount = 1,
-            ColorAttachmentCount = 1,
-            PColorAttachments = &attachmentInfo
-        };
-        
-        _vk.CmdBeginRendering(_commandBuffer, &info);
-        _vk.CmdEndRendering(_commandBuffer);
-        
-        ImageMemoryBarrier memoryBarrier2 = new ImageMemoryBarrier()
-        {
-            SType = StructureType.ImageMemoryBarrier,
-            Image = _swapchainImages[_currentImage],
-            OldLayout = ImageLayout.ColorAttachmentOptimal,
-            NewLayout = ImageLayout.PresentSrcKhr,
-            DstAccessMask = AccessFlags.ColorAttachmentWriteBit,
-            SubresourceRange = new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1)
-        };
-
-        // What happened to bottom of pipe?
-        _vk.CmdPipelineBarrier(_commandBuffer, PipelineStageFlags.ColorAttachmentOutputBit,
-            PipelineStageFlags.ColorAttachmentOutputBit, 0, 0, null, 0, null, 1, &memoryBarrier2);
+        ImageBarrier(_swapchainImages[_currentImage], ImageLayout.Undefined, ImageLayout.ColorAttachmentOptimal);
         
         _vk.EndCommandBuffer(_commandBuffer).Check("End command buffer");
 
@@ -265,8 +218,6 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
 
         _vk.WaitForFences(_device.Device, 1, in _fence, true, ulong.MaxValue);
         _vk.ResetFences(_device.Device, 1, in _fence);
-        
-        Console.WriteLine("Got here!");
     }
 
     public override void Present()
@@ -274,25 +225,14 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         SwapchainKHR swapchain = Swapchain;
         uint currentImage = _currentImage;
         
-        /*CommandBufferBeginInfo beginInfo = new CommandBufferBeginInfo()
+        CommandBufferBeginInfo beginInfo = new CommandBufferBeginInfo()
         {
             SType = StructureType.CommandBufferBeginInfo,
         };
 
         _vk.BeginCommandBuffer(_commandBuffer, &beginInfo).Check("Begin command buffer");
 
-        ImageMemoryBarrier memoryBarrier = new ImageMemoryBarrier()
-        {
-            SType = StructureType.ImageMemoryBarrier,
-            Image = _swapchainImages[currentImage],
-            OldLayout = ImageLayout.ColorAttachmentOptimal,
-            NewLayout = ImageLayout.PresentSrcKhr,
-            DstAccessMask = AccessFlags.ColorAttachmentWriteBit,
-            SubresourceRange = new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1)
-        };
-
-        _vk.CmdPipelineBarrier(_commandBuffer, PipelineStageFlags.ColorAttachmentOutputBit,
-            PipelineStageFlags.BottomOfPipeBit, 0, 0, null, 0, null, 1, &memoryBarrier);
+        ImageBarrier(_swapchainImages[currentImage], ImageLayout.ColorAttachmentOptimal, ImageLayout.PresentSrcKhr);
         
         _vk.EndCommandBuffer(_commandBuffer).Check("End command buffer");
 
@@ -310,8 +250,6 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
 
         _vk.WaitForFences(_device.Device, 1, in _fence, true, ulong.MaxValue);
         _vk.ResetFences(_device.Device, 1, in _fence);
-        
-        Console.WriteLine("Got here too");*/
 
         PresentInfoKHR presentInfo = new PresentInfoKHR()
         {
@@ -324,6 +262,22 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         };
         
         _khrSwapchain.QueuePresent(_device.Queues.Present, &presentInfo).Check("Present");
+    }
+
+    private void ImageBarrier(Image image, ImageLayout old, ImageLayout @new)
+    {
+        ImageMemoryBarrier memoryBarrier = new ImageMemoryBarrier()
+        {
+            SType = StructureType.ImageMemoryBarrier,
+            Image = image,
+            OldLayout = old,
+            NewLayout = @new,
+            DstAccessMask = AccessFlags.ColorAttachmentWriteBit,
+            SubresourceRange = new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1)
+        };
+
+        _vk.CmdPipelineBarrier(_commandBuffer, PipelineStageFlags.ColorAttachmentOutputBit,
+            PipelineStageFlags.ColorAttachmentOutputBit, 0, 0, null, 0, null, 1, &memoryBarrier);
     }
 
     public override void Dispose()
