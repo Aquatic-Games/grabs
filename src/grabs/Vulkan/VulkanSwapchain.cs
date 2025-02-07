@@ -16,6 +16,8 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
     private uint _currentImage;
 
     private readonly Fence _fence;
+
+    private readonly CommandBuffer _commandBuffer;
     
     public readonly SwapchainKHR Swapchain;
 
@@ -170,6 +172,16 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         
         GrabsLog.Log("Creating fence");
         _vk.CreateFence(_device.Device, &fenceInfo, null, out _fence).Check("Create fence");
+
+        CommandBufferAllocateInfo allocInfo = new CommandBufferAllocateInfo()
+        {
+            SType = StructureType.CommandBufferAllocateInfo,
+            CommandPool = _device.CommandPool,
+            CommandBufferCount = 1,
+            Level = CommandBufferLevel.Primary,
+        };
+
+        _vk.AllocateCommandBuffers(_device.Device, &allocInfo, out _commandBuffer).Check("Allocate command buffer");
     }
 
     public override void GetNextTexture()
@@ -180,12 +192,90 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         _vk.WaitForFences(_device.Device, 1, in _fence, true, ulong.MaxValue)
             .Check("Wait for fence");
         _vk.ResetFences(_device.Device, 1, in _fence);
+
+        CommandBufferBeginInfo beginInfo = new CommandBufferBeginInfo()
+        {
+            SType = StructureType.CommandBufferBeginInfo,
+        };
+
+        _vk.BeginCommandBuffer(_commandBuffer, &beginInfo).Check("Begin command buffer");
+
+        ImageMemoryBarrier memoryBarrier = new ImageMemoryBarrier()
+        {
+            SType = StructureType.ImageMemoryBarrier,
+            Image = _swapchainImages[_currentImage],
+            OldLayout = ImageLayout.Undefined,
+            NewLayout = ImageLayout.ColorAttachmentOptimal,
+            DstAccessMask = AccessFlags.ColorAttachmentWriteBit,
+            SubresourceRange = new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1)
+        };
+
+        _vk.CmdPipelineBarrier(_commandBuffer, PipelineStageFlags.TopOfPipeBit,
+            PipelineStageFlags.ColorAttachmentOutputBit, 0, 0, null, 0, null, 1, &memoryBarrier);
+        
+        _vk.EndCommandBuffer(_commandBuffer).Check("End command buffer");
+
+        CommandBuffer buffer = _commandBuffer;
+
+        SubmitInfo submitInfo = new SubmitInfo()
+        {
+            SType = StructureType.SubmitInfo,
+
+            CommandBufferCount = 1,
+            PCommandBuffers = &buffer
+        };
+        
+        _vk.QueueSubmit(_device.Queues.Graphics, 1, &submitInfo, _fence).Check("Submit queue");
+
+        _vk.WaitForFences(_device.Device, 1, in _fence, true, ulong.MaxValue);
+        _vk.ResetFences(_device.Device, 1, in _fence);
+        
+        Console.WriteLine("Got here!");
     }
 
     public override void Present()
     {
         SwapchainKHR swapchain = Swapchain;
         uint currentImage = _currentImage;
+        
+        CommandBufferBeginInfo beginInfo = new CommandBufferBeginInfo()
+        {
+            SType = StructureType.CommandBufferBeginInfo,
+        };
+
+        _vk.BeginCommandBuffer(_commandBuffer, &beginInfo).Check("Begin command buffer");
+
+        ImageMemoryBarrier memoryBarrier = new ImageMemoryBarrier()
+        {
+            SType = StructureType.ImageMemoryBarrier,
+            Image = _swapchainImages[currentImage],
+            OldLayout = ImageLayout.ColorAttachmentOptimal,
+            NewLayout = ImageLayout.PresentSrcKhr,
+            DstAccessMask = AccessFlags.ColorAttachmentWriteBit,
+            SubresourceRange = new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1)
+        };
+
+        _vk.CmdPipelineBarrier(_commandBuffer, PipelineStageFlags.ColorAttachmentOutputBit,
+            PipelineStageFlags.BottomOfPipeBit, 0, 0, null, 0, null, 1, &memoryBarrier);
+        
+        _vk.EndCommandBuffer(_commandBuffer).Check("End command buffer");
+
+        CommandBuffer buffer = _commandBuffer;
+
+        SubmitInfo submitInfo = new SubmitInfo()
+        {
+            SType = StructureType.SubmitInfo,
+
+            CommandBufferCount = 1,
+            PCommandBuffers = &buffer
+        };
+        
+        _vk.QueueSubmit(_device.Queues.Graphics, 1, &submitInfo, _fence).Check("Submit queue");
+
+        _vk.WaitForFences(_device.Device, 1, in _fence, true, ulong.MaxValue);
+        _vk.ResetFences(_device.Device, 1, in _fence);
+        
+        Console.WriteLine("Got here too");
 
         PresentInfoKHR presentInfo = new PresentInfoKHR()
         {
@@ -197,7 +287,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
             PImageIndices = &currentImage,
         };
         
-        _khrSwapchain.QueuePresent(_device.Queues.Present, &presentInfo);
+        _khrSwapchain.QueuePresent(_device.Queues.Present, &presentInfo).Check("Present");
     }
 
     public override void Dispose()
