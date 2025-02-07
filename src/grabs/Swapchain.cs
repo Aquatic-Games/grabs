@@ -2,7 +2,7 @@ namespace grabs;
 
 public abstract class Swapchain : IDisposable
 {
-    public abstract void GetNextTexture();
+    public abstract Texture GetNextTexture();
     
     public abstract void Present();
     

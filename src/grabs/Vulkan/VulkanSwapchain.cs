@@ -11,8 +11,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
     private readonly KhrSwapchain _khrSwapchain;
     private readonly VulkanDevice _device;
 
-    private readonly Image[] _swapchainImages;
-    private readonly ImageView[] _imageViews;
+    private readonly VulkanTexture[] _swapchainTextures;
     private uint _currentImage;
 
     private readonly Fence _fence;
@@ -141,18 +140,17 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         GrabsLog.Log("Getting swapchain images");
         uint numImages;
         _khrSwapchain.GetSwapchainImages(_device.Device, Swapchain, &numImages, null);
-        _swapchainImages = new Image[numImages];
-        fixed (Image* pImages = _swapchainImages)
-            _khrSwapchain.GetSwapchainImages(_device.Device, Swapchain, &numImages, pImages);
+        Image* swapchainImages = stackalloc Image[(int) numImages];
+        _khrSwapchain.GetSwapchainImages(_device.Device, Swapchain, &numImages, swapchainImages);
 
         GrabsLog.Log("Creating swapchain image views.");
-        _imageViews = new ImageView[numImages];
+        _swapchainTextures = new VulkanTexture[numImages];
         for (int i = 0; i < numImages; i++)
         {
             ImageViewCreateInfo imageViewInfo = new ImageViewCreateInfo()
             {
                 SType = StructureType.ImageViewCreateInfo,
-                Image = _swapchainImages[i],
+                Image = swapchainImages[i],
 
                 Format = desiredFormat,
                 ViewType = ImageViewType.Type2D,
@@ -161,8 +159,10 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
                 SubresourceRange = new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1)
             };
             
-            _vk.CreateImageView(_device.Device, &imageViewInfo, null, out _imageViews[i])
+            _vk.CreateImageView(_device.Device, &imageViewInfo, null, out ImageView view)
                 .Check("Create image view");
+
+            _swapchainTextures[i] = new VulkanTexture(_vk, _device.Device, swapchainImages[i], view);
         }
 
         FenceCreateInfo fenceInfo = new FenceCreateInfo()
@@ -184,7 +184,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         _vk.AllocateCommandBuffers(_device.Device, &allocInfo, out _commandBuffer).Check("Allocate command buffer");
     }
 
-    public override void GetNextTexture()
+    public override Texture GetNextTexture()
     {
         _khrSwapchain.AcquireNextImage(_device.Device, Swapchain, ulong.MaxValue, new Semaphore(), _fence, ref _currentImage)
             .Check("Acquire next image");
@@ -200,7 +200,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
 
         _vk.BeginCommandBuffer(_commandBuffer, &beginInfo).Check("Begin command buffer");
 
-        ImageBarrier(_swapchainImages[_currentImage], ImageLayout.Undefined, ImageLayout.ColorAttachmentOptimal);
+        ImageBarrier(_swapchainTextures[_currentImage].Image, ImageLayout.Undefined, ImageLayout.ColorAttachmentOptimal);
         
         _vk.EndCommandBuffer(_commandBuffer).Check("End command buffer");
 
@@ -218,6 +218,8 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
 
         _vk.WaitForFences(_device.Device, 1, in _fence, true, ulong.MaxValue);
         _vk.ResetFences(_device.Device, 1, in _fence);
+
+        return _swapchainTextures[_currentImage];
     }
 
     public override void Present()
@@ -232,7 +234,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
 
         _vk.BeginCommandBuffer(_commandBuffer, &beginInfo).Check("Begin command buffer");
 
-        ImageBarrier(_swapchainImages[currentImage], ImageLayout.ColorAttachmentOptimal, ImageLayout.PresentSrcKhr);
+        ImageBarrier(_swapchainTextures[currentImage].Image, ImageLayout.ColorAttachmentOptimal, ImageLayout.PresentSrcKhr);
         
         _vk.EndCommandBuffer(_commandBuffer).Check("End command buffer");
 
@@ -282,6 +284,13 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
 
     public override void Dispose()
     {
+        _vk.FreeCommandBuffers(_device.Device, _device.CommandPool, 1, in _commandBuffer);
+        
+        _vk.DestroyFence(_device.Device, _fence, null);
+        
+        foreach (VulkanTexture texture in _swapchainTextures)
+            texture.Dispose();
+        
         _khrSwapchain.DestroySwapchain(_device.Device, Swapchain, null);
     }
 }

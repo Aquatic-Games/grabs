@@ -2,8 +2,9 @@
 using grabs.Core;
 using Silk.NET.SDL;
 using Surface = grabs.Surface;
+using Texture = grabs.Texture;
 
-GrabsLog.LogMessage += (severity, source, message, _, _) => Console.WriteLine($"{severity} - {source}: {message}");
+//GrabsLog.LogMessage += (severity, source, message, _, _) => Console.WriteLine($"{severity} - {source}: {message}");
 
 unsafe
 {
@@ -80,7 +81,7 @@ unsafe
             }
         }
         
-        swapchain.GetNextTexture();
+        Texture texture = swapchain.GetNextTexture();
         
         /*cl.Begin();
         Console.WriteLine("Begin");
