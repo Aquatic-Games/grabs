@@ -102,7 +102,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         FORMAT_FOUND: ;
 
         // TODO: Compare desiredExtent vs the Min and Max extents.
-        Extent2D desiredExtent = new Extent2D(info.Width, info.Height);
+        Extent2D desiredExtent = info.Size.ToVk();
 
         SwapchainCreateInfoKHR swapchainInfo = new SwapchainCreateInfoKHR()
         {
@@ -162,7 +162,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
             _vk.CreateImageView(_device.Device, &imageViewInfo, null, out ImageView view)
                 .Check("Create image view");
 
-            _swapchainTextures[i] = new VulkanTexture(_vk, _device.Device, swapchainImages[i], view);
+            _swapchainTextures[i] = new VulkanTexture(_vk, _device.Device, swapchainImages[i], view, info.Size);
         }
 
         FenceCreateInfo fenceInfo = new FenceCreateInfo()

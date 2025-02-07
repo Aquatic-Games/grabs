@@ -1,4 +1,5 @@
 global using VkFormat = Silk.NET.Vulkan.Format;
+using grabs.Core;
 using Silk.NET.Vulkan;
 
 namespace grabs.Vulkan;
@@ -90,4 +91,7 @@ internal static class VulkanUtils
             _ => throw new ArgumentOutOfRangeException(nameof(loadOp), loadOp, null)
         };
     }
+
+    public static Extent2D ToVk(this Size2D size)
+        => new Extent2D(size.Width, size.Height);
 }

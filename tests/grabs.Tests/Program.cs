@@ -55,7 +55,7 @@ unsafe
     Device device = instance.CreateDevice(surface);
 
     Swapchain swapchain =
-        device.CreateSwapchain(surface, new SwapchainInfo(1280, 720, Format.B8G8R8A8_UNorm, PresentMode.Fifo, 2));
+        device.CreateSwapchain(surface, new SwapchainInfo(new Size2D(1280, 720), Format.B8G8R8A8_UNorm, PresentMode.Fifo, 2));
 
     CommandList cl = device.CreateCommandList();
 
@@ -100,7 +100,7 @@ unsafe
             _ => (0.0f, 0.0f, 0.0f)
         };
         
-        Console.WriteLine($"h: {h}, r: {r}, g: {g}, b: {b}");
+        //Console.WriteLine($"h: {h}, r: {r}, g: {g}, b: {b}");
 
         h += 1;
         if (h >= 360)

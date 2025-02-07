@@ -1,3 +1,4 @@
+using grabs.Core;
 using Silk.NET.Vulkan;
 
 namespace grabs.Vulkan;
@@ -10,8 +11,10 @@ internal sealed unsafe class VulkanTexture : Texture
 
     public readonly Image Image;
     public readonly ImageView ImageView;
+    
+    public override Size2D Size { get; }
 
-    public VulkanTexture(Vk vk, VkDevice device, Image image, ImageView view)
+    public VulkanTexture(Vk vk, VkDevice device, Image image, ImageView view, Size2D size)
     {
         _vk = vk;
         _device = device;
@@ -19,8 +22,9 @@ internal sealed unsafe class VulkanTexture : Texture
 
         Image = image;
         ImageView = view;
+        Size = size;
     }
-    
+
     public override void Dispose()
     {
         _vk.DestroyImageView(_device, ImageView, null);

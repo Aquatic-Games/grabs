@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using grabs.Core;
 using Silk.NET.Vulkan;
 
@@ -46,6 +47,8 @@ internal sealed unsafe class VulkanCommandList : CommandList
 
     public override void BeginRenderPass(in RenderPassInfo info)
     {
+        Debug.Assert(info.ColorAttachments.Length > 0, "Render pass must have at least one color attachment.");
+        
         RenderingAttachmentInfo* colorAttachments = stackalloc RenderingAttachmentInfo[info.ColorAttachments.Length];
 
         for (int i = 0; i < info.ColorAttachments.Length; i++)
@@ -72,7 +75,7 @@ internal sealed unsafe class VulkanCommandList : CommandList
             SType = StructureType.RenderingInfo,
 
             LayerCount = 1,
-            RenderArea = new Rect2D(extent: new Extent2D(1280, 720)),
+            RenderArea = new Rect2D { Extent = info.ColorAttachments[0].Texture.Size.ToVk() },
             
             ColorAttachmentCount = (uint) info.ColorAttachments.Length,
             PColorAttachments = colorAttachments

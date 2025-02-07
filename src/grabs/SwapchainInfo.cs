@@ -1,10 +1,10 @@
+using grabs.Core;
+
 namespace grabs;
 
 public record struct SwapchainInfo
 {
-    public uint Width;
-
-    public uint Height;
+    public Size2D Size;
 
     public Format Format;
 
@@ -12,10 +12,9 @@ public record struct SwapchainInfo
 
     public uint NumBuffers;
 
-    public SwapchainInfo(uint width, uint height, Format format, PresentMode presentMode, uint numBuffers)
+    public SwapchainInfo(Size2D size, Format format, PresentMode presentMode, uint numBuffers)
     {
-        Width = width;
-        Height = height;
+        Size = size;
         Format = format;
         PresentMode = presentMode;
         NumBuffers = numBuffers;
