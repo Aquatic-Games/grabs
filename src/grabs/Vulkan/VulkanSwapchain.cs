@@ -126,7 +126,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
             CompositeAlpha = CompositeAlphaFlagsKHR.OpaqueBitKhr,
             PreTransform = SurfaceTransformFlagsKHR.IdentityBitKhr,
 
-            Flags = SwapchainCreateFlagsKHR.None
+            Flags = SwapchainCreateFlagsKHR.None,
         };
 
         if (_device.Queues.PresentIndex == _device.Queues.GraphicsIndex)
@@ -156,7 +156,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
 
                 Format = desiredFormat,
                 ViewType = ImageViewType.Type2D,
-                Components = new ComponentMapping(ComponentSwizzle.R, ComponentSwizzle.G, ComponentSwizzle.B, ComponentSwizzle.A),
+                Components = new ComponentMapping(ComponentSwizzle.Identity, ComponentSwizzle.Identity, ComponentSwizzle.Identity, ComponentSwizzle.Identity),
 
                 SubresourceRange = new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1)
             };
@@ -212,6 +212,42 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
 
         _vk.CmdPipelineBarrier(_commandBuffer, PipelineStageFlags.TopOfPipeBit,
             PipelineStageFlags.ColorAttachmentOutputBit, 0, 0, null, 0, null, 1, &memoryBarrier);
+
+        RenderingAttachmentInfo attachmentInfo = new RenderingAttachmentInfo()
+        {
+            SType = StructureType.RenderingAttachmentInfo,
+            ImageView = _imageViews[_currentImage],
+            ImageLayout = ImageLayout.ColorAttachmentOptimal,
+            LoadOp = AttachmentLoadOp.Clear,
+            StoreOp = AttachmentStoreOp.Store,
+            ClearValue = new ClearValue(new ClearColorValue(1.0f, 0.5f, 0.25f, 1.0f))
+        };
+
+        RenderingInfo info = new RenderingInfo()
+        {
+            SType = StructureType.RenderingInfo,
+            RenderArea = new Rect2D(extent: new Extent2D(1280, 720)),
+            LayerCount = 1,
+            ColorAttachmentCount = 1,
+            PColorAttachments = &attachmentInfo
+        };
+        
+        _vk.CmdBeginRendering(_commandBuffer, &info);
+        _vk.CmdEndRendering(_commandBuffer);
+        
+        ImageMemoryBarrier memoryBarrier2 = new ImageMemoryBarrier()
+        {
+            SType = StructureType.ImageMemoryBarrier,
+            Image = _swapchainImages[_currentImage],
+            OldLayout = ImageLayout.ColorAttachmentOptimal,
+            NewLayout = ImageLayout.PresentSrcKhr,
+            DstAccessMask = AccessFlags.ColorAttachmentWriteBit,
+            SubresourceRange = new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1)
+        };
+
+        // What happened to bottom of pipe?
+        _vk.CmdPipelineBarrier(_commandBuffer, PipelineStageFlags.ColorAttachmentOutputBit,
+            PipelineStageFlags.ColorAttachmentOutputBit, 0, 0, null, 0, null, 1, &memoryBarrier2);
         
         _vk.EndCommandBuffer(_commandBuffer).Check("End command buffer");
 
@@ -238,7 +274,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         SwapchainKHR swapchain = Swapchain;
         uint currentImage = _currentImage;
         
-        CommandBufferBeginInfo beginInfo = new CommandBufferBeginInfo()
+        /*CommandBufferBeginInfo beginInfo = new CommandBufferBeginInfo()
         {
             SType = StructureType.CommandBufferBeginInfo,
         };
@@ -275,7 +311,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         _vk.WaitForFences(_device.Device, 1, in _fence, true, ulong.MaxValue);
         _vk.ResetFences(_device.Device, 1, in _fence);
         
-        Console.WriteLine("Got here too");
+        Console.WriteLine("Got here too");*/
 
         PresentInfoKHR presentInfo = new PresentInfoKHR()
         {

@@ -212,13 +212,13 @@ internal sealed unsafe class VulkanInstance : Instance
 
         PhysicalDevice physicalDevice;
 
-        do
-        {
+        //do
+        //{
             physicalDevice = physicalDevices[index++];
             
-            if (index >= numPhysicalDevices)
-                throw new NotSupportedException("No adapters supporting Vulkan 1.3 or VK_KHR_dynamic_rendering are present.");
-        } while (!CheckPhysicalDeviceSupported(physicalDevice));
+        //    if (index >= numPhysicalDevices)
+        //        throw new NotSupportedException("No adapters supporting Vulkan 1.3 or VK_KHR_dynamic_rendering are present.");
+        //} while (!CheckPhysicalDeviceSupported(physicalDevice));
 
         return new VulkanDevice(Vk, Instance, physicalDevice, (VulkanSurface) surface, _khrSurface);
     }
