@@ -83,13 +83,17 @@ unsafe
         
         Texture texture = swapchain.GetNextTexture();
         
-        /*cl.Begin();
-        Console.WriteLine("Begin");
+        cl.Begin();
+
+        ColorAttachmentInfo attachmentInfo =
+            new ColorAttachmentInfo(texture, new ColorF(1.0f, 0.5f, 0.25f), LoadOp.Clear);
+        
+        cl.BeginRenderPass(new RenderPassInfo() { ColorAttachments = new Span<ColorAttachmentInfo>(ref attachmentInfo) });
+        cl.EndRenderPass();
+        
         cl.End();
-        Console.WriteLine("end");
         
         device.ExecuteCommandList(cl);
-        Console.WriteLine("execute");*/
         
         swapchain.Present();
     }

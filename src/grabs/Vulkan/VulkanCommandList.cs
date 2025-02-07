@@ -44,6 +44,47 @@ internal sealed unsafe class VulkanCommandList : CommandList
         _vk.EndCommandBuffer(Buffer).Check("End command buffer");
     }
 
+    public override void BeginRenderPass(in RenderPassInfo info)
+    {
+        RenderingAttachmentInfo* colorAttachments = stackalloc RenderingAttachmentInfo[info.ColorAttachments.Length];
+
+        for (int i = 0; i < info.ColorAttachments.Length; i++)
+        {
+            ref ColorAttachmentInfo attachmentInfo = ref info.ColorAttachments[i];
+            ColorF clearColor = attachmentInfo.ClearColor;
+
+            VulkanTexture texture = (VulkanTexture) attachmentInfo.Texture;
+
+            colorAttachments[i] = new RenderingAttachmentInfo()
+            {
+                SType = StructureType.RenderingAttachmentInfo,
+                ImageView = texture.ImageView,
+                ImageLayout = ImageLayout.ColorAttachmentOptimal,
+                ClearValue = new ClearValue(new ClearColorValue(clearColor.R, clearColor.G, clearColor.B, clearColor.A)),
+                
+                LoadOp = AttachmentLoadOp.Clear,
+                StoreOp = AttachmentStoreOp.None
+            };
+        }
+        
+        RenderingInfo renderingInfo = new RenderingInfo()
+        {
+            SType = StructureType.RenderingInfo,
+
+            LayerCount = 1,
+            RenderArea = new Rect2D(extent: new Extent2D(1280, 720)),
+            
+            ColorAttachmentCount = (uint) info.ColorAttachments.Length,
+            PColorAttachments = colorAttachments
+        };
+        
+        _vk.CmdBeginRendering(Buffer, &renderingInfo);
+    }
+    public override void EndRenderPass()
+    {
+        _vk.CmdEndRendering(Buffer);
+    }
+
     public override void Dispose()
     {
         fixed (CommandBuffer* buffer = &Buffer)

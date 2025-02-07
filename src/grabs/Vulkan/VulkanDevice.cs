@@ -23,12 +23,7 @@ internal sealed unsafe class VulkanDevice : Device
 
     public readonly CommandPool CommandPool;
 
-    // TODO: Better names
-    private bool _alternateSemaphore;
-    
-    public readonly Semaphore ImageAvailableSemaphore;
-    
-    public readonly Semaphore Semaphore1;
+    private readonly Fence _fence;
 
     public VulkanDevice(Vk vk, VkInstance instance, PhysicalDevice physicalDevice, VulkanSurface surface, KhrSurface khrSurface)
     {
@@ -129,15 +124,14 @@ internal sealed unsafe class VulkanDevice : Device
         
         GrabsLog.Log("Creating command pool");
         _vk.CreateCommandPool(Device, &commandPoolInfo, null, out CommandPool).Check("Create command pool");
-        
-        SemaphoreCreateInfo semaphoreInfo = new SemaphoreCreateInfo()
+
+        FenceCreateInfo fenceInfo = new FenceCreateInfo()
         {
-            SType = StructureType.SemaphoreCreateInfo,
+            SType = StructureType.FenceCreateInfo
         };
-        
-        GrabsLog.Log("Creating semaphores");
-        _vk.CreateSemaphore(Device, &semaphoreInfo, null, out ImageAvailableSemaphore).Check("Create semaphore");
-        _vk.CreateSemaphore(Device, &semaphoreInfo, null, out Semaphore1).Check("Create semaphore");
+
+        GrabsLog.Log("Creating fence");
+        _vk.CreateFence(Device, &fenceInfo, null, out _fence).Check("Create fence");
     }
 
     public override Swapchain CreateSwapchain(Surface surface, in SwapchainInfo info)
@@ -154,35 +148,24 @@ internal sealed unsafe class VulkanDevice : Device
     {
         VulkanCommandList vkList = (VulkanCommandList) list;
         CommandBuffer buffer = vkList.Buffer;
-        
-        Semaphore semaphore1 = ImageAvailableSemaphore;
-        Semaphore semaphore2 = Semaphore1;
-
-        PipelineStageFlags stageFlags = PipelineStageFlags.ColorAttachmentOutputBit;
 
         SubmitInfo submitInfo = new SubmitInfo()
         {
             SType = StructureType.SubmitInfo,
-            
-            PWaitDstStageMask = &stageFlags,
 
             CommandBufferCount = 1,
             PCommandBuffers = &buffer,
-
-            WaitSemaphoreCount = 1,
-            PWaitSemaphores = &semaphore1,
-
-            SignalSemaphoreCount = 1,
-            PSignalSemaphores = &semaphore2
         };
 
-        _vk.QueueSubmit(Queues.Graphics, 1, &submitInfo, new Fence()).Check("Submit queue");
+        _vk.QueueSubmit(Queues.Graphics, 1, &submitInfo, _fence).Check("Submit queue");
+
+        _vk.WaitForFences(Device, 1, in _fence, true, ulong.MaxValue);
+        _vk.ResetFences(Device, 1, in _fence);
     }
 
     public override void Dispose()
     {
-        _vk.DestroySemaphore(Device, Semaphore1, null);
-        _vk.DestroySemaphore(Device, ImageAvailableSemaphore, null);
+        _vk.DestroyFence(Device, _fence, null);
         
         _vk.DestroyCommandPool(Device, CommandPool, null);
         
