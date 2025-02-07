@@ -7,6 +7,8 @@ public abstract class Device : IDisposable
     public abstract CommandList CreateCommandList();
 
     public abstract void ExecuteCommandList(CommandList list);
+
+    public abstract void WaitForIdle();
     
     public abstract void Dispose();
 }

@@ -116,6 +116,8 @@ unsafe
         swapchain.Present();
     }
     
+    device.WaitForIdle();
+    
     cl.Dispose();
     swapchain.Dispose();
     device.Dispose();
