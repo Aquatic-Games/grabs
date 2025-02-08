@@ -1,5 +1,6 @@
 ﻿using grabs;
 using grabs.Core;
+using grabs.ShaderCompiler;
 using Silk.NET.SDL;
 using Surface = grabs.Surface;
 using Texture = grabs.Texture;
@@ -59,11 +60,13 @@ unsafe
 
     CommandList cl = device.CreateCommandList();
 
+    string hlsl = File.ReadAllText("Shader.hlsl");
+
     ShaderModule vertexModule =
-        device.CreateShaderModule(ShaderStage.Vertex, File.ReadAllBytes("Shader_v.spv"), "VSMain");
+        device.CreateShaderModule(ShaderStage.Vertex, Compiler.CompileHlsl(ShaderStage.Vertex, hlsl, "VSMain"), "VSMain");
     
     ShaderModule pixelModule =
-        device.CreateShaderModule(ShaderStage.Pixel, File.ReadAllBytes("Shader_p.spv"), "PSMain");
+        device.CreateShaderModule(ShaderStage.Pixel, Compiler.CompileHlsl(ShaderStage.Pixel, hlsl, "PSMain"), "PSMain");
     
     pixelModule.Dispose();
     vertexModule.Dispose();
