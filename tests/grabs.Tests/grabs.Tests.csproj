@@ -16,4 +16,16 @@
       <PackageReference Include="Silk.NET.SDL" Version="2.22.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Include="Shader.hlsl">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Shader_v.spv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Shader_p.spv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

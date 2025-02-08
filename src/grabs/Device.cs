@@ -6,6 +6,8 @@ public abstract class Device : IDisposable
 
     public abstract CommandList CreateCommandList();
 
+    public abstract ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint);
+
     public abstract void ExecuteCommandList(CommandList list);
 
     public abstract void WaitForIdle();

@@ -144,6 +144,13 @@ internal sealed unsafe class VulkanDevice : Device
         return new VulkanCommandList(_vk, Device, CommandPool);
     }
 
+    public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint)
+    {
+        ReadOnlySpan<byte> spirvSpan = spirv.AsSpan();
+        
+        return new VulkanShaderModule(_vk, Device, stage, ref spirvSpan, entryPoint);
+    }
+
     public override void ExecuteCommandList(CommandList list)
     {
         VulkanCommandList vkList = (VulkanCommandList) list;

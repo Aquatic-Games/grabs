@@ -59,6 +59,15 @@ unsafe
 
     CommandList cl = device.CreateCommandList();
 
+    ShaderModule vertexModule =
+        device.CreateShaderModule(ShaderStage.Vertex, File.ReadAllBytes("Shader_v.spv"), "VSMain");
+    
+    ShaderModule pixelModule =
+        device.CreateShaderModule(ShaderStage.Pixel, File.ReadAllBytes("Shader_p.spv"), "PSMain");
+    
+    pixelModule.Dispose();
+    vertexModule.Dispose();
+
     float h = 0;
     
     bool alive = true;
