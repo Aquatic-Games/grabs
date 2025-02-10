@@ -108,7 +108,7 @@ public static unsafe class Compiler
             compiler->Release();
             utils->Release();
 
-            throw new Exception(error);
+            throw new CompilationException(stage, error);
         }
 
         IDxcBlob* outResult;
