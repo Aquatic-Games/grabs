@@ -1,16 +1,27 @@
-﻿using grabs.Core;
-using Vortice.Dxc;
-using static Vortice.Dxc.Dxc;
+﻿using System.Runtime.CompilerServices;
+using grabs.Core;
+using TerraFX.Interop.DirectX;
+using TerraFX.Interop.Windows;
+using static TerraFX.Interop.DirectX.DirectX;
+using static TerraFX.Interop.Windows.CLSID;
+using static TerraFX.Interop.Windows.Windows;
 
 namespace grabs.ShaderCompiler;
 
-public static class Compiler
+public static unsafe class Compiler
 {
     public static byte[] CompileHlsl(ShaderStage stage, string hlsl, string entryPoint, bool debug = false)
     {
-        IDxcUtils utils = DxcCreateInstance<IDxcUtils>(CLSID_DxcUtils);
+        Guid dxcUtils = CLSID_DxcUtils;
+        Guid dxcCompiler = CLSID_DxcCompiler;
+
+        IDxcUtils* utils;
+        if (DxcCreateInstance(&dxcUtils, __uuidof<IDxcUtils>(), (void**) &utils).FAILED)
+            throw new Exception("Failed to create DXC utils.");
         
-        IDxcCompiler3 compiler = DxcCreateInstance<IDxcCompiler3>(CLSID_DxcCompiler);
+        IDxcCompiler3* compiler;
+        if (DxcCreateInstance(&dxcCompiler, __uuidof<IDxcCompiler3>(), (void**) &compiler).FAILED)
+            throw new Exception("Failed to create DXC compiler.");
 
         string profile = stage switch
         {
@@ -19,24 +30,58 @@ public static class Compiler
             _ => throw new ArgumentOutOfRangeException(nameof(stage), stage, null)
         };
 
-        List<string> args = ["-spirv", "-T", profile, "-E", entryPoint];
+        List<string> args = ["-spirv"];
         
         if (debug)
             args.Add("-Od");
 
-        IDxcIncludeHandler handler = utils.CreateDefaultIncludeHandler();
-        
-        IDxcResult result = compiler.Compile(hlsl, args.ToArray(), handler);
+        using PinnedString pHlsl = new PinnedString(hlsl);
+        using WidePinnedString pEntryPoint = entryPoint;
+        using WidePinnedString pProfile = profile;
+        using WidePinnedStringArray pArgs = new WidePinnedStringArray(args);
 
-        result.GetStatus().CheckError();
+        IDxcCompilerArgs* compilerArgs;
+        utils->BuildArguments(null, pEntryPoint, pProfile, null, 0, null, 0, &compilerArgs);
 
-        IDxcBlob blob = result.GetResult();
-        byte[] bytes = blob.AsBytes();
+        DxcBuffer buffer = new DxcBuffer()
+        {
+            Ptr = pHlsl,
+            Size = (nuint) hlsl.Length * sizeof(byte),
+            Encoding = 0
+        };
 
-        blob.Release();
-        result.Release();
-        compiler.Release();
-        utils.Release();
+        IDxcResult* result;
+        if (compiler->Compile(&buffer, compilerArgs->GetArguments(), compilerArgs->GetCount(), null,
+                __uuidof<IDxcResult>(), (void**) &result).FAILED)
+        {
+            throw new Exception("Failed to compile.");
+        }
+
+        HRESULT status;
+        if (result->GetStatus(&status).FAILED)
+            throw new Exception("Failed to get compile status.");
+
+        if (status.FAILED)
+        {
+            IDxcBlobEncoding* errorBlob;
+            result->GetErrorBuffer(&errorBlob);
+
+            throw new Exception(new string((sbyte*) errorBlob->GetBufferPointer()));
+        }
+
+        IDxcBlob* outResult;
+        result->GetResult(&outResult);
+
+        byte[] bytes = new byte[outResult->GetBufferSize()];
+
+        fixed (byte* pBytes = bytes)
+            Unsafe.CopyBlock(pBytes, outResult->GetBufferPointer(), (uint) outResult->GetBufferSize());
+
+        outResult->Release();
+        result->Release();
+        compilerArgs->Release();
+        compiler->Release();
+        utils->Release();
 
         return bytes;
     }
