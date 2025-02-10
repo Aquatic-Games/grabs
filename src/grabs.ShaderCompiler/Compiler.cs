@@ -35,7 +35,11 @@ public static unsafe class Compiler
         
         IDxcCompiler3* compiler;
         if (DxcCreateInstance(&dxcCompiler, __uuidof<IDxcCompiler3>(), (void**) &compiler).FAILED)
+        {
+            utils->Release();
+            
             throw new Exception("Failed to create DXC compiler.");
+        }
 
         string profile = stage switch
         {
@@ -55,7 +59,13 @@ public static unsafe class Compiler
         using WidePinnedStringArray pArgs = new WidePinnedStringArray(args);
 
         IDxcCompilerArgs* compilerArgs;
-        utils->BuildArguments(null, pEntryPoint, pProfile, pArgs, pArgs.Length, null, 0, &compilerArgs);
+        if (utils->BuildArguments(null, pEntryPoint, pProfile, pArgs, pArgs.Length, null, 0, &compilerArgs).FAILED)
+        {
+            compiler->Release();
+            utils->Release();
+            
+            throw new Exception("Failed to build arguments.");
+        }
 
         DxcBuffer buffer = new DxcBuffer()
         {
@@ -68,19 +78,37 @@ public static unsafe class Compiler
         if (compiler->Compile(&buffer, compilerArgs->GetArguments(), compilerArgs->GetCount(), null,
                 __uuidof<IDxcResult>(), (void**) &result).FAILED)
         {
+            compilerArgs->Release();
+            compiler->Release();
+            utils->Release();
+            
             throw new Exception("Failed to compile.");
         }
 
         HRESULT status;
         if (result->GetStatus(&status).FAILED)
+        {
+            result->Release();
+            compilerArgs->Release();
+            compiler->Release();
+            utils->Release();
+            
             throw new Exception("Failed to get compile status.");
+        }
 
         if (status.FAILED)
         {
             IDxcBlobEncoding* errorBlob;
             result->GetErrorBuffer(&errorBlob);
+            string error = new string((sbyte*) errorBlob->GetBufferPointer());
 
-            throw new Exception(new string((sbyte*) errorBlob->GetBufferPointer()));
+            errorBlob->Release();
+            result->Release();
+            compilerArgs->Release();
+            compiler->Release();
+            utils->Release();
+
+            throw new Exception(error);
         }
 
         IDxcBlob* outResult;
