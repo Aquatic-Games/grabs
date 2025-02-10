@@ -14,5 +14,13 @@
     <ItemGroup>
       <ProjectReference Include="..\grabs\grabs.csproj" />
     </ItemGroup>
+    
+    <!-- TODO: Output windows binaries only on windows, etc -->
+    <ItemGroup>
+        <None Include="dxcompiler.dll" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="dxil.dll" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="libdxcompiler.so" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="libdxil.so" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
 
 </Project>

@@ -1,4 +1,7 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using grabs.Core;
 using TerraFX.Interop.DirectX;
 using TerraFX.Interop.Windows;
@@ -8,8 +11,19 @@ using static TerraFX.Interop.Windows.Windows;
 
 namespace grabs.ShaderCompiler;
 
+[SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
 public static unsafe class Compiler
 {
+    static Compiler()
+    {
+        ResolveLibrary += OnResolveLibrary;
+    }
+
+    private static IntPtr OnResolveLibrary(string libraryname, Assembly assembly, DllImportSearchPath? searchpath)
+    {
+        return NativeLibrary.Load(libraryname, assembly, DllImportSearchPath.AssemblyDirectory);
+    }
+
     public static byte[] CompileHlsl(ShaderStage stage, string hlsl, string entryPoint, bool debug = false)
     {
         Guid dxcUtils = CLSID_DxcUtils;
@@ -41,7 +55,7 @@ public static unsafe class Compiler
         using WidePinnedStringArray pArgs = new WidePinnedStringArray(args);
 
         IDxcCompilerArgs* compilerArgs;
-        utils->BuildArguments(null, pEntryPoint, pProfile, null, 0, null, 0, &compilerArgs);
+        utils->BuildArguments(null, pEntryPoint, pProfile, pArgs, pArgs.Length, null, 0, &compilerArgs);
 
         DxcBuffer buffer = new DxcBuffer()
         {
@@ -73,7 +87,6 @@ public static unsafe class Compiler
         result->GetResult(&outResult);
 
         byte[] bytes = new byte[outResult->GetBufferSize()];
-
         fixed (byte* pBytes = bytes)
             Unsafe.CopyBlock(pBytes, outResult->GetBufferPointer(), (uint) outResult->GetBufferSize());
 
