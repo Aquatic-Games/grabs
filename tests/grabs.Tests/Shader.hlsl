@@ -1,7 +1,6 @@
 struct VSInput
 {
-    float2 Position: POSITION0;
-    float4 Color:    COLOR0;
+    uint VertexID : SV_VertexID;
 };
 
 struct VSOutput
@@ -19,8 +18,20 @@ VSOutput VSMain(const in VSInput input)
 {
     VSOutput output;
 
-    output.Position = float4(input.Position, 0.0, 1.0);
-    output.Color = input.Color;
+    const float2 vertices[] = {
+        float2(-0.5, -0.5),
+        float2(0.0, 0.5),
+        float2(0.5, -0.5)
+    };
+
+    const float4 colors[] = {
+        float4(1.0, 0.0, 0.0, 1.0),
+        float4(0.0, 1.0, 0.0, 1.0),
+        float4(0.0, 0.0, 0.0, 1.0)
+    };
+
+    output.Position = float4(vertices[input.VertexID], 0.0, 1.0);
+    output.Color = colors[input.VertexID];
     
     return output;
 }

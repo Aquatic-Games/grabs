@@ -67,6 +67,10 @@ unsafe
     
     ShaderModule pixelModule =
         device.CreateShaderModule(ShaderStage.Pixel, Compiler.CompileHlsl(ShaderStage.Pixel, hlsl, "PSMain"), "PSMain");
+
+    PipelineInfo pipelineInfo = new PipelineInfo(vertexModule, pixelModule);
+
+    Pipeline pipeline = device.CreatePipeline(in pipelineInfo);
     
     pixelModule.Dispose();
     vertexModule.Dispose();
@@ -130,6 +134,7 @@ unsafe
     
     device.WaitForIdle();
     
+    pipeline.Dispose();
     cl.Dispose();
     swapchain.Dispose();
     device.Dispose();

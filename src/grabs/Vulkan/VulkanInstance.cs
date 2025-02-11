@@ -41,19 +41,33 @@ internal sealed unsafe class VulkanInstance : Instance
 
         List<string> instanceExtensions = [KhrSurface.ExtensionName];
         List<string> layersList = [];
+        
+        uint numProperties;
+        Vk.EnumerateInstanceExtensionProperties((byte*) null, &numProperties, null);
+        ExtensionProperties[] properties = new ExtensionProperties[numProperties];
+        fixed (ExtensionProperties* pProps = properties)
+            Vk.EnumerateInstanceExtensionProperties((byte*) null, &numProperties, pProps);
 
-        if (OperatingSystem.IsWindows())
+        foreach (ExtensionProperties property in properties)
         {
-            instanceExtensions.Add(KhrWin32Surface.ExtensionName);
+            string name = new string((sbyte*) property.ExtensionName);
+
+            switch (name)
+            {
+                case KhrWin32Surface.ExtensionName:
+                    instanceExtensions.Add(KhrWin32Surface.ExtensionName);
+                    break;
+                case KhrXlibSurface.ExtensionName:
+                    instanceExtensions.Add(KhrXlibSurface.ExtensionName);
+                    break;
+                case KhrXcbSurface.ExtensionName:
+                    instanceExtensions.Add(KhrXcbSurface.ExtensionName);
+                    break;
+                case KhrWaylandSurface.ExtensionName:
+                    instanceExtensions.Add(KhrWaylandSurface.ExtensionName);
+                    break;
+            }
         }
-        else if (OperatingSystem.IsLinux())
-        {
-            instanceExtensions.Add(KhrXlibSurface.ExtensionName);
-            instanceExtensions.Add(KhrXcbSurface.ExtensionName);
-            instanceExtensions.Add(KhrWaylandSurface.ExtensionName);
-        }
-        else
-            throw new PlatformNotSupportedException();
 
         if (info.Debug)
         {
