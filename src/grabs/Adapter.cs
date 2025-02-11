@@ -2,6 +2,8 @@ namespace grabs;
 
 public readonly record struct Adapter
 {
+    internal readonly nint Handle;
+    
     public readonly uint Index;
     
     public readonly string Name;
@@ -10,8 +12,9 @@ public readonly record struct Adapter
 
     public readonly ulong DedicatedMemory;
 
-    public Adapter(uint index, string name, AdapterType type, ulong dedicatedMemory)
+    public Adapter(nint handle, uint index, string name, AdapterType type, ulong dedicatedMemory)
     {
+        Handle = handle;
         Index = index;
         Name = name;
         Type = type;

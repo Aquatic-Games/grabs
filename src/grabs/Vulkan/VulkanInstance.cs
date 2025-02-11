@@ -159,7 +159,7 @@ internal sealed unsafe class VulkanInstance : Instance
         PhysicalDevice* devices = stackalloc PhysicalDevice[(int) numDevices];
         Vk.EnumeratePhysicalDevices(Instance, &numDevices, devices);
 
-        Adapter[] adapters = new Adapter[numDevices];
+        List<Adapter> adapters = new List<Adapter>();
 
         for (uint i = 0; i < numDevices; i++)
         {
@@ -185,40 +185,27 @@ internal sealed unsafe class VulkanInstance : Instance
             };
 
             ulong dedicatedMemory = memProps.MemoryHeaps[0].Size;
-            
-            adapters[i] = new Adapter(i, name, type, dedicatedMemory);
+
+            adapters.Add(new Adapter(devices[i].Handle, i, name, type, dedicatedMemory));
         }
         
-        if (adapters.Length == 0)
+        if (adapters.Count == 0)
             throw new NotSupportedException("No adapters supporting Vulkan 1.3 or VK_KHR_dynamic_rendering are present.");
 
-        return adapters;
+        return adapters.ToArray();
     }
 
     public override Device CreateDevice(Surface surface, Adapter? adapter = null)
     {
-        uint index = adapter?.Index ?? 0;
-
-        uint numPhysicalDevices;
-        Vk.EnumeratePhysicalDevices(Instance, &numPhysicalDevices, null);
-        PhysicalDevice* physicalDevices = stackalloc PhysicalDevice[(int) numPhysicalDevices];
-        Vk.EnumeratePhysicalDevices(Instance, &numPhysicalDevices, physicalDevices);
-
-        if (index > numPhysicalDevices)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index), index,
-                $"Valid adapter indexes are between 0 and {numPhysicalDevices}.");
-        }
-
         PhysicalDevice physicalDevice;
 
-        //do
-        //{
-            physicalDevice = physicalDevices[index++];
-            
-        //    if (index >= numPhysicalDevices)
-        //        throw new NotSupportedException("No adapters supporting Vulkan 1.3 or VK_KHR_dynamic_rendering are present.");
-        //} while (!CheckPhysicalDeviceSupported(physicalDevice));
+        if (adapter?.Handle is { } handle)
+            physicalDevice = new PhysicalDevice(handle);
+        else
+        {
+            Adapter[] adapters = EnumerateAdapters();
+            physicalDevice = new PhysicalDevice(adapters[0].Handle);
+        }
 
         return new VulkanDevice(Vk, Instance, physicalDevice, (VulkanSurface) surface, _khrSurface);
     }
