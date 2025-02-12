@@ -68,7 +68,7 @@ unsafe
     ShaderModule pixelModule =
         device.CreateShaderModule(ShaderStage.Pixel, Compiler.CompileHlsl(ShaderStage.Pixel, hlsl, "PSMain"), "PSMain");
 
-    PipelineInfo pipelineInfo = new PipelineInfo(vertexModule, pixelModule);
+    PipelineInfo pipelineInfo = new PipelineInfo(vertexModule, pixelModule, Format.B8G8R8A8_UNorm);
 
     Pipeline pipeline = device.CreatePipeline(in pipelineInfo);
     

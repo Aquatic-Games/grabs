@@ -103,13 +103,17 @@ internal sealed unsafe class VulkanPipeline : Pipeline
             PDynamicStates = dynamicStates
         };
 
-        VkFormat fmt = VkFormat.B8G8R8A8Unorm;
+        int numFormats = info.ColorAttachmentFormats.Length;
+        VkFormat* formats = stackalloc VkFormat[numFormats];
+
+        for (int i = 0; i < numFormats; i++)
+            formats[i] = info.ColorAttachmentFormats[i].ToVk();
 
         PipelineRenderingCreateInfo renderingInfo = new PipelineRenderingCreateInfo()
         {
             SType = StructureType.PipelineRenderingCreateInfo,
-            ColorAttachmentCount = 1,
-            PColorAttachmentFormats = &fmt
+            ColorAttachmentCount = (uint) numFormats,
+            PColorAttachmentFormats = formats
         };
 
         PipelineLayoutCreateInfo layoutInfo = new PipelineLayoutCreateInfo()
