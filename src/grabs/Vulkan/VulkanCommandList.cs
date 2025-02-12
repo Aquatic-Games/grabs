@@ -88,6 +88,36 @@ internal sealed unsafe class VulkanCommandList : CommandList
         _vk.CmdEndRendering(Buffer);
     }
 
+    public override void SetViewport(in Viewport viewport)
+    {
+        Silk.NET.Vulkan.Viewport vkViewport = new Silk.NET.Vulkan.Viewport()
+        {
+            X = viewport.X,
+            Y = viewport.Height,
+            Width = viewport.Width,
+            Height = -viewport.Height,
+            MinDepth = viewport.MinDepth,
+            MaxDepth = viewport.MaxDepth
+        };
+        
+        _vk.CmdSetViewport(Buffer, 0, 1, &vkViewport);
+
+        Rect2D scissor = new Rect2D(new Offset2D(0, 0), new Extent2D((uint) viewport.Width, (uint) viewport.Height));
+        _vk.CmdSetScissor(Buffer, 0, 1, &scissor);
+    }
+
+    public override void SetPipeline(Pipeline pipeline)
+    {
+        VulkanPipeline vkPipeline = (VulkanPipeline) pipeline;
+        
+        _vk.CmdBindPipeline(Buffer, PipelineBindPoint.Graphics, vkPipeline.Pipeline);
+    }
+
+    public override void Draw(uint numVertices)
+    {
+        _vk.CmdDraw(Buffer, numVertices, 1, 0, 0);
+    }
+
     public override void Dispose()
     {
         fixed (CommandBuffer* buffer = &Buffer)

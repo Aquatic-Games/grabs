@@ -123,6 +123,12 @@ unsafe
             h = 0;
         
         cl.BeginRenderPass(new RenderPassInfo(new ColorAttachmentInfo(texture, new ColorF(r, g, b))));
+        
+        cl.SetViewport(new Viewport(0, 0, 1280, 720));
+
+        cl.SetPipeline(pipeline);
+        cl.Draw(3);
+        
         cl.EndRenderPass();
         
         cl.End();

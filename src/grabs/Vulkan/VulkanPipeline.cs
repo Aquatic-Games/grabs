@@ -103,7 +103,7 @@ internal sealed unsafe class VulkanPipeline : Pipeline
             PDynamicStates = dynamicStates
         };
 
-        VkFormat fmt = VkFormat.R8G8B8A8Unorm;
+        VkFormat fmt = VkFormat.B8G8R8A8Unorm;
 
         PipelineRenderingCreateInfo renderingInfo = new PipelineRenderingCreateInfo()
         {

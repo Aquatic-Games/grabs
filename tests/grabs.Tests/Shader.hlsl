@@ -27,7 +27,7 @@ VSOutput VSMain(const in VSInput input)
     const float4 colors[] = {
         float4(1.0, 0.0, 0.0, 1.0),
         float4(0.0, 1.0, 0.0, 1.0),
-        float4(0.0, 0.0, 0.0, 1.0)
+        float4(0.0, 0.0, 1.0, 1.0)
     };
 
     output.Position = float4(vertices[input.VertexID], 0.0, 1.0);
