@@ -12,6 +12,7 @@ public ref struct PipelineInfo
     {
         VertexShader = vertexShader;
         PixelShader = pixelShader;
+        ColorAttachmentFormats = colorAttachmentFormats;
     }
 
     public PipelineInfo(ShaderModule vertexShader, ShaderModule pixelShader, in Format colorAttachmentFormat)
