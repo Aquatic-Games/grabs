@@ -2,6 +2,7 @@ global using VkDevice = Silk.NET.Vulkan.Device;
 using grabs.Core;
 using grabs.VulkanMemoryAllocator;
 using Silk.NET.Core;
+using Silk.NET.Core.Native;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.KHR;
 
@@ -136,16 +137,20 @@ internal sealed unsafe class VulkanDevice : Device
         _vk.CreateFence(Device, &fenceInfo, null, out _fence).Check("Create fence");
 
         VmaVulkanFunctions functions = new VmaVulkanFunctions();
-        functions.vkGetInstanceProcAddr = 
-        
+        functions.vkGetInstanceProcAddr = (delegate* unmanaged[Cdecl]<VkInstance, sbyte*, delegate* unmanaged[Cdecl]<void>>) SilkMarshal.DelegateToPtr(GetInstanceProcAddress);
+        functions.vkGetDeviceProcAddr = (delegate* unmanaged[Cdecl]<VkDevice, sbyte*, delegate* unmanaged[Cdecl]<void>>) SilkMarshal.DelegateToPtr(GetDeviceProcAddress);
+
         VmaAllocatorCreateInfo allocatorInfo = new VmaAllocatorCreateInfo()
         {
             instance = instance,
             physicalDevice = PhysicalDevice,
             device = Device,
             vulkanApiVersion = Vk.MakeVersion(1, 3),
-            
-        }
+            pVulkanFunctions = &functions
+        };
+
+        GrabsLog.Log("Creating allocator");
+        Vma.CreateAllocator(&allocatorInfo, out Allocator).Check("Create allocator");
     }
 
     public override Swapchain CreateSwapchain(Surface surface, in SwapchainInfo info)
@@ -198,10 +203,18 @@ internal sealed unsafe class VulkanDevice : Device
 
     public override void Dispose()
     {
+        Vma.DestroyAllocator(Allocator);
+        
         _vk.DestroyFence(Device, _fence, null);
         
         _vk.DestroyCommandPool(Device, CommandPool, null);
         
         _vk.DestroyDevice(Device, null);
     }
+
+    private void* GetInstanceProcAddress(VkInstance instance, byte* name)
+        => _vk.GetInstanceProcAddr(instance, name);
+
+    private void* GetDeviceProcAddress(VkDevice device, byte* name)
+        => _vk.GetDeviceProcAddr(device, name);
 }
