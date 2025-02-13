@@ -170,6 +170,11 @@ internal sealed unsafe class VulkanDevice : Device
         return new VulkanShaderModule(_vk, Device, stage, ref spirvSpan, entryPoint);
     }
 
+    public override Buffer CreateBuffer(in BufferInfo info)
+    {
+        throw new NotImplementedException();
+    }
+
     public override Pipeline CreatePipeline(in PipelineInfo info)
     {
         return new VulkanPipeline(_vk, Device, in info);
