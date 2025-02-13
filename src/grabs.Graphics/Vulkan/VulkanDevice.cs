@@ -172,7 +172,7 @@ internal sealed unsafe class VulkanDevice : Device
 
     public override Buffer CreateBuffer(in BufferInfo info)
     {
-        throw new NotImplementedException();
+        return new VulkanBuffer(_vk, Allocator, in info);
     }
 
     public override Pipeline CreatePipeline(in PipelineInfo info)

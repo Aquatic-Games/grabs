@@ -2,6 +2,7 @@
 using grabs.Graphics;
 using grabs.ShaderCompiler;
 using Silk.NET.SDL;
+using Buffer = grabs.Graphics.Buffer;
 using Surface = grabs.Graphics.Surface;
 using Texture = grabs.Graphics.Texture;
 
@@ -59,6 +60,17 @@ unsafe
         device.CreateSwapchain(surface, new SwapchainInfo(new Size2D(1280, 720), Format.B8G8R8A8_UNorm, PresentMode.Fifo, 2));
 
     CommandList cl = device.CreateCommandList();
+
+    float[] vertices =
+    {
+        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+        -0.5f, +0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+        +0.5f, +0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+        +0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f
+    };
+
+    Buffer vertexBuffer =
+        device.CreateBuffer(new BufferInfo(BufferType.Vertex, (uint) (vertices.Length * sizeof(float))));
 
     string hlsl = File.ReadAllText("Shader.hlsl");
 
@@ -141,6 +153,7 @@ unsafe
     device.WaitForIdle();
     
     pipeline.Dispose();
+    vertexBuffer.Dispose();
     cl.Dispose();
     swapchain.Dispose();
     device.Dispose();
