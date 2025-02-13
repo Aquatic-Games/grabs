@@ -69,10 +69,14 @@ unsafe
         +0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f
     };
 
-    Buffer vertexBuffer;
-    
-    fixed (float* pVertices = vertices)
-        vertexBuffer = device.CreateBuffer(new BufferInfo(BufferType.Vertex, (uint) (vertices.Length * sizeof(float))), pVertices);
+    ushort[] indices =
+    {
+        0, 1, 3,
+        1, 2, 3
+    };
+
+    Buffer vertexBuffer = device.CreateBuffer(BufferType.Vertex, vertices);
+    Buffer indexBuffer = device.CreateBuffer(BufferType.Index, indices);
 
     string hlsl = File.ReadAllText("Shader.hlsl");
 
@@ -155,6 +159,7 @@ unsafe
     device.WaitForIdle();
     
     pipeline.Dispose();
+    indexBuffer.Dispose();
     vertexBuffer.Dispose();
     cl.Dispose();
     swapchain.Dispose();
