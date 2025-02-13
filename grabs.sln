@@ -1,12 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs", "src\grabs\grabs.csproj", "{6CFB8ED2-5FD6-4461-8292-A2C737E35CE8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Graphics", "src\grabs.Graphics\grabs.Graphics.csproj", "{6CFB8ED2-5FD6-4461-8292-A2C737E35CE8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Core", "src\grabs.Core\grabs.Core.csproj", "{350F33EE-5987-4F06-BAC7-014002D888CF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{34B024AA-E2BC-40C5-BA96-BDD06D79BE47}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Tests", "tests\grabs.Tests\grabs.Tests.csproj", "{2D30C3DD-9470-4285-BFD0-C475CA591C7B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Graphics.Tests", "tests\grabs.Graphics.Tests\grabs.Graphics.Tests.csproj", "{2D30C3DD-9470-4285-BFD0-C475CA591C7B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.ShaderCompiler", "src\grabs.ShaderCompiler\grabs.ShaderCompiler.csproj", "{4ECA8DB7-CA1D-44F6-BB85-51A938D73326}"
 EndProject

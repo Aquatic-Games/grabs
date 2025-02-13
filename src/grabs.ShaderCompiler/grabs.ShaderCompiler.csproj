@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\grabs\grabs.csproj" />
+      <ProjectReference Include="..\grabs.Graphics\grabs.Graphics.csproj" />
     </ItemGroup>
     
     <!-- TODO: Output windows binaries only on windows, etc -->
