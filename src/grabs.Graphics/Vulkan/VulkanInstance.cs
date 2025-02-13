@@ -45,7 +45,7 @@ internal sealed unsafe class VulkanInstance : Instance
         List<string> instanceExtensions = [KhrSurface.ExtensionName];
         List<string> layersList = [];
         
-        GrabsLog.Log("Checking instance extensions.");
+        GrabsLog.Log("Supported instance extensions:");
         uint numProperties;
         Vk.EnumerateInstanceExtensionProperties((byte*) null, &numProperties, null);
         ExtensionProperties[] properties = new ExtensionProperties[numProperties];
@@ -57,6 +57,8 @@ internal sealed unsafe class VulkanInstance : Instance
         {
             string name = new string((sbyte*) property.ExtensionName);
 
+            GrabsLog.Log($"    {name}");
+            
             switch (name)
             {
                 case KhrWin32Surface.ExtensionName:
