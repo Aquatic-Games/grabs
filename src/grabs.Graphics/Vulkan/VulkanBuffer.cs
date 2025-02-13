@@ -64,7 +64,8 @@ internal sealed unsafe class VulkanBuffer : Buffer
             flags = (uint) (VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT),
         };
 
-        GrabsLog.Log($"data was not null, creating staging buffer with size {info.Size}");
+        GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.Performance,
+            $"data was not null, creating staging buffer with size {info.Size}");
         Vma.CreateBuffer(_allocator, &stagingInfo, &stagingAllocInfo, out VkBuffer staging,
                 out VmaAllocation_T* stagingAllocation, out VmaAllocationInfo stagingAllocationInfo)
             .Check("Create staging buffer");

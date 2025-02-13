@@ -1,5 +1,6 @@
 ﻿using grabs.Core;
 using grabs.Graphics;
+using grabs.Graphics.Exceptions;
 using grabs.ShaderCompiler;
 using Silk.NET.SDL;
 using Buffer = grabs.Graphics.Buffer;
@@ -22,7 +23,17 @@ unsafe
     
     InstanceInfo info = new InstanceInfo(Backend.Vulkan, "grabs.Graphics.Tests", true);
 
-    Instance instance = Instance.Create(info);
+
+    Instance instance = null;
+
+    try
+    {
+        instance = Instance.Create(info);
+    }
+    catch (DebugLayersNotFoundException e)
+    {
+        sdl.ShowSimpleMessageBox((uint) MessageBoxFlags.Error, "Error", e.Message, null);
+    }
 
     Adapter[] adapters = instance.EnumerateAdapters();
 

@@ -1,5 +1,6 @@
 global using VkInstance = Silk.NET.Vulkan.Instance;
 using grabs.Core;
+using grabs.Graphics.Exceptions;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.EXT;
 using Silk.NET.Vulkan.Extensions.KHR;
@@ -39,15 +40,19 @@ internal sealed unsafe class VulkanInstance : Instance
             EngineVersion = Vk.MakeVersion(1, 0)
         };
 
+        const string validationLayerName = "VK_LAYER_KHRONOS_validation";
+        
         List<string> instanceExtensions = [KhrSurface.ExtensionName];
         List<string> layersList = [];
         
+        GrabsLog.Log("Checking instance extensions.");
         uint numProperties;
         Vk.EnumerateInstanceExtensionProperties((byte*) null, &numProperties, null);
         ExtensionProperties[] properties = new ExtensionProperties[numProperties];
         fixed (ExtensionProperties* pProps = properties)
             Vk.EnumerateInstanceExtensionProperties((byte*) null, &numProperties, pProps);
 
+        bool debugSupported = false;
         foreach (ExtensionProperties property in properties)
         {
             string name = new string((sbyte*) property.ExtensionName);
@@ -66,16 +71,46 @@ internal sealed unsafe class VulkanInstance : Instance
                 case KhrWaylandSurface.ExtensionName:
                     instanceExtensions.Add(KhrWaylandSurface.ExtensionName);
                     break;
+
+                case ExtDebugUtils.ExtensionName when info.Debug:
+                {
+                    GrabsLog.Log("Debug extension is found, checking for validation layer presence.");
+                    
+                    uint numLayers;
+                    Vk.EnumerateInstanceLayerProperties(&numLayers, null);
+                    LayerProperties[] layerProps = new LayerProperties[numLayers];
+                    fixed (LayerProperties* pLayerProps = layerProps)
+                        Vk.EnumerateInstanceLayerProperties(&numLayers, pLayerProps);
+
+                    foreach (LayerProperties layerProperty in layerProps)
+                    {
+                        string layerName = new string((sbyte*) layerProperty.LayerName);
+
+                        if (layerName == validationLayerName)
+                        {
+                            debugSupported = true;
+                            break;
+                        }
+                    }
+                    
+                    break;
+                }
             }
         }
 
         if (info.Debug)
         {
+            if (!debugSupported)
+            {
+                throw new DebugLayersNotFoundException(
+                    $"Debugging is enabled, but {ExtDebugUtils.ExtensionName} extension and/or {validationLayerName} layer are not present. Please ensure you have a valid Vulkan SDK of AT LEAST version 1.3. The latest Vulkan SDK can be downloaded here: https://vulkan.lunarg.com/");
+            }
+
             GrabsLog.Log(GrabsLog.Severity.Warning, GrabsLog.Source.Performance,
                 "Debugging is enabled. This will affect performance.");
             
             instanceExtensions.Add(ExtDebugUtils.ExtensionName);
-            layersList.Add("VK_LAYER_KHRONOS_validation");
+            layersList.Add(validationLayerName);
         }
 
         GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.General,
