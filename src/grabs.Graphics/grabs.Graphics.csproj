@@ -15,6 +15,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\grabs.Core\grabs.Core.csproj" />
+      <ProjectReference Include="..\grabs.VulkanMemoryAllocator\grabs.VulkanMemoryAllocator.csproj" />
     </ItemGroup>
 
 </Project>

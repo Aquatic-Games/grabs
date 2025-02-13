@@ -78,11 +78,11 @@ namespace grabs.VulkanMemoryAllocator
 
         [DllImport("VulkanMemoryAllocator", CallingConvention = CallingConvention.Cdecl, EntryPoint = "vmaAllocateMemoryForBuffer", ExactSpelling = true)]
         [return: NativeTypeName("VkResult")]
-        public static extern Result AllocateMemoryForBuffer([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VkBuffer _Nonnull")] Silk.NET.Vulkan.Buffer* buffer, [NativeTypeName("const VmaAllocationCreateInfo * _Nonnull")] VmaAllocationCreateInfo* pCreateInfo, [NativeTypeName("VmaAllocation  _Nullable * _Nonnull")] VmaAllocation_T** pAllocation, [NativeTypeName("VmaAllocationInfo * _Nullable")] VmaAllocationInfo* pAllocationInfo);
+        public static extern Result AllocateMemoryForBuffer([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VkBuffer _Nonnull")] Silk.NET.Vulkan.Buffer buffer, [NativeTypeName("const VmaAllocationCreateInfo * _Nonnull")] VmaAllocationCreateInfo* pCreateInfo, [NativeTypeName("VmaAllocation  _Nullable * _Nonnull")] VmaAllocation_T** pAllocation, [NativeTypeName("VmaAllocationInfo * _Nullable")] VmaAllocationInfo* pAllocationInfo);
 
         [DllImport("VulkanMemoryAllocator", CallingConvention = CallingConvention.Cdecl, EntryPoint = "vmaAllocateMemoryForImage", ExactSpelling = true)]
         [return: NativeTypeName("VkResult")]
-        public static extern Result AllocateMemoryForImage([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VkImage _Nonnull")] Image* image, [NativeTypeName("const VmaAllocationCreateInfo * _Nonnull")] VmaAllocationCreateInfo* pCreateInfo, [NativeTypeName("VmaAllocation  _Nullable * _Nonnull")] VmaAllocation_T** pAllocation, [NativeTypeName("VmaAllocationInfo * _Nullable")] VmaAllocationInfo* pAllocationInfo);
+        public static extern Result AllocateMemoryForImage([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VkImage _Nonnull")] Image image, [NativeTypeName("const VmaAllocationCreateInfo * _Nonnull")] VmaAllocationCreateInfo* pCreateInfo, [NativeTypeName("VmaAllocation  _Nullable * _Nonnull")] VmaAllocation_T** pAllocation, [NativeTypeName("VmaAllocationInfo * _Nullable")] VmaAllocationInfo* pAllocationInfo);
 
         [DllImport("VulkanMemoryAllocator", CallingConvention = CallingConvention.Cdecl, EntryPoint = "vmaFreeMemory", ExactSpelling = true)]
         public static extern void FreeMemory([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VmaAllocation  _Nullable const")] VmaAllocation_T* allocation);
@@ -157,53 +157,53 @@ namespace grabs.VulkanMemoryAllocator
 
         [DllImport("VulkanMemoryAllocator", CallingConvention = CallingConvention.Cdecl, EntryPoint = "vmaBindBufferMemory", ExactSpelling = true)]
         [return: NativeTypeName("VkResult")]
-        public static extern Result BindBufferMemory([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VmaAllocation _Nonnull")] VmaAllocation_T* allocation, [NativeTypeName("VkBuffer _Nonnull")] Silk.NET.Vulkan.Buffer* buffer);
+        public static extern Result BindBufferMemory([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VmaAllocation _Nonnull")] VmaAllocation_T* allocation, [NativeTypeName("VkBuffer _Nonnull")] Silk.NET.Vulkan.Buffer buffer);
 
         [DllImport("VulkanMemoryAllocator", CallingConvention = CallingConvention.Cdecl, EntryPoint = "vmaBindBufferMemory2", ExactSpelling = true)]
         [return: NativeTypeName("VkResult")]
-        public static extern Result BindBufferMemory2([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VmaAllocation _Nonnull")] VmaAllocation_T* allocation, [NativeTypeName("VkDeviceSize")] nuint allocationLocalOffset, [NativeTypeName("VkBuffer _Nonnull")] Silk.NET.Vulkan.Buffer* buffer, [NativeTypeName("const void * _Nullable")] void* pNext);
+        public static extern Result BindBufferMemory2([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VmaAllocation _Nonnull")] VmaAllocation_T* allocation, [NativeTypeName("VkDeviceSize")] nuint allocationLocalOffset, [NativeTypeName("VkBuffer _Nonnull")] Silk.NET.Vulkan.Buffer buffer, [NativeTypeName("const void * _Nullable")] void* pNext);
 
         [DllImport("VulkanMemoryAllocator", CallingConvention = CallingConvention.Cdecl, EntryPoint = "vmaBindImageMemory", ExactSpelling = true)]
         [return: NativeTypeName("VkResult")]
-        public static extern Result BindImageMemory([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VmaAllocation _Nonnull")] VmaAllocation_T* allocation, [NativeTypeName("VkImage _Nonnull")] Image* image);
+        public static extern Result BindImageMemory([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VmaAllocation _Nonnull")] VmaAllocation_T* allocation, [NativeTypeName("VkImage _Nonnull")] Image image);
 
         [DllImport("VulkanMemoryAllocator", CallingConvention = CallingConvention.Cdecl, EntryPoint = "vmaBindImageMemory2", ExactSpelling = true)]
         [return: NativeTypeName("VkResult")]
-        public static extern Result BindImageMemory2([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VmaAllocation _Nonnull")] VmaAllocation_T* allocation, [NativeTypeName("VkDeviceSize")] nuint allocationLocalOffset, [NativeTypeName("VkImage _Nonnull")] Image* image, [NativeTypeName("const void * _Nullable")] void* pNext);
+        public static extern Result BindImageMemory2([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VmaAllocation _Nonnull")] VmaAllocation_T* allocation, [NativeTypeName("VkDeviceSize")] nuint allocationLocalOffset, [NativeTypeName("VkImage _Nonnull")] Image image, [NativeTypeName("const void * _Nullable")] void* pNext);
 
         [DllImport("VulkanMemoryAllocator", CallingConvention = CallingConvention.Cdecl, EntryPoint = "vmaCreateBuffer", ExactSpelling = true)]
         [return: NativeTypeName("VkResult")]
-        public static extern Result CreateBuffer([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("const VkBufferCreateInfo * _Nonnull")] BufferCreateInfo* pBufferCreateInfo, [NativeTypeName("const VmaAllocationCreateInfo * _Nonnull")] VmaAllocationCreateInfo* pAllocationCreateInfo, [NativeTypeName("VkBuffer  _Nullable * _Nonnull")] Silk.NET.Vulkan.Buffer** pBuffer, [NativeTypeName("VmaAllocation  _Nullable * _Nonnull")] VmaAllocation_T** pAllocation, [NativeTypeName("VmaAllocationInfo * _Nullable")] VmaAllocationInfo* pAllocationInfo);
+        public static extern Result CreateBuffer([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("const VkBufferCreateInfo * _Nonnull")] BufferCreateInfo* pBufferCreateInfo, [NativeTypeName("const VmaAllocationCreateInfo * _Nonnull")] VmaAllocationCreateInfo* pAllocationCreateInfo, [NativeTypeName("VkBuffer  _Nullable * _Nonnull")] Silk.NET.Vulkan.Buffer* pBuffer, [NativeTypeName("VmaAllocation  _Nullable * _Nonnull")] VmaAllocation_T** pAllocation, [NativeTypeName("VmaAllocationInfo * _Nullable")] VmaAllocationInfo* pAllocationInfo);
 
         [DllImport("VulkanMemoryAllocator", CallingConvention = CallingConvention.Cdecl, EntryPoint = "vmaCreateBufferWithAlignment", ExactSpelling = true)]
         [return: NativeTypeName("VkResult")]
-        public static extern Result CreateBufferWithAlignment([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("const VkBufferCreateInfo * _Nonnull")] BufferCreateInfo* pBufferCreateInfo, [NativeTypeName("const VmaAllocationCreateInfo * _Nonnull")] VmaAllocationCreateInfo* pAllocationCreateInfo, [NativeTypeName("VkDeviceSize")] nuint minAlignment, [NativeTypeName("VkBuffer  _Nullable * _Nonnull")] Silk.NET.Vulkan.Buffer** pBuffer, [NativeTypeName("VmaAllocation  _Nullable * _Nonnull")] VmaAllocation_T** pAllocation, [NativeTypeName("VmaAllocationInfo * _Nullable")] VmaAllocationInfo* pAllocationInfo);
+        public static extern Result CreateBufferWithAlignment([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("const VkBufferCreateInfo * _Nonnull")] BufferCreateInfo* pBufferCreateInfo, [NativeTypeName("const VmaAllocationCreateInfo * _Nonnull")] VmaAllocationCreateInfo* pAllocationCreateInfo, [NativeTypeName("VkDeviceSize")] nuint minAlignment, [NativeTypeName("VkBuffer  _Nullable * _Nonnull")] Silk.NET.Vulkan.Buffer* pBuffer, [NativeTypeName("VmaAllocation  _Nullable * _Nonnull")] VmaAllocation_T** pAllocation, [NativeTypeName("VmaAllocationInfo * _Nullable")] VmaAllocationInfo* pAllocationInfo);
 
         [DllImport("VulkanMemoryAllocator", CallingConvention = CallingConvention.Cdecl, EntryPoint = "vmaCreateAliasingBuffer", ExactSpelling = true)]
         [return: NativeTypeName("VkResult")]
-        public static extern Result CreateAliasingBuffer([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VmaAllocation _Nonnull")] VmaAllocation_T* allocation, [NativeTypeName("const VkBufferCreateInfo * _Nonnull")] BufferCreateInfo* pBufferCreateInfo, [NativeTypeName("VkBuffer  _Nullable * _Nonnull")] Silk.NET.Vulkan.Buffer** pBuffer);
+        public static extern Result CreateAliasingBuffer([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VmaAllocation _Nonnull")] VmaAllocation_T* allocation, [NativeTypeName("const VkBufferCreateInfo * _Nonnull")] BufferCreateInfo* pBufferCreateInfo, [NativeTypeName("VkBuffer  _Nullable * _Nonnull")] Silk.NET.Vulkan.Buffer* pBuffer);
 
         [DllImport("VulkanMemoryAllocator", CallingConvention = CallingConvention.Cdecl, EntryPoint = "vmaCreateAliasingBuffer2", ExactSpelling = true)]
         [return: NativeTypeName("VkResult")]
-        public static extern Result CreateAliasingBuffer2([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VmaAllocation _Nonnull")] VmaAllocation_T* allocation, [NativeTypeName("VkDeviceSize")] nuint allocationLocalOffset, [NativeTypeName("const VkBufferCreateInfo * _Nonnull")] BufferCreateInfo* pBufferCreateInfo, [NativeTypeName("VkBuffer  _Nullable * _Nonnull")] Silk.NET.Vulkan.Buffer** pBuffer);
+        public static extern Result CreateAliasingBuffer2([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VmaAllocation _Nonnull")] VmaAllocation_T* allocation, [NativeTypeName("VkDeviceSize")] nuint allocationLocalOffset, [NativeTypeName("const VkBufferCreateInfo * _Nonnull")] BufferCreateInfo* pBufferCreateInfo, [NativeTypeName("VkBuffer  _Nullable * _Nonnull")] Silk.NET.Vulkan.Buffer* pBuffer);
 
         [DllImport("VulkanMemoryAllocator", CallingConvention = CallingConvention.Cdecl, EntryPoint = "vmaDestroyBuffer", ExactSpelling = true)]
-        public static extern void DestroyBuffer([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VkBuffer _Nullable")] Silk.NET.Vulkan.Buffer* buffer, [NativeTypeName("VmaAllocation _Nullable")] VmaAllocation_T* allocation);
+        public static extern void DestroyBuffer([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VkBuffer _Nullable")] Silk.NET.Vulkan.Buffer buffer, [NativeTypeName("VmaAllocation _Nullable")] VmaAllocation_T* allocation);
 
         [DllImport("VulkanMemoryAllocator", CallingConvention = CallingConvention.Cdecl, EntryPoint = "vmaCreateImage", ExactSpelling = true)]
         [return: NativeTypeName("VkResult")]
-        public static extern Result CreateImage([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("const VkImageCreateInfo * _Nonnull")] ImageCreateInfo* pImageCreateInfo, [NativeTypeName("const VmaAllocationCreateInfo * _Nonnull")] VmaAllocationCreateInfo* pAllocationCreateInfo, [NativeTypeName("VkImage  _Nullable * _Nonnull")] Image** pImage, [NativeTypeName("VmaAllocation  _Nullable * _Nonnull")] VmaAllocation_T** pAllocation, [NativeTypeName("VmaAllocationInfo * _Nullable")] VmaAllocationInfo* pAllocationInfo);
+        public static extern Result CreateImage([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("const VkImageCreateInfo * _Nonnull")] ImageCreateInfo* pImageCreateInfo, [NativeTypeName("const VmaAllocationCreateInfo * _Nonnull")] VmaAllocationCreateInfo* pAllocationCreateInfo, [NativeTypeName("VkImage  _Nullable * _Nonnull")] Image* pImage, [NativeTypeName("VmaAllocation  _Nullable * _Nonnull")] VmaAllocation_T** pAllocation, [NativeTypeName("VmaAllocationInfo * _Nullable")] VmaAllocationInfo* pAllocationInfo);
 
         [DllImport("VulkanMemoryAllocator", CallingConvention = CallingConvention.Cdecl, EntryPoint = "vmaCreateAliasingImage", ExactSpelling = true)]
         [return: NativeTypeName("VkResult")]
-        public static extern Result CreateAliasingImage([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VmaAllocation _Nonnull")] VmaAllocation_T* allocation, [NativeTypeName("const VkImageCreateInfo * _Nonnull")] ImageCreateInfo* pImageCreateInfo, [NativeTypeName("VkImage  _Nullable * _Nonnull")] Image** pImage);
+        public static extern Result CreateAliasingImage([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VmaAllocation _Nonnull")] VmaAllocation_T* allocation, [NativeTypeName("const VkImageCreateInfo * _Nonnull")] ImageCreateInfo* pImageCreateInfo, [NativeTypeName("VkImage  _Nullable * _Nonnull")] Image* pImage);
 
         [DllImport("VulkanMemoryAllocator", CallingConvention = CallingConvention.Cdecl, EntryPoint = "vmaCreateAliasingImage2", ExactSpelling = true)]
         [return: NativeTypeName("VkResult")]
-        public static extern Result CreateAliasingImage2([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VmaAllocation _Nonnull")] VmaAllocation_T* allocation, [NativeTypeName("VkDeviceSize")] nuint allocationLocalOffset, [NativeTypeName("const VkImageCreateInfo * _Nonnull")] ImageCreateInfo* pImageCreateInfo, [NativeTypeName("VkImage  _Nullable * _Nonnull")] Image** pImage);
+        public static extern Result CreateAliasingImage2([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VmaAllocation _Nonnull")] VmaAllocation_T* allocation, [NativeTypeName("VkDeviceSize")] nuint allocationLocalOffset, [NativeTypeName("const VkImageCreateInfo * _Nonnull")] ImageCreateInfo* pImageCreateInfo, [NativeTypeName("VkImage  _Nullable * _Nonnull")] Image* pImage);
 
         [DllImport("VulkanMemoryAllocator", CallingConvention = CallingConvention.Cdecl, EntryPoint = "vmaDestroyImage", ExactSpelling = true)]
-        public static extern void DestroyImage([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VkImage _Nullable")] Image* image, [NativeTypeName("VmaAllocation _Nullable")] VmaAllocation_T* allocation);
+        public static extern void DestroyImage([NativeTypeName("VmaAllocator _Nonnull")] VmaAllocator_T* allocator, [NativeTypeName("VkImage _Nullable")] Image image, [NativeTypeName("VmaAllocation _Nullable")] VmaAllocation_T* allocation);
 
         [DllImport("VulkanMemoryAllocator", CallingConvention = CallingConvention.Cdecl, EntryPoint = "vmaCreateVirtualBlock", ExactSpelling = true)]
         [return: NativeTypeName("VkResult")]

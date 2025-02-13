@@ -1,5 +1,6 @@
 global using VkDevice = Silk.NET.Vulkan.Device;
 using grabs.Core;
+using grabs.VulkanMemoryAllocator;
 using Silk.NET.Core;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.KHR;
@@ -21,6 +22,8 @@ internal sealed unsafe class VulkanDevice : Device
     public readonly Queues Queues;
 
     public readonly CommandPool CommandPool;
+
+    public readonly VmaAllocator_T* Allocator;
 
     private readonly Fence _fence;
 
@@ -131,6 +134,18 @@ internal sealed unsafe class VulkanDevice : Device
 
         GrabsLog.Log("Creating fence");
         _vk.CreateFence(Device, &fenceInfo, null, out _fence).Check("Create fence");
+
+        VmaVulkanFunctions functions = new VmaVulkanFunctions();
+        functions.vkGetInstanceProcAddr = 
+        
+        VmaAllocatorCreateInfo allocatorInfo = new VmaAllocatorCreateInfo()
+        {
+            instance = instance,
+            physicalDevice = PhysicalDevice,
+            device = Device,
+            vulkanApiVersion = Vk.MakeVersion(1, 3),
+            
+        }
     }
 
     public override Swapchain CreateSwapchain(Surface surface, in SwapchainInfo info)

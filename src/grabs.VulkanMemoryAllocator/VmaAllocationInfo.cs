@@ -8,7 +8,7 @@ namespace grabs.VulkanMemoryAllocator
         public uint memoryType;
 
         [NativeTypeName("VkDeviceMemory _Nullable")]
-        public DeviceMemory* deviceMemory;
+        public DeviceMemory deviceMemory;
 
         [NativeTypeName("VkDeviceSize")]
         public nuint offset;

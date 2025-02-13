@@ -8,10 +8,10 @@ namespace grabs.VulkanMemoryAllocator
         public uint flags;
 
         [NativeTypeName("VkPhysicalDevice _Nonnull")]
-        public PhysicalDevice* physicalDevice;
+        public PhysicalDevice physicalDevice;
 
         [NativeTypeName("VkDevice _Nonnull")]
-        public Device* device;
+        public Device device;
 
         [NativeTypeName("VkDeviceSize")]
         public nuint preferredLargeHeapBlockSize;
@@ -29,7 +29,7 @@ namespace grabs.VulkanMemoryAllocator
         public VmaVulkanFunctions* pVulkanFunctions;
 
         [NativeTypeName("VkInstance _Nonnull")]
-        public Instance* instance;
+        public Instance instance;
 
         [NativeTypeName("uint32_t")]
         public uint vulkanApiVersion;

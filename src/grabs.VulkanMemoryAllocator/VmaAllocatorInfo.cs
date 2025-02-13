@@ -2,15 +2,15 @@ using Silk.NET.Vulkan;
 
 namespace grabs.VulkanMemoryAllocator
 {
-    public unsafe partial struct VmaAllocatorInfo
+    public partial struct VmaAllocatorInfo
     {
         [NativeTypeName("VkInstance _Nonnull")]
-        public Instance* instance;
+        public Instance instance;
 
         [NativeTypeName("VkPhysicalDevice _Nonnull")]
-        public PhysicalDevice* physicalDevice;
+        public PhysicalDevice physicalDevice;
 
         [NativeTypeName("VkDevice _Nonnull")]
-        public Device* device;
+        public Device device;
     }
 }
