@@ -113,9 +113,37 @@ internal sealed unsafe class VulkanCommandList : CommandList
         _vk.CmdBindPipeline(Buffer, PipelineBindPoint.Graphics, vkPipeline.Pipeline);
     }
 
+    public override void SetVertexBuffer(Buffer vertexBuffer)
+    {
+        VulkanBuffer vkBuffer = (VulkanBuffer) vertexBuffer;
+        VkBuffer buffer = vkBuffer.Buffer;
+
+        ulong offset = 0;
+        _vk.CmdBindVertexBuffers(Buffer, 0, 1, &buffer, &offset);
+    }
+
+    public override void SetIndexBuffer(Buffer indexBuffer, Format format)
+    {
+        VulkanBuffer vkBuffer = (VulkanBuffer) indexBuffer;
+
+        IndexType type = format switch
+        {
+            Format.R16_UInt => IndexType.Uint16,
+            Format.R32_UInt => IndexType.Uint32,
+            _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
+        };
+        
+        _vk.CmdBindIndexBuffer(Buffer, vkBuffer.Buffer, 0, type);
+    }
+
     public override void Draw(uint numVertices)
     {
         _vk.CmdDraw(Buffer, numVertices, 1, 0, 0);
+    }
+
+    public override void DrawIndexed(uint numIndices)
+    {
+        _vk.CmdDrawIndexed(Buffer, numIndices, 1, 0, 0, 0);
     }
 
     public override void Dispose()

@@ -65,7 +65,7 @@ unsafe
     {
         -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
         -0.5f, +0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-        +0.5f, +0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+        +0.5f, +0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
         +0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f
     };
 
@@ -86,8 +86,11 @@ unsafe
     ShaderModule pixelModule =
         device.CreateShaderModule(ShaderStage.Pixel, Compiler.CompileHlsl(ShaderStage.Pixel, hlsl, "PSMain"), "PSMain");
 
-    PipelineInfo pipelineInfo = new PipelineInfo(vertexModule, pixelModule, Format.B8G8R8A8_UNorm);
+    PipelineInfo pipelineInfo = new PipelineInfo(vertexModule, pixelModule, Format.B8G8R8A8_UNorm,
+        [new InputLayoutInfo(Format.R32G32B32_Float, 0, 0), new InputLayoutInfo(Format.R32G32B32_Float, 12, 0)]);
 
+    pipelineInfo.Stride = 6 * sizeof(float);
+    
     Pipeline pipeline = device.CreatePipeline(in pipelineInfo);
     
     pixelModule.Dispose();
@@ -145,7 +148,9 @@ unsafe
         cl.SetViewport(new Viewport(0, 0, 1280, 720));
 
         cl.SetPipeline(pipeline);
-        cl.Draw(3);
+        cl.SetVertexBuffer(vertexBuffer);
+        cl.SetIndexBuffer(indexBuffer, Format.R16_UInt);
+        cl.DrawIndexed(6);
         
         cl.EndRenderPass();
         

@@ -41,9 +41,36 @@ internal sealed unsafe class VulkanPipeline : Pipeline
             }
         };
 
+        VertexInputAttributeDescription* vertexAttribDescs =
+            stackalloc VertexInputAttributeDescription[info.InputLayout.Length];
+
+        VertexInputBindingDescription vertexBindingDesc = new VertexInputBindingDescription()
+        {
+            Binding = 0,
+            Stride = info.Stride
+        };
+
+        for (int i = 0; i < info.InputLayout.Length; i++)
+        {
+            ref readonly InputLayoutInfo layout = ref info.InputLayout[i];
+
+            vertexAttribDescs[i] = new VertexInputAttributeDescription()
+            {
+                Binding = layout.Slot,
+                Location = (uint) i,
+                Format = layout.Format.ToVk(),
+                Offset = layout.Offset
+            };
+        }
+
         PipelineVertexInputStateCreateInfo vertexInput = new PipelineVertexInputStateCreateInfo()
         {
             SType = StructureType.PipelineVertexInputStateCreateInfo,
+            VertexAttributeDescriptionCount = (uint) info.InputLayout.Length,
+            PVertexAttributeDescriptions = vertexAttribDescs,
+            
+            VertexBindingDescriptionCount = 1,
+            PVertexBindingDescriptions = &vertexBindingDesc
         };
 
         PipelineInputAssemblyStateCreateInfo inputAssemblyState = new PipelineInputAssemblyStateCreateInfo()
@@ -118,7 +145,7 @@ internal sealed unsafe class VulkanPipeline : Pipeline
 
         PipelineLayoutCreateInfo layoutInfo = new PipelineLayoutCreateInfo()
         {
-            SType = StructureType.PipelineLayoutCreateInfo,
+            SType = StructureType.PipelineLayoutCreateInfo
         };
 
         _vk.CreatePipelineLayout(_device, &layoutInfo, null, out Layout)
