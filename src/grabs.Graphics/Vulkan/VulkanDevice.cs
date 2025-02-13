@@ -23,6 +23,7 @@ internal sealed unsafe class VulkanDevice : Device
     public readonly Queues Queues;
 
     public readonly CommandPool CommandPool;
+    public readonly CommandBuffer DeviceCommandBuffer;
 
     public readonly VmaAllocator_T* Allocator;
 
@@ -128,6 +129,18 @@ internal sealed unsafe class VulkanDevice : Device
         GrabsLog.Log("Creating command pool");
         _vk.CreateCommandPool(Device, &commandPoolInfo, null, out CommandPool).Check("Create command pool");
 
+        CommandBufferAllocateInfo commandBufferInfo = new CommandBufferAllocateInfo()
+        {
+            SType = StructureType.CommandBufferAllocateInfo,
+            CommandPool = CommandPool,
+            CommandBufferCount = 1,
+            Level = CommandBufferLevel.Primary
+        };
+        
+        GrabsLog.Log("Creating device command buffer.");
+        _vk.AllocateCommandBuffers(Device, &commandBufferInfo, out DeviceCommandBuffer)
+            .Check("Allocate device command buffer");
+        
         FenceCreateInfo fenceInfo = new FenceCreateInfo()
         {
             SType = StructureType.FenceCreateInfo
@@ -170,9 +183,9 @@ internal sealed unsafe class VulkanDevice : Device
         return new VulkanShaderModule(_vk, Device, stage, ref spirvSpan, entryPoint);
     }
 
-    public override Buffer CreateBuffer(in BufferInfo info)
+    public override Buffer CreateBuffer(in BufferInfo info, void* data)
     {
-        return new VulkanBuffer(_vk, Allocator, in info);
+        return new VulkanBuffer(_vk, this, in info, data);
     }
 
     public override Pipeline CreatePipeline(in PipelineInfo info)
@@ -204,6 +217,36 @@ internal sealed unsafe class VulkanDevice : Device
     public override void WaitForIdle()
     {
         _vk.DeviceWaitIdle(Device).Check("Wait for idle");
+    }
+    
+    public CommandBuffer BeginCommands()
+    {
+        CommandBufferBeginInfo beginInfo = new CommandBufferBeginInfo()
+        {
+            SType = StructureType.CommandBufferBeginInfo,
+            Flags = CommandBufferUsageFlags.OneTimeSubmitBit
+        };
+        
+        _vk.BeginCommandBuffer(DeviceCommandBuffer, &beginInfo).Check("Begin one time command buffer");
+
+        return DeviceCommandBuffer;
+    }
+
+    public void EndCommands()
+    {
+        CommandBuffer cb = DeviceCommandBuffer;
+        
+        _vk.EndCommandBuffer(cb).Check("End one time command buffer");
+
+        SubmitInfo submitInfo = new SubmitInfo()
+        {
+            SType = StructureType.SubmitInfo,
+            CommandBufferCount = 1,
+            PCommandBuffers = &cb
+        };
+
+        _vk.QueueSubmit(Queues.Graphics, 1, &submitInfo, new Fence()).Check("Submit one time queue");
+        _vk.QueueWaitIdle(Queues.Graphics).Check("Wait for queue idle");
     }
 
     public override void Dispose()

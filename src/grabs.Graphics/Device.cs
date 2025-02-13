@@ -8,7 +8,7 @@ public abstract class Device : IDisposable
 
     public abstract ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint);
 
-    public abstract Buffer CreateBuffer(in BufferInfo info);
+    public abstract unsafe Buffer CreateBuffer(in BufferInfo info, void* pData);
     
     public abstract Pipeline CreatePipeline(in PipelineInfo info);
 

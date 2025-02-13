@@ -69,8 +69,10 @@ unsafe
         +0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f
     };
 
-    Buffer vertexBuffer =
-        device.CreateBuffer(new BufferInfo(BufferType.Vertex, (uint) (vertices.Length * sizeof(float))));
+    Buffer vertexBuffer;
+    
+    fixed (float* pVertices = vertices)
+        vertexBuffer = device.CreateBuffer(new BufferInfo(BufferType.Vertex, (uint) (vertices.Length * sizeof(float))), pVertices);
 
     string hlsl = File.ReadAllText("Shader.hlsl");
 
