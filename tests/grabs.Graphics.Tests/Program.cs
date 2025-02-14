@@ -137,32 +137,13 @@ unsafe
         Texture texture = swapchain.GetNextTexture();
         
         cl.Begin();
-
-        float x = 1 - float.Abs((h / 60.0f) % 2.0f - 1);
-
-        (float r, float g, float b) = h switch
-        {
-            >= 0 and < 60 => (1, x, 0),
-            >= 60 and < 120 => (x, 1, 0),
-            >= 120 and < 180 => (0, 1, x),
-            >= 180 and < 240 => (0, x, 1),
-            >= 240 and < 300 => (x, 0, 1),
-            >= 300 and < 360 => (1, 0, x),
-            _ => (0.0f, 0.0f, 0.0f)
-        };
         
-        //Console.WriteLine($"h: {h}, r: {r}, g: {g}, b: {b}");
-
-        h += 1;
-        if (h >= 360)
-            h = 0;
-        
-        cl.BeginRenderPass(new RenderPassInfo(new ColorAttachmentInfo(texture, new ColorF(r, g, b))));
+        cl.BeginRenderPass(new RenderPassInfo(new ColorAttachmentInfo(texture, new ColorF(1.0f, 0.5f, 0.25f))));
         
         cl.SetViewport(new Viewport(0, 0, 1280, 720));
 
         cl.SetPipeline(pipeline);
-        cl.SetVertexBuffer(vertexBuffer);
+        cl.SetVertexBuffer(0, vertexBuffer);
         cl.SetIndexBuffer(indexBuffer, Format.R16_UInt);
         cl.DrawIndexed(6);
         

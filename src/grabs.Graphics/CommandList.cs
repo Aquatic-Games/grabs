@@ -14,9 +14,9 @@ public abstract class CommandList : IDisposable
 
     public abstract void SetPipeline(Pipeline pipeline);
 
-    public abstract void SetVertexBuffer(Buffer vertexBuffer);
+    public abstract void SetVertexBuffer(uint slot, Buffer vertexBuffer, ulong offset = 0);
 
-    public abstract void SetIndexBuffer(Buffer indexBuffer, Format format);
+    public abstract void SetIndexBuffer(Buffer indexBuffer, Format format, ulong offset = 0);
 
     public abstract void Draw(uint numVertices);
 

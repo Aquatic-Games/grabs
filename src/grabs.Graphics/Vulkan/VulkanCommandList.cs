@@ -113,16 +113,15 @@ internal sealed unsafe class VulkanCommandList : CommandList
         _vk.CmdBindPipeline(Buffer, PipelineBindPoint.Graphics, vkPipeline.Pipeline);
     }
 
-    public override void SetVertexBuffer(Buffer vertexBuffer)
+    public override void SetVertexBuffer(uint slot, Buffer vertexBuffer, ulong offset = 0)
     {
         VulkanBuffer vkBuffer = (VulkanBuffer) vertexBuffer;
         VkBuffer buffer = vkBuffer.Buffer;
-
-        ulong offset = 0;
-        _vk.CmdBindVertexBuffers(Buffer, 0, 1, &buffer, &offset);
+        
+        _vk.CmdBindVertexBuffers(Buffer, slot, 1, &buffer, &offset);
     }
 
-    public override void SetIndexBuffer(Buffer indexBuffer, Format format)
+    public override void SetIndexBuffer(Buffer indexBuffer, Format format, ulong offset = 0)
     {
         VulkanBuffer vkBuffer = (VulkanBuffer) indexBuffer;
 
@@ -133,7 +132,7 @@ internal sealed unsafe class VulkanCommandList : CommandList
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
         };
         
-        _vk.CmdBindIndexBuffer(Buffer, vkBuffer.Buffer, 0, type);
+        _vk.CmdBindIndexBuffer(Buffer, vkBuffer.Buffer, offset, type);
     }
 
     public override void Draw(uint numVertices)
