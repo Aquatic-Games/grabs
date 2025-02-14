@@ -11,6 +11,7 @@
       <PackageReference Include="Silk.NET.Vulkan" Version="2.22.0" />
       <PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.22.0" />
       <PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.22.0" />
+      <PackageReference Include="Vortice.Direct3D11" Version="3.7.1-beta" />
     </ItemGroup>
 
     <ItemGroup>

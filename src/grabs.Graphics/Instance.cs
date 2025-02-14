@@ -1,4 +1,5 @@
-﻿using grabs.Graphics.Vulkan;
+﻿using grabs.Graphics.D3D11;
+using grabs.Graphics.Vulkan;
 
 namespace grabs.Graphics;
 
@@ -18,7 +19,11 @@ public abstract class Instance : IDisposable
     {
         Backend backend = info.BackendHint;
         if (backend == Backend.Unknown)
-            backend = Backend.Vulkan;
+            backend = Backend.Vulkan | Backend.D3D11;
+
+        // Prioritize D3D11 on Windows.
+        if (OperatingSystem.IsWindows() && backend.HasFlag(Backend.D3D11))
+            return new D3D11Instance(in info);
 
         if (backend.HasFlag(Backend.Vulkan))
             return new VulkanInstance(in info);
