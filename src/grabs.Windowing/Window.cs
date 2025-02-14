@@ -1,4 +1,5 @@
 ﻿using grabs.Core;
+using grabs.Graphics;
 using grabs.Windowing.Events;
 using SDL;
 using static SDL.SDL3;
@@ -33,6 +34,51 @@ public unsafe class Window : IDisposable
 
         if (_window == null)
             throw new Exception($"Failed to create window: {SDL_GetError()}");
+    }
+
+    public Surface CreateSurface(Instance instance)
+    {
+        SDL_PropertiesID props = SDL_GetWindowProperties(_window);
+        
+        SurfaceInfo info;
+
+        if (OperatingSystem.IsWindows())
+        {
+            nint hinstance = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_INSTANCE_POINTER, IntPtr.Zero);
+            nint hwnd = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, IntPtr.Zero);
+            
+            info = SurfaceInfo.Windows(hinstance, hwnd);
+        }
+        else if (OperatingSystem.IsLinux())
+        {
+            string driver = SDL_GetCurrentVideoDriver();
+
+            switch (driver)
+            {
+                case "wayland":
+                {
+                    nint display = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, IntPtr.Zero);
+                    nint surface = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, IntPtr.Zero);
+
+                    info = SurfaceInfo.Wayland(display, surface);
+                    break;
+                }
+                case "x11":
+                {
+                    nint display = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_X11_DISPLAY_POINTER, IntPtr.Zero);
+                    long window = SDL_GetNumberProperty(props, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0);
+
+                    info = SurfaceInfo.Xlib(display, (nint) window);
+                    break;
+                }
+                default:
+                    throw new NotSupportedException(driver);
+            }
+        }
+        else
+            throw new PlatformNotSupportedException();
+
+        return instance.CreateSurface(in info);
     }
 
     public bool PollEvent(out Event @event)
