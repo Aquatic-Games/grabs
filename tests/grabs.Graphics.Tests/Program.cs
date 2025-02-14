@@ -7,6 +7,8 @@ using Buffer = grabs.Graphics.Buffer;
 using Surface = grabs.Graphics.Surface;
 using Texture = grabs.Graphics.Texture;
 
+//Console.WriteLine(Instance.IsBackendSupported(Backend.Vulkan));
+
 GrabsLog.LogMessage += (severity, source, message, _, _) => Console.WriteLine($"{severity} - {source}: {message}");
 
 unsafe
