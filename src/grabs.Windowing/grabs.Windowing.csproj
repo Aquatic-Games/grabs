@@ -4,6 +4,16 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="ppy.SDL3-CS" Version="2025.127.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\grabs.Core\grabs.Core.csproj" />
+      <ProjectReference Include="..\grabs.Graphics\grabs.Graphics.csproj" />
+    </ItemGroup>
 
 </Project>
