@@ -1,4 +1,5 @@
-﻿using Vortice.DXGI;
+﻿using grabs.Core;
+using Vortice.DXGI;
 
 namespace grabs.Graphics.D3D11;
 
@@ -10,6 +11,7 @@ internal sealed class D3D11Instance : Instance
 
     public D3D11Instance(ref readonly InstanceInfo info)
     {
+        GrabsLog.Log("Creating DXGI factory.");
         Factory = DXGI.CreateDXGIFactory1<IDXGIFactory1>();
     }
     
@@ -42,7 +44,7 @@ internal sealed class D3D11Instance : Instance
     
     public override Surface CreateSurface(in SurfaceInfo info)
     {
-        throw new NotImplementedException();
+        return new D3D11Surface(in info);
     }
     
     public override void Dispose()
