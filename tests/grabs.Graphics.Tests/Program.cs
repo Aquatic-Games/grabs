@@ -24,9 +24,8 @@ unsafe
         throw new Exception($"Failed to create window: {sdl.GetErrorS()}");
     
     InstanceInfo info = new InstanceInfo(Backend.Unknown, "grabs.Graphics.Tests", true);
-
-
-    Instance instance = null;
+    
+    Instance instance;
 
     try
     {
@@ -35,6 +34,7 @@ unsafe
     catch (DebugLayersNotFoundException e)
     {
         sdl.ShowSimpleMessageBox((uint) MessageBoxFlags.Error, "Error", e.Message, null);
+        throw;
     }
 
     Adapter[] adapters = instance.EnumerateAdapters();
@@ -102,6 +102,7 @@ unsafe
     PipelineInfo pipelineInfo = new PipelineInfo(vertexModule, pixelModule, Format.B8G8R8A8_UNorm,
         [new InputLayoutInfo(Format.R32G32B32_Float, 0, 0), new InputLayoutInfo(Format.R32G32B32_Float, 12, 0)]);
 
+    // TODO: Have this in SetVertexBuffer.
     pipelineInfo.Stride = 6 * sizeof(float);
     
     Pipeline pipeline = device.CreatePipeline(in pipelineInfo);

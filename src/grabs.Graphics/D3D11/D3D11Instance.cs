@@ -5,12 +5,16 @@ namespace grabs.Graphics.D3D11;
 
 internal sealed class D3D11Instance : Instance
 {
+    private readonly bool _debug;
+    
     public readonly IDXGIFactory1 Factory;
     
     public override Backend Backend => Backend.D3D11;
 
     public D3D11Instance(ref readonly InstanceInfo info)
     {
+        _debug = info.Debug;
+        
         GrabsLog.Log("Creating DXGI factory.");
         Factory = DXGI.CreateDXGIFactory1<IDXGIFactory1>();
     }
@@ -39,7 +43,17 @@ internal sealed class D3D11Instance : Instance
     
     public override Device CreateDevice(Surface surface, Adapter? adapter = null)
     {
-        throw new NotImplementedException();
+        IDXGIAdapter1 dxgiAdapter;
+        
+        if (adapter is { } givenAdapter)
+            dxgiAdapter = new IDXGIAdapter1(givenAdapter.Handle);
+        else
+        {
+            Adapter[] adapters = EnumerateAdapters();
+            dxgiAdapter = new IDXGIAdapter1(adapters[0].Handle);
+        }
+
+        return new D3D11Device(dxgiAdapter, _debug);
     }
     
     public override Surface CreateSurface(in SurfaceInfo info)
@@ -49,6 +63,6 @@ internal sealed class D3D11Instance : Instance
     
     public override void Dispose()
     {
-        Factory.Release();
+        Factory.Dispose();
     }
 }
