@@ -15,18 +15,38 @@ internal sealed class D3D11Instance : Instance
     
     public override Adapter[] EnumerateAdapters()
     {
-        throw new NotImplementedException();
+        List<Adapter> adapters = new List<Adapter>();
+        
+        for (uint i = 0; Factory.EnumAdapters1(i, out IDXGIAdapter1 adapter).Success; i++)
+        {
+            AdapterDescription1 desc = adapter.Description1;
+            
+            string name = desc.Description;
+
+            AdapterType type = AdapterType.Dedicated;
+            if (desc.Flags.HasFlag(AdapterFlags.Software))
+                type = AdapterType.Software;
+
+            ulong memory = desc.DedicatedVideoMemory;
+            
+            adapters.Add(new Adapter(adapter.NativePointer, i, name, type, memory));
+        }
+
+        return adapters.ToArray();
     }
+    
     public override Device CreateDevice(Surface surface, Adapter? adapter = null)
     {
         throw new NotImplementedException();
     }
+    
     public override Surface CreateSurface(in SurfaceInfo info)
     {
         throw new NotImplementedException();
     }
+    
     public override void Dispose()
     {
-        throw new NotImplementedException();
+        Factory.Release();
     }
 }
