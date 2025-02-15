@@ -6,12 +6,16 @@ namespace grabs.Graphics.D3D11;
 
 internal sealed class D3D11Device : Device
 {
+    private readonly IDXGIFactory _factory;
+    
     public readonly ID3D11Device Device;
 
     public readonly ID3D11DeviceContext Context;
 
-    public D3D11Device(IDXGIAdapter1 adapter, bool debug)
+    public D3D11Device(IDXGIFactory factory, IDXGIAdapter1 adapter, bool debug)
     {
+        _factory = factory;
+        
         DeviceCreationFlags creationFlags = DeviceCreationFlags.BgraSupport;
         if (debug)
             creationFlags |= DeviceCreationFlags.Debug;
@@ -22,7 +26,7 @@ internal sealed class D3D11Device : Device
     
     public override Swapchain CreateSwapchain(Surface surface, in SwapchainInfo info)
     {
-        throw new NotImplementedException();
+        return new D3D11Swapchain(_factory, Device, (D3D11Surface) surface, in info);
     }
     
     public override CommandList CreateCommandList()

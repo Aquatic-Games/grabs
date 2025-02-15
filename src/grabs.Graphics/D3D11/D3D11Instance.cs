@@ -53,7 +53,7 @@ internal sealed class D3D11Instance : Instance
             dxgiAdapter = new IDXGIAdapter1(adapters[0].Handle);
         }
 
-        return new D3D11Device(dxgiAdapter, _debug);
+        return new D3D11Device(Factory, dxgiAdapter, _debug);
     }
     
     public override Surface CreateSurface(in SurfaceInfo info)
