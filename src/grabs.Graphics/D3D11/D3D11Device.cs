@@ -1,4 +1,5 @@
-﻿using Vortice.Direct3D;
+﻿using System.Diagnostics;
+using Vortice.Direct3D;
 using Vortice.Direct3D11;
 using Vortice.DXGI;
 
@@ -31,7 +32,7 @@ internal sealed class D3D11Device : Device
     
     public override CommandList CreateCommandList()
     {
-        throw new NotImplementedException();
+        return new D3D11CommandList(Device);
     }
     
     public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint)
@@ -51,16 +52,21 @@ internal sealed class D3D11Device : Device
     
     public override void ExecuteCommandList(CommandList list)
     {
-        throw new NotImplementedException();
+        D3D11CommandList d3dList = (D3D11CommandList) list;
+        
+        Debug.Assert(d3dList.CommandList != null, "Command List was null, have you called End()?");
+        
+        Context.ExecuteCommandList(d3dList.CommandList, false);
     }
     
     public override void WaitForIdle()
     {
-        throw new NotImplementedException();
+        Context.Flush();
     }
     
     public override void Dispose()
     {
+        Context.Dispose();
         Device.Dispose();
     }
 }

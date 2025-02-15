@@ -14,7 +14,7 @@ using Surface surface = window.CreateSurface(instance);
 using Device device = instance.CreateDevice(surface);
 using Swapchain swapchain = device.CreateSwapchain(surface,
     new SwapchainInfo(windowInfo.Size, Format.B8G8R8A8_UNorm, PresentMode.Fifo, 2));
-//using CommandList cl = device.CreateCommandList();
+using CommandList cl = device.CreateCommandList();
 
 bool alive = true;
 while (alive)
@@ -31,11 +31,11 @@ while (alive)
 
     Texture texture = swapchain.GetNextTexture();
     
-    //cl.Begin();
+    cl.Begin();
     //cl.BeginRenderPass(new RenderPassInfo(new ColorAttachmentInfo(texture, new ColorF(1.0f, 0.5f, 0.25f))));
     //cl.EndRenderPass();
-    //cl.End();
+    cl.End();
     
-    //device.ExecuteCommandList(cl);
+    device.ExecuteCommandList(cl);
     swapchain.Present();
 }
