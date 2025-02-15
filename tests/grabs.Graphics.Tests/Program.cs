@@ -23,7 +23,7 @@ unsafe
     if (window == null)
         throw new Exception($"Failed to create window: {sdl.GetErrorS()}");
     
-    InstanceInfo info = new InstanceInfo(Backend.Unknown, "grabs.Graphics.Tests", true);
+    InstanceInfo info = new InstanceInfo(Backend.Vulkan, "grabs.Graphics.Tests", true);
     
     Instance instance;
 

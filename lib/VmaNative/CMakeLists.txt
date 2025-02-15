@@ -6,6 +6,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC ../VulkanMemoryAllocator/inclu
 
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
-#if (MSVC)
-#add_compile_definitions(VMA_CALL_PRE=__declspec(dllexport) VMA_CALL_POST=__cdecl)
-    #endif()
+if (WIN32)
+    find_package(Vulkan REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PUBLIC ${Vulkan_LIBRARIES})
+    target_include_directories(${PROJECT_NAME} PUBLIC ${Vulkan_INCLUDE_DIRS})
+endif()
