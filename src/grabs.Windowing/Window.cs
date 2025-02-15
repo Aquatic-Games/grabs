@@ -51,7 +51,7 @@ public unsafe class Window : IDisposable
         }
         else if (OperatingSystem.IsLinux())
         {
-            string driver = SDL_GetCurrentVideoDriver();
+            string? driver = SDL_GetCurrentVideoDriver();
 
             switch (driver)
             {

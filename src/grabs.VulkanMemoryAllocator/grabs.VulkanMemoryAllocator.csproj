@@ -11,4 +11,10 @@
       <PackageReference Include="Silk.NET.Vulkan" Version="2.22.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="libVulkanMemoryAllocator.so">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
