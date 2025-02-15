@@ -32,8 +32,8 @@ while (alive)
     Texture texture = swapchain.GetNextTexture();
     
     cl.Begin();
-    //cl.BeginRenderPass(new RenderPassInfo(new ColorAttachmentInfo(texture, new ColorF(1.0f, 0.5f, 0.25f))));
-    //cl.EndRenderPass();
+    cl.BeginRenderPass(new RenderPassInfo(new ColorAttachmentInfo(texture, new ColorF(1.0f, 0.5f, 0.25f))));
+    cl.EndRenderPass();
     cl.End();
     
     device.ExecuteCommandList(cl);
