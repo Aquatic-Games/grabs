@@ -1,4 +1,6 @@
-﻿using grabs.Graphics.D3D11;
+﻿using System.Diagnostics.CodeAnalysis;
+using grabs.Core;
+using grabs.Graphics.D3D11;
 using grabs.Graphics.Vulkan;
 
 namespace grabs.Graphics;
@@ -14,18 +16,30 @@ public abstract class Instance : IDisposable
     public abstract Surface CreateSurface(in SurfaceInfo info);
     
     public abstract void Dispose();
+    
+    // Vulkan is always enabled unless disabled.
+    [FeatureSwitchDefinition("Vulkan")]
+    private static bool VulkanEnabled => !AppContext.TryGetSwitch("Vulkan", out bool enabled) || enabled;
+
+    // Only enable D3D11 on windows unless a feature switch explicitly enables it on other OSes.
+    [FeatureSwitchDefinition("D3D11")]
+    private static bool D3D11Enabled =>
+        AppContext.TryGetSwitch("D3D11", out bool enabled) ? enabled : OperatingSystem.IsWindows();
 
     public static Instance Create(in InstanceInfo info)
     {
+        GrabsLog.Log($"VulkanEnabled: {VulkanEnabled}");
+        GrabsLog.Log($"D3D11Enabled: {D3D11Enabled}");
+        
         Backend backend = info.BackendHint;
         if (backend == Backend.Unknown)
             backend = Backend.Vulkan | Backend.D3D11;
 
         // Prioritize D3D11 on Windows.
-        if (OperatingSystem.IsWindows() && backend.HasFlag(Backend.D3D11))
+        if (D3D11Enabled && backend.HasFlag(Backend.D3D11))
             return new D3D11Instance(in info);
 
-        if (backend.HasFlag(Backend.Vulkan))
+        if (VulkanEnabled && backend.HasFlag(Backend.Vulkan))
             return new VulkanInstance(in info);
 
         throw new NotImplementedException();
