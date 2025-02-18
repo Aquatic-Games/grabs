@@ -28,6 +28,12 @@ public abstract class Device : IDisposable
 
     public abstract void ExecuteCommandList(CommandList list);
 
+    public MappedData MapResource(MappableResource resource, MapType type)
+        => resource.Map(type);
+
+    public void UnmapResource(MappableResource resource)
+        => resource.Unmap();
+
     public abstract void WaitForIdle();
     
     public abstract void Dispose();

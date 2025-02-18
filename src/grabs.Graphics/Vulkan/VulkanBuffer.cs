@@ -61,7 +61,7 @@ internal sealed unsafe class VulkanBuffer : Buffer
         VmaAllocationCreateInfo stagingAllocInfo = new VmaAllocationCreateInfo()
         {
             usage = VMA_MEMORY_USAGE_AUTO,
-            flags = (uint) (VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT),
+            flags = (uint) (VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT),
         };
 
         GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.Performance,
@@ -83,6 +83,19 @@ internal sealed unsafe class VulkanBuffer : Buffer
         device.EndCommands();
         
         Vma.DestroyBuffer(_allocator, staging, stagingAllocation);
+    }
+    
+    internal override MappedData Map(MapType type)
+    {
+        void* pData;
+        Vma.MapMemory(_allocator, _allocation, &pData);
+
+        return new MappedData((nint) pData);
+    }
+    
+    internal override void Unmap()
+    {
+        Vma.UnmapMemory(_allocator, _allocation);
     }
     
     public override void Dispose()
