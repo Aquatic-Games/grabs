@@ -8,10 +8,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Silk.NET.Shaderc" Version="2.22.0" />
+      <PackageReference Include="Silk.NET.Shaderc.Native" Version="2.22.0" />
       <PackageReference Include="Silk.NET.Vulkan" Version="2.22.0" />
       <PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.22.0" />
       <PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.22.0" />
-      <PackageReference Include="Vortice.Direct3D11" Version="3.7.1-beta" />
+      <PackageReference Include="Vortice.D3DCompiler" Version="3.6.2" />
+      <PackageReference Include="Vortice.Direct3D11" Version="3.6.2" />
     </ItemGroup>
 
     <ItemGroup>
