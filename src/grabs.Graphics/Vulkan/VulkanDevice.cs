@@ -1,4 +1,5 @@
 global using VkDevice = Silk.NET.Vulkan.Device;
+using System.Diagnostics;
 using grabs.Core;
 using grabs.VulkanMemoryAllocator;
 using Silk.NET.Core;
@@ -28,27 +29,32 @@ internal sealed unsafe class VulkanDevice : Device
     public readonly VmaAllocator_T* Allocator;
 
     private readonly Fence _fence;
+    
+    public override Adapter Adapter { get; }
 
-    public VulkanDevice(Vk vk, VkInstance instance, PhysicalDevice physicalDevice, VulkanSurface surface, KhrSurface khrSurface)
+    public VulkanDevice(Vk vk, VkInstance instance, in Adapter adapter, VulkanSurface surface, KhrSurface khrSurface)
     {
+        Debug.Assert(adapter.Handle != 0);
+        
         _vk = vk;
-        PhysicalDevice = physicalDevice;
+        Adapter = adapter;
+        PhysicalDevice = new PhysicalDevice(adapter.Handle);
         KhrSurface = khrSurface;
 
         uint? graphicsQueueIndex = null;
         uint? presentQueueIndex = null;
 
         uint numQueueFamilies;
-        _vk.GetPhysicalDeviceQueueFamilyProperties(physicalDevice, &numQueueFamilies, null);
+        _vk.GetPhysicalDeviceQueueFamilyProperties(PhysicalDevice, &numQueueFamilies, null);
         QueueFamilyProperties* queueFamilies = stackalloc QueueFamilyProperties[(int) numQueueFamilies];
-        _vk.GetPhysicalDeviceQueueFamilyProperties(physicalDevice, &numQueueFamilies, queueFamilies);
+        _vk.GetPhysicalDeviceQueueFamilyProperties(PhysicalDevice, &numQueueFamilies, queueFamilies);
 
         for (uint i = 0; i < numQueueFamilies; i++)
         {
             if (queueFamilies[i].QueueFlags.HasFlag(QueueFlags.TransferBit))
                 graphicsQueueIndex = i;
 
-            khrSurface.GetPhysicalDeviceSurfaceSupport(physicalDevice, i, surface.Surface, out Bool32 supported);
+            khrSurface.GetPhysicalDeviceSurfaceSupport(PhysicalDevice, i, surface.Surface, out Bool32 supported);
 
             if (supported)
                 presentQueueIndex = i;
@@ -108,7 +114,7 @@ internal sealed unsafe class VulkanDevice : Device
         deviceInfo.PNext = &dynamicRenderingFeatures;
 
         GrabsLog.Log("Creating device.");
-        _vk.CreateDevice(physicalDevice, &deviceInfo, null, out Device).Check("Create device");
+        _vk.CreateDevice(PhysicalDevice, &deviceInfo, null, out Device).Check("Create device");
 
         GrabsLog.Log("Get graphics queue");
         _vk.GetDeviceQueue(Device, Queues.GraphicsIndex, 0, out Queues.Graphics);

@@ -12,8 +12,10 @@ internal sealed class D3D11Device : Device
     public readonly ID3D11Device Device;
 
     public readonly ID3D11DeviceContext Context;
+    
+    public override Adapter Adapter { get; }
 
-    public D3D11Device(IDXGIFactory factory, IDXGIAdapter1 adapter, bool debug)
+    public D3D11Device(IDXGIFactory factory, in Adapter adapter, bool debug)
     {
         _factory = factory;
         
@@ -21,10 +23,13 @@ internal sealed class D3D11Device : Device
         if (debug)
             creationFlags |= DeviceCreationFlags.Debug;
 
-        Vortice.Direct3D11.D3D11.D3D11CreateDevice(adapter, DriverType.Unknown, creationFlags,
+        Debug.Assert(adapter.Handle != 0);
+        IDXGIAdapter1 adapter1 = new IDXGIAdapter1(adapter.Handle);
+
+        Vortice.Direct3D11.D3D11.D3D11CreateDevice(adapter1, DriverType.Unknown, creationFlags,
             [FeatureLevel.Level_11_1], out Device, out Context).CheckError();
     }
-    
+
     public override Swapchain CreateSwapchain(Surface surface, in SwapchainInfo info)
     {
         return new D3D11Swapchain(_factory, Device, (D3D11Surface) surface, in info);

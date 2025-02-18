@@ -66,11 +66,12 @@ unsafe
     }
 
     Surface surface = instance.CreateSurface(in surfaceInfo);
-    Console.WriteLine(string.Join(", ", surface.EnumerateSupportedFormats(in adapters[0])));
-    Format swapchainFormat = surface.GetOptimalSwapchainFormat(in adapters[0]);
-    Console.WriteLine(swapchainFormat);
 
     Device device = instance.CreateDevice(surface);
+    
+    Console.WriteLine(string.Join(", ", surface.EnumerateSupportedFormats(device.Adapter)));
+    Format swapchainFormat = surface.GetOptimalSwapchainFormat(device.Adapter);
+    Console.WriteLine(swapchainFormat);
 
     Swapchain swapchain =
         device.CreateSwapchain(surface, new SwapchainInfo(new Size2D(1280, 720), swapchainFormat, PresentMode.Fifo, 2));

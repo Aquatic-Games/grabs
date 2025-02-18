@@ -2,6 +2,8 @@ namespace grabs.Graphics;
 
 public abstract class Device : IDisposable
 {
+    public abstract Adapter Adapter { get; }
+    
     public abstract Swapchain CreateSwapchain(Surface surface, in SwapchainInfo info);
 
     public abstract CommandList CreateCommandList();

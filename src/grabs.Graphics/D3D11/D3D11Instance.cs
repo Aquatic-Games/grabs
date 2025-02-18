@@ -43,17 +43,9 @@ internal sealed class D3D11Instance : Instance
     
     public override Device CreateDevice(Surface surface, Adapter? adapter = null)
     {
-        IDXGIAdapter1 dxgiAdapter;
-        
-        if (adapter is { } givenAdapter)
-            dxgiAdapter = new IDXGIAdapter1(givenAdapter.Handle);
-        else
-        {
-            Adapter[] adapters = EnumerateAdapters();
-            dxgiAdapter = new IDXGIAdapter1(adapters[0].Handle);
-        }
+        Adapter inAdapter = adapter ?? EnumerateAdapters()[0];
 
-        return new D3D11Device(Factory, dxgiAdapter, _debug);
+        return new D3D11Device(Factory, inAdapter, _debug);
     }
     
     public override Surface CreateSurface(in SurfaceInfo info)
