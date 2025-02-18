@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using grabs.Core;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.KHR;
@@ -18,6 +19,15 @@ internal sealed unsafe class VulkanSurface : Surface
 
     public VulkanSurface(Vk vk, VkInstance instance, KhrSurface khrSurface, ref readonly SurfaceInfo info)
     {
+        Debug.Assert(info.Type != SurfaceType.Windows || (info.Display.Windows != 0 && info.Window.Windows != 0),
+            $"SurfaceType is Windows however Display (0x{info.Display.Windows:X}) and/or Window (0x{info.Window.Windows:X}) pointer(s) are null.");
+        Debug.Assert(info.Type != SurfaceType.Xlib || (info.Display.Xlib != 0 && info.Window.Xlib != 0),
+            $"SurfaceType is Xlib however Display (0x{info.Display.Xlib:X}) and/or Window (0x{info.Window.Xlib:X}) pointer(s) are null.");
+        Debug.Assert(info.Type != SurfaceType.Xcb || (info.Display.Xcb != 0 && info.Window.Xcb != 0),
+            $"SurfaceType is Xcb however Display (0x{info.Display.Xcb:X}) and/or Window (0x{info.Window.Xcb:X}) pointer(s) are null.");
+        Debug.Assert(info.Type != SurfaceType.Wayland || (info.Display.Wayland != 0 && info.Window.Wayland != 0),
+            $"SurfaceType is Wayland however Display (0x{info.Display.Wayland:X}) and/or Window (0x{info.Window.Wayland:X}) pointer(s) are null.");
+        
         _instance = instance;
         _khrSurface = khrSurface;
 
@@ -101,7 +111,33 @@ internal sealed unsafe class VulkanSurface : Surface
                 throw new ArgumentOutOfRangeException();
         }
     }
-    
+
+    public override Format[] EnumerateSupportedFormats(in Adapter adapter)
+    {
+        Debug.Assert(adapter.Handle != IntPtr.Zero);
+        PhysicalDevice device = new PhysicalDevice(adapter.Handle);
+
+        uint numFormats;
+        _khrSurface.GetPhysicalDeviceSurfaceFormats(device, Surface, &numFormats, null);
+        SurfaceFormatKHR* vkFormats = stackalloc SurfaceFormatKHR[(int) numFormats];
+        _khrSurface.GetPhysicalDeviceSurfaceFormats(device, Surface, &numFormats, vkFormats);
+
+        List<Format> formats = [];
+        for (int i = 0; i < numFormats; i++)
+        {
+            if (vkFormats[i].ColorSpace == ColorSpaceKHR.SpaceSrgbNonlinearKhr)
+            {
+                Format format = vkFormats[i].Format.ToGrabs();
+                if (format == Format.Unknown)
+                    continue;
+                
+                formats.Add(format);
+            }
+        }
+
+        return formats.ToArray();
+    }
+
     public override void Dispose()
     {
         _khrSurface.DestroySurface(_instance, Surface, null);

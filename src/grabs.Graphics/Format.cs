@@ -2,6 +2,8 @@ namespace grabs.Graphics;
 
 public enum Format
 {
+    Unknown,
+    
     B5G6R5_UNorm,
     B5G5R5A1_UNorm,
 
