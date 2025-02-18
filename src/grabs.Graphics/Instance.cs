@@ -48,7 +48,7 @@ public abstract class Instance : IDisposable
             {
                 try
                 {
-                    Instance instance = Create(new InstanceInfo(Backend.Vulkan, "", withDebugging));
+                    Instance instance = Create(new InstanceInfo("grabs.CheckBackendSupported", Backend.Vulkan, withDebugging));
                     instance.EnumerateAdapters();
                     
                     instance.Dispose();

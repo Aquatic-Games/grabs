@@ -9,11 +9,16 @@ WindowInfo windowInfo = new WindowInfo(new Size2D(1280, 720), "grabs.Windowing.T
 
 using Window window = new Window(in windowInfo);
 
-using Instance instance = Instance.Create(new InstanceInfo(Backend.Unknown, "grabs.Windowing.Tests", true));
+using Instance instance = Instance.Create(new InstanceInfo("grabs.Windowing.Tests", debug: true));
+
 using Surface surface = window.CreateSurface(instance);
 using Device device = instance.CreateDevice(surface);
+
+Format format = surface.GetOptimalSwapchainFormat(device.Adapter);
+
 using Swapchain swapchain = device.CreateSwapchain(surface,
-    new SwapchainInfo(windowInfo.Size, Format.B8G8R8A8_UNorm, PresentMode.Fifo, 2));
+    new SwapchainInfo(windowInfo.Size, format, PresentMode.Fifo, 2));
+
 using CommandList cl = device.CreateCommandList();
 
 bool alive = true;
