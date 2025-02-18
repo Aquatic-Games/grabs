@@ -9,8 +9,12 @@ internal sealed class D3D11Swapchain : Swapchain
     
     public readonly IDXGISwapChain Swapchain;
     
+    public override Format SwapchainFormat { get; }
+    
     public D3D11Swapchain(IDXGIFactory factory, ID3D11Device device, D3D11Surface surface, ref readonly SwapchainInfo info)
     {
+        SwapchainFormat = info.Format;
+        
         SwapChainDescription swapchainDesc = new SwapChainDescription()
         {
             OutputWindow = surface.Hwnd,

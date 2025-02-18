@@ -19,6 +19,8 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
     private readonly CommandBuffer _commandBuffer;
     
     public readonly SwapchainKHR Swapchain;
+    
+    public override Format SwapchainFormat { get; }
 
     public VulkanSwapchain(Vk vk, VulkanDevice device, VulkanSurface surface, ref readonly SwapchainInfo info)
     {
@@ -78,28 +80,8 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         
         PRESENT_MODE_FOUND: ;
 
-        GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.General,
-            "Checking supported formats over selected format.");
-
-        uint numFormats;
-        khrSurface.GetPhysicalDeviceSurfaceFormats(physicalDevice, surface.Surface, &numFormats, null);
-        SurfaceFormatKHR* formats = stackalloc SurfaceFormatKHR[(int) numFormats];
-        khrSurface.GetPhysicalDeviceSurfaceFormats(physicalDevice, surface.Surface, &numFormats, formats);
-
-        VkFormat desiredFormat = info.Format.ToVk();
-
-        for (uint i = 0; i < numFormats; i++)
-        {
-            if (desiredFormat == formats[i].Format && formats[i].ColorSpace == ColorSpaceKHR.SpaceSrgbNonlinearKhr)
-                goto FORMAT_FOUND;
-        }
-        
-        GrabsLog.Log(GrabsLog.Severity.Warning, GrabsLog.Source.Performance,
-            $"Desired format {desiredFormat} is not supported by the GPU - format {formats[0].Format} will be used instead.");
-
-        desiredFormat = formats[0].Format;
-        
-        FORMAT_FOUND: ;
+        SwapchainFormat = info.Format;
+        VkFormat format = info.Format.ToVk();
 
         // TODO: Compare desiredExtent vs the Min and Max extents.
         Extent2D desiredExtent = info.Size.ToVk();
@@ -113,7 +95,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
             MinImageCount = desiredNumImages,
             PresentMode = desiredPresentMode,
 
-            ImageFormat = desiredFormat,
+            ImageFormat = format,
             ImageColorSpace = ColorSpaceKHR.SpaceSrgbNonlinearKhr,
 
             ImageExtent = desiredExtent,
@@ -152,7 +134,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
                 SType = StructureType.ImageViewCreateInfo,
                 Image = swapchainImages[i],
 
-                Format = desiredFormat,
+                Format = format,
                 ViewType = ImageViewType.Type2D,
                 Components = new ComponentMapping(ComponentSwizzle.Identity, ComponentSwizzle.Identity, ComponentSwizzle.Identity, ComponentSwizzle.Identity),
 
