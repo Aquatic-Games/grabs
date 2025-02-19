@@ -21,7 +21,6 @@ internal static class CompilerUtils
 
         try
         {
-
             ParsedIr* ir;
             fixed (byte* pSpirv = spirv)
             {

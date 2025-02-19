@@ -52,7 +52,7 @@ internal sealed class D3D11Device : Device
     
     public override Pipeline CreatePipeline(in PipelineInfo info)
     {
-        throw new NotImplementedException();
+        return new D3D11Pipeline(Device, in info);
     }
     
     public override void ExecuteCommandList(CommandList list)
