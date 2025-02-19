@@ -8,26 +8,18 @@ public ref struct PipelineInfo
 
     public ReadOnlySpan<Format> ColorAttachmentFormats;
 
+    public ReadOnlySpan<VertexBufferInfo> VertexBuffers;
+    
     public ReadOnlySpan<InputLayoutInfo> InputLayout;
 
-    // TODO: This is temporary
-    public uint Stride;
-
     public PipelineInfo(ShaderModule vertexShader, ShaderModule pixelShader,
-        in ReadOnlySpan<Format> colorAttachmentFormats, in ReadOnlySpan<InputLayoutInfo> inputLayout)
+        ReadOnlySpan<Format> colorAttachmentFormats, ReadOnlySpan<VertexBufferInfo> vertexBuffers,
+        ReadOnlySpan<InputLayoutInfo> inputLayout)
     {
         VertexShader = vertexShader;
         PixelShader = pixelShader;
         ColorAttachmentFormats = colorAttachmentFormats;
-        InputLayout = inputLayout;
-    }
-
-    public PipelineInfo(ShaderModule vertexShader, ShaderModule pixelShader, in Format colorAttachmentFormat,
-        in ReadOnlySpan<InputLayoutInfo> inputLayout)
-    {
-        VertexShader = vertexShader;
-        PixelShader = pixelShader;
-        ColorAttachmentFormats = new ReadOnlySpan<Format>(in colorAttachmentFormat);
+        VertexBuffers = vertexBuffers;
         InputLayout = inputLayout;
     }
 }

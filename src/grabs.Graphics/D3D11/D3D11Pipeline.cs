@@ -10,7 +10,7 @@ internal sealed class D3D11Pipeline : Pipeline
 
     public readonly ID3D11InputLayout? Layout;
 
-    public readonly uint Stride;
+    public readonly Dictionary<uint, VertexBufferInfo>? VertexBuffers;
     
     public D3D11Pipeline(ID3D11Device device, ref readonly PipelineInfo info)
     {
@@ -19,6 +19,14 @@ internal sealed class D3D11Pipeline : Pipeline
 
         VertexShader = device.CreateVertexShader(vertexModule.Blob);
         PixelShader = device.CreatePixelShader(pixelModule.Blob);
+
+        if (info.VertexBuffers.Length > 0)
+        {
+            VertexBuffers = new Dictionary<uint, VertexBufferInfo>(info.VertexBuffers.Length);
+
+            foreach (VertexBufferInfo bufferInfo in info.VertexBuffers)
+                VertexBuffers.Add(bufferInfo.Binding, bufferInfo);
+        }
 
         if (info.InputLayout.Length > 0)
         {
@@ -41,8 +49,6 @@ internal sealed class D3D11Pipeline : Pipeline
 
             Layout = device.CreateInputLayout(elementDescs, vertexModule.Blob);
         }
-
-        Stride = info.Stride;
     }
     
     public override void Dispose()

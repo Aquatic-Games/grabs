@@ -40,15 +40,24 @@ internal sealed unsafe class VulkanPipeline : Pipeline
                 PName = pPixelEntryPoint
             }
         };
+        
+        VertexInputBindingDescription* vertexBindingDescs =
+            stackalloc VertexInputBindingDescription[info.VertexBuffers.Length];
+
+        for (int i = 0; i < info.VertexBuffers.Length; i++)
+        {
+            ref readonly VertexBufferInfo buffer = ref info.VertexBuffers[i];
+
+            vertexBindingDescs[i] = new VertexInputBindingDescription()
+            {
+                Binding = buffer.Binding,
+                Stride = buffer.Stride,
+                InputRate = VertexInputRate.Vertex,
+            };
+        }
 
         VertexInputAttributeDescription* vertexAttribDescs =
             stackalloc VertexInputAttributeDescription[info.InputLayout.Length];
-
-        VertexInputBindingDescription vertexBindingDesc = new VertexInputBindingDescription()
-        {
-            Binding = 0,
-            Stride = info.Stride
-        };
 
         for (int i = 0; i < info.InputLayout.Length; i++)
         {
@@ -66,11 +75,12 @@ internal sealed unsafe class VulkanPipeline : Pipeline
         PipelineVertexInputStateCreateInfo vertexInput = new PipelineVertexInputStateCreateInfo()
         {
             SType = StructureType.PipelineVertexInputStateCreateInfo,
-            VertexAttributeDescriptionCount = (uint) info.InputLayout.Length,
-            PVertexAttributeDescriptions = vertexAttribDescs,
             
-            VertexBindingDescriptionCount = 1,
-            PVertexBindingDescriptions = &vertexBindingDesc
+            VertexBindingDescriptionCount = (uint) info.VertexBuffers.Length,
+            PVertexBindingDescriptions = vertexBindingDescs,
+            
+            VertexAttributeDescriptionCount = (uint) info.InputLayout.Length,
+            PVertexAttributeDescriptions = vertexAttribDescs
         };
 
         PipelineInputAssemblyStateCreateInfo inputAssemblyState = new PipelineInputAssemblyStateCreateInfo()

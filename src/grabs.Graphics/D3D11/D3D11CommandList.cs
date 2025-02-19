@@ -9,7 +9,7 @@ namespace grabs.Graphics.D3D11;
 
 internal sealed class D3D11CommandList : CommandList
 {
-    private uint _stride;
+    private Dictionary<uint, VertexBufferInfo>? _vertexBuffers;
     
     public const int MaxColorAttachments = 8;
     
@@ -90,14 +90,16 @@ internal sealed class D3D11CommandList : CommandList
         Context.IASetInputLayout(d3dPipeline.Layout);
         Context.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
 
-        _stride = d3dPipeline.Stride;
+        _vertexBuffers = d3dPipeline.VertexBuffers;
     }
     
     public override void SetVertexBuffer(uint slot, Buffer vertexBuffer, uint offset = 0)
     {
         D3D11Buffer d3dBuffer = (D3D11Buffer) vertexBuffer;
         
-        Context.IASetVertexBuffer(slot, d3dBuffer.Buffer, _stride, offset);
+        Debug.Assert(_vertexBuffers != null);
+        
+        Context.IASetVertexBuffer(slot, d3dBuffer.Buffer, _vertexBuffers[slot].Stride, offset);
     }
     
     public override void SetIndexBuffer(Buffer indexBuffer, Format format, uint offset = 0)

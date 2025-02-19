@@ -103,11 +103,18 @@ unsafe
     ShaderModule pixelModule =
         device.CreateShaderModule(ShaderStage.Pixel, Compiler.CompileHlsl(ShaderStage.Pixel, hlsl, "PSMain"), "PSMain");
 
-    PipelineInfo pipelineInfo = new PipelineInfo(vertexModule, pixelModule, swapchain.SwapchainFormat,
-        [new InputLayoutInfo(Format.R32G32B32_Float, 0, 0), new InputLayoutInfo(Format.R32G32B32_Float, 12, 0)]);
-
-    // TODO: Have this in SetVertexBuffer.
-    pipelineInfo.Stride = 6 * sizeof(float);
+    PipelineInfo pipelineInfo = new PipelineInfo()
+    {
+        VertexShader = vertexModule,
+        PixelShader = pixelModule,
+        ColorAttachmentFormats = [swapchain.SwapchainFormat],
+        VertexBuffers = [new VertexBufferInfo(0, 6 * sizeof(float))],
+        InputLayout =
+        [
+            new InputLayoutInfo(Format.R32G32B32_Float, 0, 0),
+            new InputLayoutInfo(Format.R32G32B32_Float, 12, 0)
+        ]
+    };
     
     Pipeline pipeline = device.CreatePipeline(in pipelineInfo);
     
