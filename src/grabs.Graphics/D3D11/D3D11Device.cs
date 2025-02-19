@@ -42,7 +42,7 @@ internal sealed class D3D11Device : Device
     
     public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint)
     {
-        throw new NotImplementedException();
+        return new D3D11ShaderModule(stage, spirv, entryPoint);
     }
     
     public override unsafe Buffer CreateBuffer(in BufferInfo info, void* pData)
