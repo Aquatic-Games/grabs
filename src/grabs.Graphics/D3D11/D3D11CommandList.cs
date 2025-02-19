@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using grabs.Core;
+using Vortice.Direct3D;
 using Vortice.Direct3D11;
 using Vortice.Mathematics;
 
@@ -8,6 +9,8 @@ namespace grabs.Graphics.D3D11;
 
 internal sealed class D3D11CommandList : CommandList
 {
+    private uint _stride;
+    
     public const int MaxColorAttachments = 8;
     
     private readonly ID3D11RenderTargetView[] _targetCache;
@@ -65,32 +68,53 @@ internal sealed class D3D11CommandList : CommandList
     
     public override void SetViewport(in Viewport viewport)
     {
-        throw new NotImplementedException();
+        Vortice.Mathematics.Viewport d3dViewport = new Vortice.Mathematics.Viewport()
+        {
+            X = viewport.X,
+            Y = viewport.Y,
+            Width = viewport.Width,
+            Height = viewport.Height,
+            MinDepth = viewport.MinDepth,
+            MaxDepth = viewport.MaxDepth
+        };
+        
+        Context.RSSetViewport(d3dViewport);
     }
     
     public override void SetPipeline(Pipeline pipeline)
     {
-        throw new NotImplementedException();
+        D3D11Pipeline d3dPipeline = (D3D11Pipeline) pipeline;
+        
+        Context.VSSetShader(d3dPipeline.VertexShader);
+        Context.PSSetShader(d3dPipeline.PixelShader);
+        Context.IASetInputLayout(d3dPipeline.Layout);
+        Context.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
+
+        _stride = d3dPipeline.Stride;
     }
     
-    public override void SetVertexBuffer(uint slot, Buffer vertexBuffer, ulong offset = 0)
+    public override void SetVertexBuffer(uint slot, Buffer vertexBuffer, uint offset = 0)
     {
-        throw new NotImplementedException();
+        D3D11Buffer d3dBuffer = (D3D11Buffer) vertexBuffer;
+        
+        Context.IASetVertexBuffer(slot, d3dBuffer.Buffer, _stride, offset);
     }
     
-    public override void SetIndexBuffer(Buffer indexBuffer, Format format, ulong offset = 0)
+    public override void SetIndexBuffer(Buffer indexBuffer, Format format, uint offset = 0)
     {
-        throw new NotImplementedException();
+        D3D11Buffer d3dBuffer = (D3D11Buffer) indexBuffer;
+        
+        Context.IASetIndexBuffer(d3dBuffer.Buffer, format.ToD3D(), offset);
     }
     
     public override void Draw(uint numVertices)
     {
-        throw new NotImplementedException();
+        Context.Draw(numVertices, 0);
     }
     
     public override void DrawIndexed(uint numIndices)
     {
-        throw new NotImplementedException();
+        Context.DrawIndexed(numIndices, 0, 0);
     }
     
     public override void Dispose()
