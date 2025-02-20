@@ -15,14 +15,14 @@ public abstract class Device : IDisposable
     public unsafe Buffer CreateBuffer(in BufferInfo info)
         => CreateBuffer(in info, null);
 
-    public unsafe Buffer CreateBuffer<T>(BufferType type, in ReadOnlySpan<T> data) where T : unmanaged
+    public unsafe Buffer CreateBuffer<T>(BufferType type, in ReadOnlySpan<T> data, bool dynamic = false) where T : unmanaged
     {
         fixed (void* pData = data)
-            return CreateBuffer(new BufferInfo(type, (uint) (data.Length * sizeof(T))), pData);
+            return CreateBuffer(new BufferInfo(type, (uint) (data.Length * sizeof(T)), dynamic), pData);
     }
 
-    public Buffer CreateBuffer<T>(BufferType type, T[] data) where T : unmanaged
-        => CreateBuffer<T>(type, data.AsSpan());
+    public Buffer CreateBuffer<T>(BufferType type, T[] data, bool dynamic = false) where T : unmanaged
+        => CreateBuffer<T>(type, data.AsSpan(), dynamic);
     
     public abstract Pipeline CreatePipeline(in PipelineInfo info);
 

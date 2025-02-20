@@ -8,9 +8,12 @@ public record struct BufferInfo
 
     public uint Size;
 
-    public BufferInfo(BufferType type, uint size)
+    public bool Dynamic;
+
+    public BufferInfo(BufferType type, uint size, bool dynamic = false)
     {
         Type = type;
         Size = size;
+        Dynamic = dynamic;
     }
 }

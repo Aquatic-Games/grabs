@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace grabs.Graphics;
 
 public static class GrabsUtils
@@ -16,5 +18,13 @@ public static class GrabsUtils
             default:
                 return false;
         }
+    }
+
+    public static unsafe void CopyData<T>(nint dataPtr, in ReadOnlySpan<T> data) where T : unmanaged
+    {
+        uint dataSize = (uint) (data.Length * sizeof(T));
+        
+        fixed (void* pData = data)
+            Unsafe.CopyBlock((void*) dataPtr, pData, dataSize);
     }
 }

@@ -38,9 +38,21 @@ internal sealed unsafe class VulkanBuffer : Buffer
             Usage = usage
         };
 
+        VmaMemoryUsage bufferUsage;
+        VmaAllocationCreateFlagBits bufferFlags = 0;
+
+        if (info.Dynamic)
+        {
+            bufferUsage = VMA_MEMORY_USAGE_AUTO;
+            bufferFlags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
+        }
+        else
+            bufferUsage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
+
         VmaAllocationCreateInfo allocInfo = new VmaAllocationCreateInfo()
         {
-            usage = VMA_MEMORY_USAGE_AUTO
+            usage = bufferUsage,
+            flags = (uint) bufferFlags
         };
 
         GrabsLog.Log("Creating buffer.");
@@ -50,39 +62,49 @@ internal sealed unsafe class VulkanBuffer : Buffer
         if (data == null)
             return;
 
-        BufferCreateInfo stagingInfo = new BufferCreateInfo()
+        if (info.Dynamic)
         {
-            SType = StructureType.BufferCreateInfo,
-            Size = info.Size,
-            Usage = BufferUsageFlags.TransferSrcBit,
-            SharingMode = SharingMode.Exclusive
-        };
-
-        VmaAllocationCreateInfo stagingAllocInfo = new VmaAllocationCreateInfo()
+            void* mappedData;
+            Vma.MapMemory(_allocator, _allocation, &mappedData).Check("Map memory");
+            Unsafe.CopyBlock(mappedData, data, info.Size);
+            Vma.UnmapMemory(_allocator, _allocation);
+        }
+        else
         {
-            usage = VMA_MEMORY_USAGE_AUTO,
-            flags = (uint) (VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT),
-        };
+            BufferCreateInfo stagingInfo = new BufferCreateInfo()
+            {
+                SType = StructureType.BufferCreateInfo,
+                Size = info.Size,
+                Usage = BufferUsageFlags.TransferSrcBit,
+                SharingMode = SharingMode.Exclusive
+            };
 
-        GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.Performance,
-            $"data was not null, creating staging buffer with size {info.Size}");
-        Vma.CreateBuffer(_allocator, &stagingInfo, &stagingAllocInfo, out VkBuffer staging,
-                out VmaAllocation_T* stagingAllocation, out VmaAllocationInfo stagingAllocationInfo)
-            .Check("Create staging buffer");
-        
-        Unsafe.CopyBlock(stagingAllocationInfo.pMappedData, data, info.Size);
-        
-        CommandBuffer cb = device.BeginCommands();
+            VmaAllocationCreateInfo stagingAllocInfo = new VmaAllocationCreateInfo()
+            {
+                usage = VMA_MEMORY_USAGE_AUTO,
+                flags = (uint) (VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT |
+                                VMA_ALLOCATION_CREATE_MAPPED_BIT),
+            };
 
-        BufferCopy copy = new BufferCopy()
-        {
-            Size = info.Size
-        };
-        _vk.CmdCopyBuffer(cb, staging, Buffer, 1, &copy);
-        
-        device.EndCommands();
-        
-        Vma.DestroyBuffer(_allocator, staging, stagingAllocation);
+            GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.Performance,
+                $"data was not null, creating staging buffer with size {info.Size}");
+            Vma.CreateBuffer(_allocator, &stagingInfo, &stagingAllocInfo, out VkBuffer staging, out VmaAllocation_T* stagingAllocation, out VmaAllocationInfo stagingAllocationInfo)
+                .Check("Create staging buffer");
+
+            Unsafe.CopyBlock(stagingAllocationInfo.pMappedData, data, info.Size);
+
+            CommandBuffer cb = device.BeginCommands();
+
+            BufferCopy copy = new BufferCopy()
+            {
+                Size = info.Size
+            };
+            _vk.CmdCopyBuffer(cb, staging, Buffer, 1, &copy);
+
+            device.EndCommands();
+
+            Vma.DestroyBuffer(_allocator, staging, stagingAllocation);
+        }
     }
     
     internal override MappedData Map(MapType type)

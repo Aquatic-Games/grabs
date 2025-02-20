@@ -92,7 +92,7 @@ unsafe
         1, 2, 3
     };
 
-    Buffer vertexBuffer = device.CreateBuffer(BufferType.Vertex, vertices);
+    Buffer vertexBuffer = device.CreateBuffer(BufferType.Vertex, vertices, true);
     Buffer indexBuffer = device.CreateBuffer(BufferType.Index, indices);
 
     string hlsl = File.ReadAllText("Shader.hlsl");
@@ -144,6 +144,12 @@ unsafe
                 }
             }
         }
+
+        h += 0.05f;
+        vertices[0] = float.Sin(h);
+        MappedData data = device.MapResource(vertexBuffer, MapType.Write);
+        GrabsUtils.CopyData<float>(data.DataPointer, vertices);
+        device.UnmapResource(vertexBuffer);
         
         Texture texture = swapchain.GetNextTexture();
         
