@@ -16,6 +16,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Windowing", "src\grab
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Windowing.Tests", "tests\grabs.Windowing.Tests\grabs.Windowing.Tests.csproj", "{3133AD6C-166B-4717-8575-CA3B592625D8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{30433EFC-E84C-4B10-9C75-79855AB79110}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tutorials", "tutorials", "{F6C54B9A-AF40-4AEE-AD5B-17C9B43A7CC1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tutorial.1.1.BasicWindow", "examples\tutorials\Tutorial.1.1.BasicWindow\Tutorial.1.1.BasicWindow.csproj", "{8C4AFCEF-B4B4-4715-AB5E-840C824DC62B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,9 +56,15 @@ Global
 		{3133AD6C-166B-4717-8575-CA3B592625D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3133AD6C-166B-4717-8575-CA3B592625D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3133AD6C-166B-4717-8575-CA3B592625D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C4AFCEF-B4B4-4715-AB5E-840C824DC62B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C4AFCEF-B4B4-4715-AB5E-840C824DC62B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C4AFCEF-B4B4-4715-AB5E-840C824DC62B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C4AFCEF-B4B4-4715-AB5E-840C824DC62B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{2D30C3DD-9470-4285-BFD0-C475CA591C7B} = {34B024AA-E2BC-40C5-BA96-BDD06D79BE47}
 		{3133AD6C-166B-4717-8575-CA3B592625D8} = {34B024AA-E2BC-40C5-BA96-BDD06D79BE47}
+		{F6C54B9A-AF40-4AEE-AD5B-17C9B43A7CC1} = {30433EFC-E84C-4B10-9C75-79855AB79110}
+		{8C4AFCEF-B4B4-4715-AB5E-840C824DC62B} = {F6C54B9A-AF40-4AEE-AD5B-17C9B43A7CC1}
 	EndGlobalSection
 EndGlobal
