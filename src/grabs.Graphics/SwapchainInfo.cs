@@ -4,6 +4,8 @@ namespace grabs.Graphics;
 
 public record struct SwapchainInfo
 {
+    public Surface Surface;
+    
     public Size2D Size;
 
     public Format Format;
@@ -12,8 +14,9 @@ public record struct SwapchainInfo
 
     public uint NumBuffers;
 
-    public SwapchainInfo(Size2D size, Format format, PresentMode presentMode, uint numBuffers)
+    public SwapchainInfo(Surface surface, Size2D size, Format format, PresentMode presentMode, uint numBuffers)
     {
+        Surface = surface;
         Size = size;
         Format = format;
         PresentMode = presentMode;

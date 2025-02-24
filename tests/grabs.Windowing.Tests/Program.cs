@@ -16,8 +16,8 @@ using Device device = instance.CreateDevice(surface);
 
 Format format = surface.GetOptimalSwapchainFormat(device.Adapter);
 
-using Swapchain swapchain = device.CreateSwapchain(surface,
-    new SwapchainInfo(windowInfo.Size, format, PresentMode.Fifo, 2));
+using Swapchain swapchain =
+    device.CreateSwapchain(new SwapchainInfo(surface, windowInfo.Size, format, PresentMode.Fifo, 2));
 
 using CommandList cl = device.CreateCommandList();
 

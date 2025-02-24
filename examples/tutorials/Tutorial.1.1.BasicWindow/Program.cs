@@ -31,6 +31,7 @@ using Device device = instance.CreateDevice(surface);
 // A swapchain contains a series of textures (images) that are presented to the surface.
 SwapchainInfo swapchainInfo = new()
 {
+    Surface = surface,
     Size = window.Size,
     // While you can pass in any format you'd like (as long as it's supported by the surface), GRABS has a utility
     // method that will pick the optimal format for you.
@@ -39,7 +40,7 @@ SwapchainInfo swapchainInfo = new()
     // to having V-Sync enabled.
     PresentMode = PresentMode.Fifo
 };
-using Swapchain swapchain = device.CreateSwapchain(surface, in swapchainInfo);
+using Swapchain swapchain = device.CreateSwapchain(in swapchainInfo);
 
 // A command list contains a series of render commands that can be sent to the device.
 using CommandList commandList = device.CreateCommandList();

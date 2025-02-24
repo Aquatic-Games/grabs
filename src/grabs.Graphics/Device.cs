@@ -2,11 +2,22 @@ using System.Runtime.CompilerServices;
 
 namespace grabs.Graphics;
 
+/// <summary>
+/// Represents a logical device that rendering commands can be issued to.
+/// </summary>
 public abstract class Device : IDisposable
 {
+    /// <summary>
+    /// The <see cref="grabs.Graphics.Adapter"/> that was used to create this device.
+    /// </summary>
     public abstract Adapter Adapter { get; }
     
-    public abstract Swapchain CreateSwapchain(Surface surface, in SwapchainInfo info);
+    /// <summary>
+    /// Create a swapchain for this device.
+    /// </summary>
+    /// <param name="info">Describe how the swapchain should be created.</param>
+    /// <returns>The created <see cref="Swapchain"/>.</returns>
+    public abstract Swapchain CreateSwapchain(in SwapchainInfo info);
 
     public abstract CommandList CreateCommandList();
 

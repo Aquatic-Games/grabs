@@ -75,7 +75,7 @@ unsafe
     Console.WriteLine(swapchainFormat);
 
     Swapchain swapchain =
-        device.CreateSwapchain(surface, new SwapchainInfo(new Size2D(1280, 720), swapchainFormat, PresentMode.Fifo, 2));
+        device.CreateSwapchain(new SwapchainInfo(surface, new Size2D(1280, 720), swapchainFormat, PresentMode.Fifo, 2));
 
     CommandList cl = device.CreateCommandList();
 
