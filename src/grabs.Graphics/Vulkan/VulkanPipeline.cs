@@ -61,14 +61,14 @@ internal sealed unsafe class VulkanPipeline : Pipeline
 
         for (int i = 0; i < info.InputLayout.Length; i++)
         {
-            ref readonly InputLayoutInfo layout = ref info.InputLayout[i];
+            ref readonly InputElement element = ref info.InputLayout[i];
 
             vertexAttribDescs[i] = new VertexInputAttributeDescription()
             {
-                Binding = layout.Slot,
+                Binding = element.Slot,
                 Location = (uint) i,
-                Format = layout.Format.ToVk(),
-                Offset = layout.Offset
+                Format = element.Format.ToVk(),
+                Offset = element.Offset
             };
         }
 

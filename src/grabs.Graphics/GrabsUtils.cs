@@ -2,8 +2,16 @@ using System.Runtime.CompilerServices;
 
 namespace grabs.Graphics;
 
+/// <summary>
+/// Contains various utility functions useful during development.
+/// </summary>
 public static class GrabsUtils
 {
+    /// <summary>
+    /// Check if the given format is an SRGB format.
+    /// </summary>
+    /// <param name="format">The format to check.</param>
+    /// <returns>True, if the given format is SRGB.</returns>
     public static bool IsSrgb(this Format format)
     {
         switch (format)
@@ -20,6 +28,12 @@ public static class GrabsUtils
         }
     }
 
+    /// <summary>
+    /// Copy managed data into an unmanaged region of memory.
+    /// </summary>
+    /// <param name="dataPtr">The pointer to the unmanaged data.</param>
+    /// <param name="data">The managed data to copy.</param>
+    /// <typeparam name="T">Any unmanaged type.</typeparam>
     public static unsafe void CopyData<T>(nint dataPtr, in ReadOnlySpan<T> data) where T : unmanaged
     {
         uint dataSize = (uint) (data.Length * sizeof(T));

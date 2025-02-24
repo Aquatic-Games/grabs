@@ -30,9 +30,9 @@ internal sealed class D3D11Device : Device
             [FeatureLevel.Level_11_1], out Device, out Context).CheckError();
     }
 
-    public override Swapchain CreateSwapchain(Surface surface, in SwapchainInfo info)
+    public override Swapchain CreateSwapchain(in SwapchainInfo info)
     {
-        return new D3D11Swapchain(_factory, Device, (D3D11Surface) surface, in info);
+        return new D3D11Swapchain(_factory, Device, in info);
     }
     
     public override CommandList CreateCommandList()

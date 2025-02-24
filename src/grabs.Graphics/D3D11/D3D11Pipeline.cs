@@ -34,15 +34,15 @@ internal sealed class D3D11Pipeline : Pipeline
 
             for (int i = 0; i < info.InputLayout.Length; i++)
             {
-                ref readonly InputLayoutInfo layout = ref info.InputLayout[i];
+                ref readonly InputElement element = ref info.InputLayout[i];
 
                 elementDescs[i] = new InputElementDescription()
                 {
                     SemanticName = "TEXCOORD",
                     SemanticIndex = (uint) i,
-                    Format = layout.Format.ToD3D(),
-                    Slot = layout.Slot,
-                    AlignedByteOffset = layout.Offset,
+                    Format = element.Format.ToD3D(),
+                    Slot = element.Slot,
+                    AlignedByteOffset = element.Offset,
                     Classification = InputClassification.PerVertexData
                 };
             }

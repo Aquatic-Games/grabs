@@ -1,5 +1,9 @@
 namespace grabs.Graphics;
 
+/// <summary>
+/// Defines various formats supported by the GPU. Used to define texture pixel formats, as well as shader attribute
+/// formats.
+/// </summary>
 public enum Format
 {
     Unknown,

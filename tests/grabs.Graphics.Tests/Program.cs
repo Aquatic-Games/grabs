@@ -113,8 +113,8 @@ unsafe
         VertexBuffers = [new VertexBufferInfo(0, 6 * sizeof(float))],
         InputLayout =
         [
-            new InputLayoutInfo(Format.R32G32B32_Float, 0, 0),
-            new InputLayoutInfo(Format.R32G32B32_Float, 12, 0)
+            new InputElement(Format.R32G32B32_Float, 0, 0),
+            new InputElement(Format.R32G32B32_Float, 12, 0)
         ]
     };
     

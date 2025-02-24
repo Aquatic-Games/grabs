@@ -22,7 +22,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
     
     public override Format SwapchainFormat { get; }
 
-    public VulkanSwapchain(Vk vk, VulkanDevice device, VulkanSurface surface, ref readonly SwapchainInfo info)
+    public VulkanSwapchain(Vk vk, VulkanDevice device, ref readonly SwapchainInfo info)
     {
         _vk = vk;
         _device = device;
@@ -30,6 +30,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
 
         PhysicalDevice physicalDevice = _device.PhysicalDevice;
         KhrSurface khrSurface = _device.KhrSurface;
+        VulkanSurface surface = (VulkanSurface) info.Surface;
         
         SurfaceCapabilitiesKHR surfaceCapabilities;
         khrSurface.GetPhysicalDeviceSurfaceCapabilities(physicalDevice, surface.Surface, &surfaceCapabilities);

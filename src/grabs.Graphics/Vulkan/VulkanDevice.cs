@@ -172,9 +172,9 @@ internal sealed unsafe class VulkanDevice : Device
         Vma.CreateAllocator(&allocatorInfo, out Allocator).Check("Create allocator");
     }
 
-    public override Swapchain CreateSwapchain(Surface surface, in SwapchainInfo info)
+    public override Swapchain CreateSwapchain(in SwapchainInfo info)
     {
-        return new VulkanSwapchain(_vk, this, (VulkanSurface) surface, in info);
+        return new VulkanSwapchain(_vk, this, in info);
     }
 
     public override CommandList CreateCommandList()

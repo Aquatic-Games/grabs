@@ -11,9 +11,11 @@ internal sealed class D3D11Swapchain : Swapchain
     
     public override Format SwapchainFormat { get; }
     
-    public D3D11Swapchain(IDXGIFactory factory, ID3D11Device device, D3D11Surface surface, ref readonly SwapchainInfo info)
+    public D3D11Swapchain(IDXGIFactory factory, ID3D11Device device, ref readonly SwapchainInfo info)
     {
         SwapchainFormat = info.Format;
+
+        D3D11Surface surface = (D3D11Surface) info.Surface;
         
         SwapChainDescription swapchainDesc = new SwapChainDescription()
         {
