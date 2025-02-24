@@ -1,5 +1,8 @@
 namespace grabs.Graphics;
 
+/// <summary>
+/// A command list contains a list of instructions used for rendering, which can then be executed by the GPU. 
+/// </summary>
 public abstract class CommandList : IDisposable
 {
     public abstract void Begin();
