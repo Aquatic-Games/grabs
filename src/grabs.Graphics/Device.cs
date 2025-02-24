@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace grabs.Graphics;
 
 public abstract class Device : IDisposable
@@ -23,6 +25,9 @@ public abstract class Device : IDisposable
 
     public Buffer CreateBuffer<T>(BufferType type, T[] data, bool dynamic = false) where T : unmanaged
         => CreateBuffer<T>(type, data.AsSpan(), dynamic);
+
+    public unsafe Buffer CreateBuffer<T>(BufferType type, T data, bool dynamic = false) where T : unmanaged
+        => CreateBuffer(new BufferInfo(type, (uint) sizeof(T), dynamic), Unsafe.AsPointer(ref data));
     
     public abstract Pipeline CreatePipeline(in PipelineInfo info);
 

@@ -26,6 +26,7 @@ internal sealed unsafe class VulkanBuffer : Buffer
         {
             BufferType.Vertex => BufferUsageFlags.VertexBufferBit,
             BufferType.Index => BufferUsageFlags.IndexBufferBit,
+            BufferType.Constant => BufferUsageFlags.UniformBufferBit,
             _ => throw new ArgumentOutOfRangeException()
         };
 

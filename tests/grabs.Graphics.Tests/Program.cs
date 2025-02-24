@@ -1,4 +1,5 @@
-﻿using grabs.Core;
+﻿using System.Numerics;
+using grabs.Core;
 using grabs.Graphics;
 using grabs.Graphics.Exceptions;
 using grabs.ShaderCompiler;
@@ -94,6 +95,7 @@ unsafe
 
     Buffer vertexBuffer = device.CreateBuffer(BufferType.Vertex, vertices, true);
     Buffer indexBuffer = device.CreateBuffer(BufferType.Index, indices);
+    Buffer constantBuffer = device.CreateBuffer(BufferType.Constant, Matrix4x4.CreateTranslation(0.5f, 0, 0));
 
     string hlsl = File.ReadAllText("Shader.hlsl");
 
@@ -144,12 +146,6 @@ unsafe
                 }
             }
         }
-
-        h += 0.05f;
-        vertices[0] = float.Sin(h);
-        MappedData data = device.MapResource(vertexBuffer, MapType.Write);
-        GrabsUtils.CopyData<float>(data.DataPointer, vertices);
-        device.UnmapResource(vertexBuffer);
         
         Texture texture = swapchain.GetNextTexture();
         
@@ -176,6 +172,7 @@ unsafe
     device.WaitForIdle();
     
     pipeline.Dispose();
+    constantBuffer.Dispose();
     indexBuffer.Dispose();
     vertexBuffer.Dispose();
     cl.Dispose();
