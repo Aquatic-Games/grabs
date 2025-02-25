@@ -4,7 +4,7 @@ using Silk.NET.SPIRV.Cross;
 
 namespace grabs.Graphics.Internal;
 
-internal static class CompilerUtils
+public static class CompilerUtils
 {
     private static readonly Cross _spirv;
 

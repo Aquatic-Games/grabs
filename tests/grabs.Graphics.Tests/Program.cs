@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using grabs.Core;
 using grabs.Graphics;
+using grabs.Graphics.D3D11;
 using grabs.Graphics.Exceptions;
 using grabs.Graphics.Vulkan;
 using grabs.ShaderCompiler;
@@ -25,6 +26,7 @@ unsafe
     if (window == null)
         throw new Exception($"Failed to create window: {sdl.GetErrorS()}");
     
+    Instance.RegisterBackend<D3D11Backend>();
     Instance.RegisterBackend<VulkanBackend>();
     
     InstanceInfo info = new InstanceInfo("grabs.Graphics.Tests", debug: true);

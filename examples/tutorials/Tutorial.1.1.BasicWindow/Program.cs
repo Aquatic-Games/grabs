@@ -1,5 +1,7 @@
 ﻿using grabs.Core;
 using grabs.Graphics;
+using grabs.Graphics.D3D11;
+using grabs.Graphics.Vulkan;
 using grabs.Windowing;
 using grabs.Windowing.Events;
 
@@ -17,6 +19,10 @@ WindowInfo windowInfo = new WindowInfo()
 using Window window = new Window(in windowInfo);
 
 // An instance is the base on which we can enumerate adapters, create devices, etc.
+// Before we can create an instance, we must first register the backends we want to support.
+Instance.RegisterBackend<D3D11Backend>();
+Instance.RegisterBackend<VulkanBackend>();
+
 // There are various parameters we can pass into the InstanceInfo struct. Here, we only pass in the app name.
 // You can also enable debugging and choose a preferred Backend, if any.
 InstanceInfo instanceInfo = new InstanceInfo("Tutorial.1.1.BasicWindow");

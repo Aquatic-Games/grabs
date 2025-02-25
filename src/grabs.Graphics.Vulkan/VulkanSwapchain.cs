@@ -38,7 +38,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         uint desiredNumImages = info.NumBuffers;
         if (desiredNumImages < surfaceCapabilities.MinImageCount)
         {
-            GrabsLog.Log(GrabsLog.Severity.Warning, GrabsLog.Source.General,
+            GrabsLog.Log(GrabsLog.Severity.Warning, GrabsLog.Type.General,
                 $"Desired buffer count ({desiredNumImages}) is under the minimum allowed buffer count ({surfaceCapabilities.MinImageCount}). Clamping to the minimum.");
 
             desiredNumImages = surfaceCapabilities.MinImageCount;
@@ -46,13 +46,13 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         // If max image count is 0, there is no limit.
         else if (desiredNumImages > surfaceCapabilities.MaxImageCount && surfaceCapabilities.MaxImageCount != 0)
         {
-            GrabsLog.Log(GrabsLog.Severity.Warning, GrabsLog.Source.General,
+            GrabsLog.Log(GrabsLog.Severity.Warning, GrabsLog.Type.General,
                 $"Desired buffer count ({desiredNumImages}) is above the maximum allowed buffer count ({surfaceCapabilities.MaxImageCount}). Clamping to the maximum.");
 
             desiredNumImages = surfaceCapabilities.MaxImageCount;
         }
         
-        GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.General,
+        GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Type.General,
             "Checking supported present modes over selected present mode.");
         
         uint numPresentModes;
@@ -74,7 +74,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
                 goto PRESENT_MODE_FOUND;
         }
 
-        GrabsLog.Log(GrabsLog.Severity.Warning, GrabsLog.Source.Performance,
+        GrabsLog.Log(GrabsLog.Severity.Warning, GrabsLog.Type.Performance,
             $"Desired present mode {desiredPresentMode} is not supported by the GPU - present mode {presentModes[0]} will be used instead.");
 
         desiredPresentMode = presentModes[0];

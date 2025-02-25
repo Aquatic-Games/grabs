@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using grabs.Core;
-using grabs.Graphics.D3D11;
+using grabs.Graphics.Exceptions;
+using NotSupportedException = System.NotSupportedException;
 
 namespace grabs.Graphics;
 
@@ -30,9 +31,12 @@ public abstract class Instance : IDisposable
 
     public static Instance Create(in InstanceInfo info)
     {
+        if (_backends.Count == 0)
+            throw new NoBackendsException();
+        
         GrabsLog.Log($"Registered backends: {string.Join(", ", _backends.Keys)}");
 
-        foreach ((_, IBackendBase backend) in _backends)
+        foreach ((string name, IBackendBase backend) in _backends)
         {
             try
             {
@@ -40,10 +44,10 @@ public abstract class Instance : IDisposable
             }
             catch (Exception e)
             {
-                GrabsLog.Log(GrabsLog.Severity.Error, $"Failed to create instance: {e}");
+                GrabsLog.Log(GrabsLog.Severity.Error, GrabsLog.Type.Other, $"Failed to create {name} instance: {e}");
             }
         }
 
-        throw new NotImplementedException();
+        throw new NotSupportedException("None of the provided backends were supported by this system.");
     }
 }

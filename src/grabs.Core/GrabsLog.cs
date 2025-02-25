@@ -12,19 +12,19 @@ public static class GrabsLog
         LogMessage = delegate { };
     }
     
-    public static void Log(Severity severity, Source source, string message, [CallerFilePath] string file = "",
+    public static void Log(Severity severity, Type type, string message, [CallerFilePath] string file = "",
         [CallerLineNumber] int line = 0)
     {
-        LogMessage(severity, source, message, file, line);
+        LogMessage(severity, type, message, file, line);
     }
 
     public static void Log(string message, [CallerFilePath] string file = "", [CallerLineNumber] int line = 0)
-        => Log(Severity.Verbose, Source.General, message, file, line);
+        => Log(Severity.Verbose, Type.General, message, file, line);
 
     public static void Log(Severity severity, string message, [CallerFilePath] string file = "",
         [CallerLineNumber] int line = 0)
     {
-        Log(severity, Source.General, message, file, line);
+        Log(severity, Type.General, message, file, line);
     }
     
     public enum Severity
@@ -35,7 +35,7 @@ public static class GrabsLog
         Error
     }
 
-    public enum Source
+    public enum Type
     {
         General,
         Validation,
@@ -43,5 +43,5 @@ public static class GrabsLog
         Other
     }
 
-    public delegate void OnLogMessage(Severity severity, Source source, string message, string file, int line);
+    public delegate void OnLogMessage(Severity severity, Type type, string message, string file, int line);
 }

@@ -40,7 +40,7 @@ internal sealed class D3D11Pipeline : Pipeline
                 {
                     SemanticName = "TEXCOORD",
                     SemanticIndex = (uint) i,
-                    Format = element.Format.ToD3D(),
+                    Format = D3D11Utils.ToD3D(element.Format),
                     Slot = element.Slot,
                     AlignedByteOffset = element.Offset,
                     Classification = InputClassification.PerVertexData

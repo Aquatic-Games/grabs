@@ -5,16 +5,15 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
-
+    
     <ItemGroup>
-      <PackageReference Include="Silk.NET.SPIRV.Cross" Version="2.22.0" />
-      <PackageReference Include="Silk.NET.SPIRV.Cross.Native" Version="2.22.0" />
+        <PackageReference Include="Vortice.D3DCompiler" Version="3.6.2" />
+        <PackageReference Include="Vortice.Direct3D11" Version="3.6.2" />
     </ItemGroup>
-
+    
     <ItemGroup>
-      <ProjectReference Include="..\grabs.Core\grabs.Core.csproj" />
+      <ProjectReference Include="..\grabs.Graphics\grabs.Graphics.csproj" />
     </ItemGroup>
 
 </Project>

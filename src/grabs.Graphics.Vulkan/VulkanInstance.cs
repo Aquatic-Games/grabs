@@ -108,14 +108,14 @@ internal sealed unsafe class VulkanInstance : Instance
                     $"Debugging is enabled, but {ExtDebugUtils.ExtensionName} extension and/or {validationLayerName} layer are not present. Please ensure you have a valid Vulkan SDK of AT LEAST version 1.3. The latest Vulkan SDK can be downloaded here: https://vulkan.lunarg.com/");
             }
 
-            GrabsLog.Log(GrabsLog.Severity.Warning, GrabsLog.Source.Performance,
+            GrabsLog.Log(GrabsLog.Severity.Warning, GrabsLog.Type.Performance,
                 "Debugging is enabled. This will affect performance.");
             
             instanceExtensions.Add(ExtDebugUtils.ExtensionName);
             layersList.Add(validationLayerName);
         }
 
-        GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Source.General,
+        GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Type.General,
             $"Instance exts: [{string.Join(", ", instanceExtensions)}]");
 
         GrabsLog.Log($"Layers: [{string.Join(", ", layersList)}]");
@@ -188,17 +188,17 @@ internal sealed unsafe class VulkanInstance : Instance
             _ => throw new ArgumentOutOfRangeException(nameof(messageSeverity), messageSeverity, null)
         };
 
-        GrabsLog.Source source = messageTypes switch
+        GrabsLog.Type type = messageTypes switch
         {
-            DebugUtilsMessageTypeFlagsEXT.None => GrabsLog.Source.General,
-            DebugUtilsMessageTypeFlagsEXT.GeneralBitExt => GrabsLog.Source.General,
-            DebugUtilsMessageTypeFlagsEXT.ValidationBitExt => GrabsLog.Source.Validation,
-            DebugUtilsMessageTypeFlagsEXT.PerformanceBitExt => GrabsLog.Source.Performance,
-            DebugUtilsMessageTypeFlagsEXT.DeviceAddressBindingBitExt => GrabsLog.Source.Other,
+            DebugUtilsMessageTypeFlagsEXT.None => GrabsLog.Type.General,
+            DebugUtilsMessageTypeFlagsEXT.GeneralBitExt => GrabsLog.Type.General,
+            DebugUtilsMessageTypeFlagsEXT.ValidationBitExt => GrabsLog.Type.Validation,
+            DebugUtilsMessageTypeFlagsEXT.PerformanceBitExt => GrabsLog.Type.Performance,
+            DebugUtilsMessageTypeFlagsEXT.DeviceAddressBindingBitExt => GrabsLog.Type.Other,
             _ => throw new ArgumentOutOfRangeException(nameof(messageTypes), messageTypes, null)
         };
         
-        GrabsLog.Log(severity, source, message);
+        GrabsLog.Log(severity, type, message);
 
         return Vk.True;
     }

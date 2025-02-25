@@ -23,7 +23,7 @@ internal sealed class D3D11Swapchain : Swapchain
             Windowed = true,
 
             BufferCount = info.NumBuffers,
-            BufferDescription = new ModeDescription(info.Size.Width, info.Size.Height, info.Format.ToD3D()),
+            BufferDescription = new ModeDescription(info.Size.Width, info.Size.Height, D3D11Utils.ToD3D(info.Format)),
             BufferUsage = Usage.RenderTargetOutput,
             
             SampleDescription = new SampleDescription(1, 0),

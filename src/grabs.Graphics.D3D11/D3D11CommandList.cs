@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using grabs.Core;
 using Vortice.Direct3D;
 using Vortice.Direct3D11;
@@ -106,7 +105,7 @@ internal sealed class D3D11CommandList : CommandList
     {
         D3D11Buffer d3dBuffer = (D3D11Buffer) indexBuffer;
         
-        Context.IASetIndexBuffer(d3dBuffer.Buffer, format.ToD3D(), offset);
+        Context.IASetIndexBuffer(d3dBuffer.Buffer, D3D11Utils.ToD3D(format), offset);
     }
     
     public override void Draw(uint numVertices)
