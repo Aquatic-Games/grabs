@@ -8,8 +8,8 @@ internal sealed class D3D11Instance : Instance
     private readonly bool _debug;
     
     public readonly IDXGIFactory1 Factory;
-    
-    public override Backend Backend => Backend.D3D11;
+
+    public override string Backend => "";
 
     public D3D11Instance(ref readonly InstanceInfo info)
     {

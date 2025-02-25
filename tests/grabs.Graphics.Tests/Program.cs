@@ -2,6 +2,7 @@
 using grabs.Core;
 using grabs.Graphics;
 using grabs.Graphics.Exceptions;
+using grabs.Graphics.Vulkan;
 using grabs.ShaderCompiler;
 using Silk.NET.SDL;
 using Buffer = grabs.Graphics.Buffer;
@@ -23,6 +24,8 @@ unsafe
 
     if (window == null)
         throw new Exception($"Failed to create window: {sdl.GetErrorS()}");
+    
+    Instance.RegisterBackend<VulkanBackend>();
     
     InstanceInfo info = new InstanceInfo("grabs.Graphics.Tests", debug: true);
     

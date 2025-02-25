@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\src\grabs.Graphics.Vulkan\grabs.Graphics.Vulkan.csproj" />
       <ProjectReference Include="..\..\src\grabs.ShaderCompiler\grabs.ShaderCompiler.csproj" />
       <ProjectReference Include="..\..\src\grabs.Graphics\grabs.Graphics.csproj" />
     </ItemGroup>

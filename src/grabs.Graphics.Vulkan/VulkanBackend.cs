@@ -6,6 +6,6 @@ public class VulkanBackend : IBackend
     
     public Instance CreateInstance(ref readonly InstanceInfo info)
     {
-        throw new NotImplementedException();
+        return new VulkanInstance(in info);
     }
 }

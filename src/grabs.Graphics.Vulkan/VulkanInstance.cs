@@ -18,7 +18,7 @@ internal sealed unsafe class VulkanInstance : Instance
     
     public readonly VkInstance Instance;
 
-    public override Backend Backend => Backend.Vulkan;
+    public override string Backend => VulkanBackend.Name;
 
     public VulkanInstance(ref readonly InstanceInfo info)
     {

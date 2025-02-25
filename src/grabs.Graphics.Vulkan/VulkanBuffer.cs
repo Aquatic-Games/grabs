@@ -108,7 +108,7 @@ internal sealed unsafe class VulkanBuffer : Buffer
         }
     }
     
-    internal override MappedData Map(MapType type)
+    protected override MappedData Map(MapType type)
     {
         void* pData;
         Vma.MapMemory(_allocator, _allocation, &pData);
@@ -116,7 +116,7 @@ internal sealed unsafe class VulkanBuffer : Buffer
         return new MappedData((nint) pData);
     }
     
-    internal override void Unmap()
+    protected override void Unmap()
     {
         Vma.UnmapMemory(_allocator, _allocation);
     }

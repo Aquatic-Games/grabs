@@ -25,12 +25,12 @@ internal sealed unsafe class D3D11Buffer : Buffer
         Buffer = device.CreateBuffer(in description, (nint) pData);
     }
     
-    internal override MappedData Map(MapType type)
+    protected internal override MappedData Map(MapType type)
     {
         throw new NotImplementedException();
     }
     
-    internal override void Unmap()
+    protected internal override void Unmap()
     {
         throw new NotImplementedException();
     }

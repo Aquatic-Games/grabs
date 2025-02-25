@@ -5,7 +5,7 @@ namespace grabs.Graphics;
 /// </summary>
 public readonly record struct Adapter
 {
-    internal readonly nint Handle;
+    public readonly nint Handle;
     
     /// <summary>
     /// The enumerated index of the adapter.
