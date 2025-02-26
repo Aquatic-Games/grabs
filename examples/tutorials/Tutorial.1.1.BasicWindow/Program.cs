@@ -10,6 +10,11 @@ using grabs.Windowing.Events;
  * Shows you how to create a window and set up the basic objects required to clear the screen.
  */
 
+// OPTIONAL - Enable logging to the console. This can help debug issues. Be aware though, it is very verbose!
+// You may want to filter these messages in an actual application.
+GrabsLog.LogMessage += (severity, type, message, file, line) =>
+    Console.WriteLine($"{severity} | {type} | {Path.GetFileName(file)}:{line} | {message}"); 
+
 // Create our window. We describe various parameters of the window using the WindowInfo struct. 
 WindowInfo windowInfo = new WindowInfo()
 {
