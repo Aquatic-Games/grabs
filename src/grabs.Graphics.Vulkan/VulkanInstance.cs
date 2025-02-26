@@ -169,7 +169,7 @@ internal sealed unsafe class VulkanInstance : Instance
             throw new Exception("Failed to get Surface extension.");
     }
 
-    private uint DebugCallback(DebugUtilsMessageSeverityFlagsEXT messageSeverity,
+    private static uint DebugCallback(DebugUtilsMessageSeverityFlagsEXT messageSeverity,
         DebugUtilsMessageTypeFlagsEXT messageTypes, DebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
     {
         string message = new string((sbyte*) pCallbackData->PMessage);

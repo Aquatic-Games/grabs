@@ -75,14 +75,14 @@ internal static class D3D11Utils
         };
     }
 
-    public static MapMode ToD3D(this MapType type)
+    public static Vortice.Direct3D11.MapMode ToD3D(this MapMode mode)
     {
-        return type switch
+        return mode switch
         {
-            MapType.Write => MapMode.WriteDiscard,
-            MapType.Read => MapMode.Read,
-            MapType.ReadAndWrite => MapMode.ReadWrite,
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            MapMode.Write => Vortice.Direct3D11.MapMode.WriteDiscard,
+            MapMode.Read => Vortice.Direct3D11.MapMode.Read,
+            MapMode.ReadAndWrite => Vortice.Direct3D11.MapMode.ReadWrite,
+            _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null)
         };
     }
 }

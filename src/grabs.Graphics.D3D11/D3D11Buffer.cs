@@ -31,9 +31,9 @@ internal sealed unsafe class D3D11Buffer : Buffer
         Buffer = device.CreateBuffer(in description, (nint) pData);
     }
     
-    protected override MappedData Map(MapType type)
+    protected override MappedData Map(MapMode mode)
     {
-        MappedSubresource resource = _context.Map(Buffer, type.ToD3D());
+        MappedSubresource resource = _context.Map(Buffer, mode.ToD3D());
         return new MappedData(resource.DataPointer);
     }
     

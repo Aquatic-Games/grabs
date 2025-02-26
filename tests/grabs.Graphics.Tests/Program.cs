@@ -155,7 +155,7 @@ unsafe
         h += 0.05f;
         vertices[0] = float.Sin(h);
 
-        MappedData vData = device.MapResource(vertexBuffer, MapType.Write);
+        MappedData vData = device.MapResource(vertexBuffer, MapMode.Write);
         GrabsUtils.CopyData(vData.DataPtr, vertices);
         device.UnmapResource(vertexBuffer);
         
