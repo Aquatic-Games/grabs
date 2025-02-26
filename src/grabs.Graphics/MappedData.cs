@@ -2,10 +2,10 @@ namespace grabs.Graphics;
 
 public readonly struct MappedData
 {
-    public readonly nint DataPointer;
+    public readonly nint DataPtr;
 
-    public MappedData(IntPtr dataPointer)
+    public MappedData(IntPtr dataPtr)
     {
-        DataPointer = dataPointer;
+        DataPtr = dataPtr;
     }
 }

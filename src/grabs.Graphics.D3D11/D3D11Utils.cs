@@ -1,4 +1,6 @@
 ﻿global using DxgiFormat = Vortice.DXGI.Format;
+using Vortice.Direct3D11;
+
 namespace grabs.Graphics.D3D11;
 
 internal static class D3D11Utils
@@ -70,6 +72,17 @@ internal static class D3D11Utils
             Format.BC7_UNorm => DxgiFormat.BC7_UNorm,
             Format.BC7_UNorm_SRGB => DxgiFormat.BC7_UNorm_SRgb,
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
+        };
+    }
+
+    public static MapMode ToD3D(this MapType type)
+    {
+        return type switch
+        {
+            MapType.Write => MapMode.WriteDiscard,
+            MapType.Read => MapMode.Read,
+            MapType.ReadAndWrite => MapMode.ReadWrite,
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
     }
 }

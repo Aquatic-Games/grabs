@@ -13,7 +13,7 @@ public record struct SwapchainInfo
     public PresentMode PresentMode;
 
     public uint NumBuffers;
-
+    
     public SwapchainInfo(Surface surface, Size2D size, Format format, PresentMode presentMode, uint numBuffers)
     {
         Surface = surface;

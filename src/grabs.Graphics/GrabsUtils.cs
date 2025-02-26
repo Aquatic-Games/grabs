@@ -41,4 +41,13 @@ public static class GrabsUtils
         fixed (void* pData = data)
             Unsafe.CopyBlock((void*) dataPtr, pData, dataSize);
     }
+
+    /// <summary>
+    /// Copy managed data into an unmanaged region of memory.
+    /// </summary>
+    /// <param name="dataPtr">The pointer to the unmanaged data.</param>
+    /// <param name="data">The managed data to copy.</param>
+    /// <typeparam name="T">Any unmanaged type.</typeparam>
+    public static void CopyData<T>(nint dataPtr, T[] data) where T : unmanaged
+        => CopyData<T>(dataPtr, data.AsSpan());
 }

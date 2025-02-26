@@ -49,7 +49,10 @@ SwapchainInfo swapchainInfo = new()
     Format = surface.GetOptimalSwapchainFormat(device.Adapter),
     // The present mode determines how the presentation will occur - in this case we are using FIFO, which is equivalent
     // to having V-Sync enabled.
-    PresentMode = PresentMode.Fifo
+    PresentMode = PresentMode.Fifo,
+    // Determines the number of textures that will be created. This number is only a hint, the backend may ignore it
+    // if it is an invalid number.
+    NumBuffers = 2
 };
 using Swapchain swapchain = device.CreateSwapchain(in swapchainInfo);
 
