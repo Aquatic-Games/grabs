@@ -6,6 +6,8 @@ namespace grabs.Graphics.D3D11;
 internal sealed class D3D11Swapchain : Swapchain
 {
     private readonly D3D11Texture _swapchainTexture;
+
+    private uint _presentInterval;
     
     public readonly IDXGISwapChain Swapchain;
     
@@ -13,6 +15,15 @@ internal sealed class D3D11Swapchain : Swapchain
     
     public D3D11Swapchain(IDXGIFactory factory, ID3D11Device device, ref readonly SwapchainInfo info)
     {
+        _presentInterval = info.PresentMode switch
+        {
+            PresentMode.Immediate => 0,
+            PresentMode.Fifo => 1,
+            PresentMode.FifoRelaxed => 1,
+            PresentMode.Mailbox => 1,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+        
         SwapchainFormat = info.Format;
 
         D3D11Surface surface = (D3D11Surface) info.Surface;
@@ -43,7 +54,7 @@ internal sealed class D3D11Swapchain : Swapchain
     
     public override void Present()
     {
-        Swapchain.Present(1);
+        Swapchain.Present(_presentInterval);
     }
     
     public override void Dispose()

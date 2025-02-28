@@ -63,11 +63,13 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         PresentModeKHR desiredPresentMode = info.PresentMode switch
         {
             PresentMode.Immediate => PresentModeKHR.ImmediateKhr,
-            PresentMode.Mailbox => PresentModeKHR.MailboxKhr,
             PresentMode.Fifo => PresentModeKHR.FifoKhr,
+            PresentMode.FifoRelaxed => PresentModeKHR.FifoRelaxedKhr,
+            PresentMode.Mailbox => PresentModeKHR.MailboxKhr,
             _ => throw new ArgumentOutOfRangeException()
         };
         
+        // TODO: Make this smarter so FifoRelaxed will prefer Fifo if not present, etc.
         for (uint i = 0; i < numPresentModes; i++)
         {
             if (desiredPresentMode == presentModes[i])
