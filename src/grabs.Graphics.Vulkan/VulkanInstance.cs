@@ -1,6 +1,8 @@
 global using VkInstance = Silk.NET.Vulkan.Instance;
+using System.Runtime.InteropServices;
 using grabs.Core;
 using grabs.Graphics.Exceptions;
+using Silk.NET.Core;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.EXT;
 using Silk.NET.Vulkan.Extensions.KHR;
@@ -157,7 +159,10 @@ internal sealed unsafe class VulkanInstance : Instance
                               DebugUtilsMessageTypeFlagsEXT.ValidationBitExt |
                               DebugUtilsMessageTypeFlagsEXT.DeviceAddressBindingBitExt,
 
-                PfnUserCallback = new PfnDebugUtilsMessengerCallbackEXT(DebugCallback)
+                PfnUserCallback = new PfnDebugUtilsMessengerCallbackEXT(
+                    (delegate* unmanaged[Cdecl]<DebugUtilsMessageSeverityFlagsEXT, DebugUtilsMessageTypeFlagsEXT,
+                        DebugUtilsMessengerCallbackDataEXT*, void*, Bool32>) Marshal
+                        .GetFunctionPointerForDelegate<DebugUtilsMessengerCallbackFunctionEXT>(DebugCallback))
             };
 
             GrabsLog.Log("Creating debug messenger.");

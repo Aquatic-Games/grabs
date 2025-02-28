@@ -1,5 +1,6 @@
 global using VkDevice = Silk.NET.Vulkan.Device;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using grabs.Core;
 using grabs.VulkanMemoryAllocator;
 using Silk.NET.Core;
@@ -12,6 +13,9 @@ namespace grabs.Graphics.Vulkan;
 internal sealed unsafe class VulkanDevice : Device
 {
     private readonly Vk _vk;
+
+    private GCHandle _instanceFnHandle;
+    private GCHandle _deviceFnHandle;
     
     public readonly PhysicalDevice PhysicalDevice;
     
@@ -155,9 +159,12 @@ internal sealed unsafe class VulkanDevice : Device
         GrabsLog.Log("Creating fence");
         _vk.CreateFence(Device, &fenceInfo, null, out _fence).Check("Create fence");
 
+        _instanceFnHandle = GCHandle.Alloc(GetInstanceProcAddress);
+        _deviceFnHandle = GCHandle.Alloc(GetDeviceProcAddress);
+        
         VmaVulkanFunctions functions = new VmaVulkanFunctions();
-        functions.vkGetInstanceProcAddr = (delegate* unmanaged[Cdecl]<VkInstance, sbyte*, delegate* unmanaged[Cdecl]<void>>) SilkMarshal.DelegateToPtr(GetInstanceProcAddress);
-        functions.vkGetDeviceProcAddr = (delegate* unmanaged[Cdecl]<VkDevice, sbyte*, delegate* unmanaged[Cdecl]<void>>) SilkMarshal.DelegateToPtr(GetDeviceProcAddress);
+        functions.vkGetInstanceProcAddr = (delegate* unmanaged[Cdecl]<VkInstance, sbyte*, delegate* unmanaged[Cdecl]<void>>) Marshal.GetFunctionPointerForDelegate(GetInstanceProcAddress);
+        functions.vkGetDeviceProcAddr = (delegate* unmanaged[Cdecl]<VkDevice, sbyte*, delegate* unmanaged[Cdecl]<void>>) Marshal.GetFunctionPointerForDelegate(GetDeviceProcAddress);
 
         VmaAllocatorCreateInfo allocatorInfo = new VmaAllocatorCreateInfo()
         {
@@ -258,6 +265,8 @@ internal sealed unsafe class VulkanDevice : Device
     public override void Dispose()
     {
         Vma.DestroyAllocator(Allocator);
+        _deviceFnHandle.Free();
+        _instanceFnHandle.Free();
         
         _vk.DestroyFence(Device, _fence, null);
         
