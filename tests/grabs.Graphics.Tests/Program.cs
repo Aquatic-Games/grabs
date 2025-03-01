@@ -123,7 +123,8 @@ unsafe
         [
             new InputElement(Format.R32G32B32_Float, 0, 0),
             new InputElement(Format.R32G32B32_Float, 12, 0)
-        ]
+        ],
+        Descriptors = [layout]
     };
     
     Pipeline pipeline = device.CreatePipeline(in pipelineInfo);

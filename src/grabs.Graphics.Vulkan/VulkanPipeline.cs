@@ -153,9 +153,17 @@ internal sealed unsafe class VulkanPipeline : Pipeline
             PColorAttachmentFormats = formats
         };
 
+        int numDescriptors = info.Descriptors.Length;
+        DescriptorSetLayout* descriptors = stackalloc DescriptorSetLayout[numDescriptors];
+        
+        for (int i = 0; i < numDescriptors; i++)
+            descriptors[i] = ((VulkanDescriptorLayout) info.Descriptors[i]).Layout;
+
         PipelineLayoutCreateInfo layoutInfo = new PipelineLayoutCreateInfo()
         {
-            SType = StructureType.PipelineLayoutCreateInfo
+            SType = StructureType.PipelineLayoutCreateInfo,
+            SetLayoutCount = (uint) numDescriptors,
+            PSetLayouts = descriptors
         };
 
         _vk.CreatePipelineLayout(_device, &layoutInfo, null, out Layout)
@@ -180,6 +188,7 @@ internal sealed unsafe class VulkanPipeline : Pipeline
             Layout = Layout
         };
 
+        GrabsLog.Log("Creating graphics pipeline.");
         _vk.CreateGraphicsPipelines(_device, new PipelineCache(), 1, &pipelineInfo, null, out Pipeline)
             .Check("Create pipeline");
     }
