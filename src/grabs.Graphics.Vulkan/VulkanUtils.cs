@@ -1,4 +1,5 @@
 global using VkFormat = Silk.NET.Vulkan.Format;
+global using VkDescriptorType = Silk.NET.Vulkan.DescriptorType;
 using grabs.Core;
 using Silk.NET.Vulkan;
 
@@ -160,6 +161,28 @@ internal static class VulkanUtils
             LoadOp.Load => AttachmentLoadOp.Load,
             _ => throw new ArgumentOutOfRangeException(nameof(loadOp), loadOp, null)
         };
+    }
+
+    public static VkDescriptorType ToVk(this DescriptorType type)
+    {
+        return type switch
+        {
+            DescriptorType.ConstantBuffer => VkDescriptorType.UniformBuffer,
+            DescriptorType.Texture => VkDescriptorType.SampledImage,
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+        };
+    }
+
+    public static ShaderStageFlags ToVk(this ShaderStage stage)
+    {
+        ShaderStageFlags flags = ShaderStageFlags.None;
+
+        if (stage.HasFlag(ShaderStage.Vertex))
+            flags |= ShaderStageFlags.VertexBit;
+        if (stage.HasFlag(ShaderStage.Pixel))
+            flags |= ShaderStageFlags.FragmentBit;
+
+        return flags;
     }
 
     public static Extent2D ToVk(this Size2D size)

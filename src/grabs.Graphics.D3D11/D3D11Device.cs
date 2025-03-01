@@ -54,7 +54,12 @@ internal sealed class D3D11Device : Device
     {
         return new D3D11Pipeline(Device, in info);
     }
-    
+
+    public override DescriptorLayout CreateDescriptorLayout(in DescriptorLayoutInfo info)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void ExecuteCommandList(CommandList list)
     {
         D3D11CommandList d3dList = (D3D11CommandList) list;

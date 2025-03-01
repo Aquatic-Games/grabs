@@ -206,6 +206,11 @@ internal sealed unsafe class VulkanDevice : Device
         return new VulkanPipeline(_vk, Device, in info);
     }
 
+    public override DescriptorLayout CreateDescriptorLayout(in DescriptorLayoutInfo info)
+    {
+        return new VulkanDescriptorLayout(_vk, Device, in info);
+    }
+
     public override void ExecuteCommandList(CommandList list)
     {
         VulkanCommandList vkList = (VulkanCommandList) list;

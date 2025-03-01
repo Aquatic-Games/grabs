@@ -26,7 +26,7 @@ unsafe
     if (window == null)
         throw new Exception($"Failed to create window: {sdl.GetErrorS()}");
     
-    Instance.RegisterBackend<D3D11Backend>();
+    //Instance.RegisterBackend<D3D11Backend>();
     Instance.RegisterBackend<VulkanBackend>();
     
     InstanceInfo info = new InstanceInfo("grabs.Graphics.Tests", debug: true);
@@ -102,6 +102,9 @@ unsafe
     Buffer indexBuffer = device.CreateBuffer(BufferType.Index, indices);
     Buffer constantBuffer = device.CreateBuffer(BufferType.Constant, Matrix4x4.CreateTranslation(0.5f, 0, 0));
 
+    DescriptorLayout layout = device.CreateDescriptorLayout(
+        new DescriptorLayoutInfo(new DescriptorBinding(0, DescriptorType.ConstantBuffer, ShaderStage.Vertex)));
+    
     string hlsl = File.ReadAllText("Shader.hlsl");
 
     ShaderModule vertexModule =
@@ -184,6 +187,7 @@ unsafe
     device.WaitForIdle();
     
     pipeline.Dispose();
+    layout.Dispose();
     constantBuffer.Dispose();
     indexBuffer.Dispose();
     vertexBuffer.Dispose();

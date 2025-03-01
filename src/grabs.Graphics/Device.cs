@@ -94,6 +94,13 @@ public abstract class Device : IDisposable
     public abstract Pipeline CreatePipeline(in PipelineInfo info);
 
     /// <summary>
+    /// Create a descriptor layout for use in pipelines and descriptor sets.
+    /// </summary>
+    /// <param name="info">The layout's description.</param>
+    /// <returns>The created layout.</returns>
+    public abstract DescriptorLayout CreateDescriptorLayout(in DescriptorLayoutInfo info);
+
+    /// <summary>
     /// Execute the commands in given command list.
     /// </summary>
     /// <param name="list">The <see cref="CommandList"/> to execute.</param>
