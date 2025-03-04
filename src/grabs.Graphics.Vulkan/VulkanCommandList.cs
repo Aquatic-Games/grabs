@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using grabs.Core;
 using Silk.NET.Vulkan;
+using Silk.NET.Vulkan.Extensions.KHR;
 
 namespace grabs.Graphics.Vulkan;
 
@@ -9,14 +10,20 @@ internal sealed unsafe class VulkanCommandList : CommandList
     private readonly Vk _vk;
     private readonly VkDevice _device;
     private readonly CommandPool _pool;
+    private readonly KhrPushDescriptor _pushDescriptor;
+
+    private VulkanPipeline? _currentlyBoundPipeline;
     
     public readonly CommandBuffer Buffer;
 
-    public VulkanCommandList(Vk vk, VkDevice device, CommandPool pool)
+    public VulkanCommandList(Vk vk, VkDevice device, CommandPool pool, KhrPushDescriptor pushDescriptor)
     {
         _vk = vk;
         _device = device;
         _pool = pool;
+        _pushDescriptor = pushDescriptor;
+
+        _currentlyBoundPipeline = null;
         
         CommandBufferAllocateInfo allocInfo = new CommandBufferAllocateInfo()
         {
@@ -113,18 +120,17 @@ internal sealed unsafe class VulkanCommandList : CommandList
         _vk.CmdBindPipeline(Buffer, PipelineBindPoint.Graphics, vkPipeline.Pipeline);
     }
 
-    public override void SetVertexBuffer(uint slot, Buffer vertexBuffer, uint offset = 0)
+    public override void SetVertexBuffer(uint slot, Buffer buffer, uint offset = 0)
     {
-        VulkanBuffer vkBuffer = (VulkanBuffer) vertexBuffer;
-        VkBuffer buffer = vkBuffer.Buffer;
+        VkBuffer vkBuffer = ((VulkanBuffer) buffer).Buffer;
 
         ulong bufferOffset = offset;
-        _vk.CmdBindVertexBuffers(Buffer, slot, 1, &buffer, &bufferOffset);
+        _vk.CmdBindVertexBuffers(Buffer, slot, 1, &vkBuffer, &bufferOffset);
     }
 
-    public override void SetIndexBuffer(Buffer indexBuffer, Format format, uint offset = 0)
+    public override void SetIndexBuffer(Buffer buffer, Format format, uint offset = 0)
     {
-        VulkanBuffer vkBuffer = (VulkanBuffer) indexBuffer;
+        VulkanBuffer vkBuffer = (VulkanBuffer) buffer;
 
         IndexType type = format switch
         {
@@ -134,6 +140,11 @@ internal sealed unsafe class VulkanCommandList : CommandList
         };
         
         _vk.CmdBindIndexBuffer(Buffer, vkBuffer.Buffer, offset, type);
+    }
+
+    public override void SetConstantBuffer(uint slot, Buffer buffer)
+    {
+        _pushDescriptor.CmdPushDescriptorSet();
     }
 
     public override void Draw(uint numVertices)

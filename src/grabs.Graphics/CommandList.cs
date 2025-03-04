@@ -42,17 +42,19 @@ public abstract class CommandList : IDisposable
     /// Set the vertex buffer to use on next draw.
     /// </summary>
     /// <param name="slot">The slot to bind the buffer at.</param>
-    /// <param name="vertexBuffer">The buffer to use.</param>
+    /// <param name="bufferBuffer">The buffer to use.</param>
     /// <param name="offset">The offset, in bytes, to bind the buffer at.</param>
-    public abstract void SetVertexBuffer(uint slot, Buffer vertexBuffer, uint offset = 0);
+    public abstract void SetVertexBuffer(uint slot, Buffer buffer, uint offset = 0);
 
     /// <summary>
     /// Set the index buffer to use on next draw.
     /// </summary>
-    /// <param name="indexBuffer">The index buffer to use.</param>
+    /// <param name="buffer">The index buffer to use.</param>
     /// <param name="format">The elements type. Valid values are <see cref="Format.R32_UInt"/> and <see cref="Format.R16_UInt"/>.</param>
     /// <param name="offset">The offset, in bytes, to bind the buffer at.</param>
-    public abstract void SetIndexBuffer(Buffer indexBuffer, Format format, uint offset = 0);
+    public abstract void SetIndexBuffer(Buffer buffer, Format format, uint offset = 0);
+
+    public abstract void SetConstantBuffer(uint slot, Buffer buffer);
 
     /// <summary>
     /// Draw vertices with the given number of vertices.
