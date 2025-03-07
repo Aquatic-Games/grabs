@@ -100,7 +100,8 @@ unsafe
 
     Buffer vertexBuffer = device.CreateBuffer(BufferType.Vertex, vertices);
     Buffer indexBuffer = device.CreateBuffer(BufferType.Index, indices);
-    Buffer constantBuffer = device.CreateBuffer(BufferType.Constant, Matrix4x4.CreateTranslation(0.5f, 0.0f, 0.0f));
+    Buffer constantBuffer = device.CreateBuffer(BufferType.Constant, Matrix4x4.Identity, BufferUsage.Dynamic);
+    MappedData cbData = device.MapResource(constantBuffer, MapMode.Write);
 
     DescriptorLayout layout = device.CreateDescriptorLayout(
         new DescriptorLayoutInfo(new DescriptorBinding(0, DescriptorType.ConstantBuffer, ShaderStage.Vertex)));
@@ -155,6 +156,10 @@ unsafe
                 }
             }
         }
+
+        h += 0.05f;
+        Matrix4x4 trans = Matrix4x4.CreateRotationZ(h);
+        GrabsUtils.CopyData(cbData.DataPtr, trans);
         
         Texture texture = swapchain.GetNextTexture();
         
@@ -182,6 +187,8 @@ unsafe
     }
     
     device.WaitForIdle();
+    
+    device.UnmapResource(constantBuffer);
     
     pipeline.Dispose();
     layout.Dispose();

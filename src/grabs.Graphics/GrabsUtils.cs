@@ -28,6 +28,11 @@ public static class GrabsUtils
         }
     }
 
+    public static unsafe void CopyData<T>(nint dataPtr, T data) where T : unmanaged
+    {
+        Unsafe.CopyBlock((void*) dataPtr, Unsafe.AsPointer(ref data), (uint) sizeof(T));
+    }
+
     /// <summary>
     /// Copy managed data into an unmanaged region of memory.
     /// </summary>

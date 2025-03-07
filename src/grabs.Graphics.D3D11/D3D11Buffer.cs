@@ -24,8 +24,8 @@ internal sealed unsafe class D3D11Buffer : Buffer
         {
             BindFlags = flags,
             ByteWidth = info.Size,
-            Usage = info.Dynamic ? ResourceUsage.Dynamic : ResourceUsage.Default,
-            CPUAccessFlags = info.Dynamic ? CpuAccessFlags.Write : CpuAccessFlags.None
+            Usage = info.Usage == BufferUsage.Dynamic ? ResourceUsage.Dynamic : ResourceUsage.Default,
+            CPUAccessFlags = info.Usage == BufferUsage.Dynamic ? CpuAccessFlags.Write : CpuAccessFlags.None
         };
 
         Buffer = device.CreateBuffer(in description, (nint) pData);

@@ -42,13 +42,22 @@ internal sealed unsafe class VulkanBuffer : Buffer
         VmaMemoryUsage bufferUsage;
         VmaAllocationCreateFlagBits bufferFlags = 0;
 
-        if (info.Dynamic)
+        switch (info.Usage)
         {
-            bufferUsage = VMA_MEMORY_USAGE_AUTO;
-            bufferFlags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
+            case BufferUsage.Default:
+            {
+                bufferUsage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
+                break;
+            }
+            case BufferUsage.Dynamic:
+            {
+                bufferUsage = VMA_MEMORY_USAGE_AUTO;
+                bufferFlags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
+                break;
+            }
+            default:
+                throw new ArgumentOutOfRangeException();
         }
-        else
-            bufferUsage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
 
         VmaAllocationCreateInfo allocInfo = new VmaAllocationCreateInfo()
         {
@@ -63,7 +72,7 @@ internal sealed unsafe class VulkanBuffer : Buffer
         if (data == null)
             return;
 
-        if (info.Dynamic)
+        if (info.Usage == BufferUsage.Dynamic)
         {
             void* mappedData;
             Vma.MapMemory(_allocator, _allocation, &mappedData).Check("Map memory");

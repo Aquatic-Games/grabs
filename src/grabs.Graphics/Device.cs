@@ -55,13 +55,13 @@ public abstract class Device : IDisposable
     /// </summary>
     /// <param name="type">The <see cref="BufferType"/> to create the buffer with.</param>
     /// <param name="data">The data to initialize the buffer with.</param>
-    /// <param name="dynamic">If true, the buffer will be created in a memory region accessible by the CPU.</param>
+    /// <param name="usage">The way the buffer will be used.</param>
     /// <typeparam name="T">A primitive or sequential struct.</typeparam>
     /// <returns>The created buffer.</returns>
-    public unsafe Buffer CreateBuffer<T>(BufferType type, in ReadOnlySpan<T> data, bool dynamic = false) where T : unmanaged
+    public unsafe Buffer CreateBuffer<T>(BufferType type, in ReadOnlySpan<T> data, BufferUsage usage = BufferUsage.Default) where T : unmanaged
     {
         fixed (void* pData = data)
-            return CreateBuffer(new BufferInfo(type, (uint) (data.Length * sizeof(T)), dynamic), pData);
+            return CreateBuffer(new BufferInfo(type, (uint) (data.Length * sizeof(T)), usage), pData);
     }
 
     /// <summary>
@@ -69,22 +69,22 @@ public abstract class Device : IDisposable
     /// </summary>
     /// <param name="type">The <see cref="BufferType"/> to create the buffer with.</param>
     /// <param name="data">The data to initialize the buffer with.</param>
-    /// <param name="dynamic">If true, the buffer will be created in a memory region accessible by the CPU.</param>
+    /// <param name="usage">The way the buffer will be used.</param>
     /// <typeparam name="T">A primitive or sequential struct.</typeparam>
     /// <returns>The created buffer.</returns>
-    public Buffer CreateBuffer<T>(BufferType type, T[] data, bool dynamic = false) where T : unmanaged
-        => CreateBuffer<T>(type, data.AsSpan(), dynamic);
+    public Buffer CreateBuffer<T>(BufferType type, T[] data, BufferUsage usage = BufferUsage.Default) where T : unmanaged
+        => CreateBuffer<T>(type, data.AsSpan(), usage);
 
     /// <summary>
     /// Create a buffer with the given data.
     /// </summary>
     /// <param name="type">The <see cref="BufferType"/> to create the buffer with.</param>
     /// <param name="data">The data to initialize the buffer with.</param>
-    /// <param name="dynamic">If true, the buffer will be created in a memory region accessible by the CPU.</param>
+    /// <param name="usage">The way the buffer will be used.</param>
     /// <typeparam name="T">A primitive or sequential struct.</typeparam>
     /// <returns>The created buffer.</returns>
-    public unsafe Buffer CreateBuffer<T>(BufferType type, T data, bool dynamic = false) where T : unmanaged
-        => CreateBuffer(new BufferInfo(type, (uint) sizeof(T), dynamic), Unsafe.AsPointer(ref data));
+    public unsafe Buffer CreateBuffer<T>(BufferType type, T data, BufferUsage usage = BufferUsage.Default) where T : unmanaged
+        => CreateBuffer(new BufferInfo(type, (uint) sizeof(T), usage), Unsafe.AsPointer(ref data));
     
     /// <summary>
     /// Create a graphics pipeline used for rendering.
