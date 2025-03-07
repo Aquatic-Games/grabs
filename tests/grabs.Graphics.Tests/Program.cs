@@ -98,9 +98,9 @@ unsafe
         1, 2, 3
     };
 
-    Buffer vertexBuffer = device.CreateBuffer(BufferType.Vertex, vertices, true);
+    Buffer vertexBuffer = device.CreateBuffer(BufferType.Vertex, vertices);
     Buffer indexBuffer = device.CreateBuffer(BufferType.Index, indices);
-    Buffer constantBuffer = device.CreateBuffer(BufferType.Constant, Matrix4x4.CreateTranslation(0.5f, 0, 0));
+    Buffer constantBuffer = device.CreateBuffer(BufferType.Constant, Matrix4x4.CreateTranslation(0.5f, 0.0f, 0.0f));
 
     DescriptorLayout layout = device.CreateDescriptorLayout(
         new DescriptorLayoutInfo(new DescriptorBinding(0, DescriptorType.ConstantBuffer, ShaderStage.Vertex)));
@@ -155,13 +155,6 @@ unsafe
                 }
             }
         }
-
-        h += 0.05f;
-        vertices[0] = float.Sin(h);
-
-        MappedData vData = device.MapResource(vertexBuffer, MapMode.Write);
-        GrabsUtils.CopyData(vData.DataPtr, vertices);
-        device.UnmapResource(vertexBuffer);
         
         Texture texture = swapchain.GetNextTexture();
         
@@ -172,6 +165,9 @@ unsafe
         cl.SetViewport(new Viewport(0, 0, 1280, 720));
 
         cl.SetPipeline(pipeline);
+        
+        cl.PushDescriptor(0, pipeline, new Descriptor(0, DescriptorType.ConstantBuffer, constantBuffer));
+        
         cl.SetVertexBuffer(0, vertexBuffer);
         cl.SetIndexBuffer(indexBuffer, Format.R16_UInt);
         cl.DrawIndexed(6);

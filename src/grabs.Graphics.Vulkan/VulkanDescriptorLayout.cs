@@ -33,7 +33,8 @@ internal sealed unsafe class VulkanDescriptorLayout : DescriptorLayout
         {
             SType = StructureType.DescriptorSetLayoutCreateInfo,
             BindingCount = (uint) info.Bindings.Length,
-            PBindings = bindings
+            PBindings = bindings,
+            Flags = DescriptorSetLayoutCreateFlags.PushDescriptorBitKhr
         };
 
         GrabsLog.Log("Creating descriptor layout.");

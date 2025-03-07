@@ -54,7 +54,10 @@ public abstract class CommandList : IDisposable
     /// <param name="offset">The offset, in bytes, to bind the buffer at.</param>
     public abstract void SetIndexBuffer(Buffer buffer, Format format, uint offset = 0);
 
-    public abstract void SetConstantBuffer(uint slot, Buffer buffer);
+    public abstract void PushDescriptors(uint slot, Pipeline pipeline, in ReadOnlySpan<Descriptor> descriptors);
+
+    public void PushDescriptor(uint slot, Pipeline pipeline, in Descriptor descriptor)
+        => PushDescriptors(slot, pipeline, new ReadOnlySpan<Descriptor>(in descriptor));
 
     /// <summary>
     /// Draw vertices with the given number of vertices.

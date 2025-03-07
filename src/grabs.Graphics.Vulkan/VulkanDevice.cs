@@ -20,8 +20,8 @@ internal sealed unsafe class VulkanDevice : Device
     public readonly PhysicalDevice PhysicalDevice;
     
     public readonly KhrSurface KhrSurface;
-    
     public readonly KhrSwapchain KhrSwapchain;
+    public readonly KhrPushDescriptor KhrPushDescriptor;
     
     public readonly VkDevice Device;
 
@@ -93,7 +93,8 @@ internal sealed unsafe class VulkanDevice : Device
 
         PhysicalDeviceFeatures enabledFeatures = new PhysicalDeviceFeatures();
 
-        using PinnedStringArray extensions = new PinnedStringArray(KhrSwapchain.ExtensionName);
+        using PinnedStringArray extensions =
+            new PinnedStringArray(KhrSwapchain.ExtensionName, KhrPushDescriptor.ExtensionName);
 
         DeviceCreateInfo deviceInfo = new DeviceCreateInfo()
         {
@@ -128,6 +129,9 @@ internal sealed unsafe class VulkanDevice : Device
 
         if (!_vk.TryGetDeviceExtension(instance, Device, out KhrSwapchain))
             throw new Exception("Failed to get Swapchain extension.");
+
+        if (!_vk.TryGetDeviceExtension(instance, Device, out KhrPushDescriptor))
+            throw new Exception("Failed to get Push Descriptor extension.");
 
         CommandPoolCreateInfo commandPoolInfo = new CommandPoolCreateInfo()
         {
@@ -186,7 +190,7 @@ internal sealed unsafe class VulkanDevice : Device
 
     public override CommandList CreateCommandList()
     {
-        return new VulkanCommandList(_vk, Device, CommandPool);
+        return new VulkanCommandList(_vk, Device, CommandPool, KhrPushDescriptor);
     }
 
     public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] spirv, string entryPoint)
@@ -273,9 +277,12 @@ internal sealed unsafe class VulkanDevice : Device
         _deviceFnHandle.Free();
         _instanceFnHandle.Free();
         
-        _vk.DestroyFence(Device, _fence, null);
         
+        _vk.DestroyFence(Device, _fence, null);
         _vk.DestroyCommandPool(Device, CommandPool, null);
+        
+        KhrPushDescriptor.Dispose();
+        KhrSwapchain.Dispose();
         
         _vk.DestroyDevice(Device, null);
     }

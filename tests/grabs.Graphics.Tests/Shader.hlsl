@@ -15,11 +15,16 @@ struct PSOutput
     float4 Color: SV_Target0;
 };
 
+cbuffer Matrices : register(b0)
+{
+    float4x4 Matrix;
+}
+
 VSOutput VSMain(const in VSInput input)
 {
     VSOutput output;
 
-    output.Position = float4(input.Position, 1.0);
+    output.Position = mul(Matrix, float4(input.Position, 1.0));
     output.Color = float4(input.Color, 1.0);
     
     return output;

@@ -108,7 +108,7 @@ internal sealed class D3D11CommandList : CommandList
         Context.IASetIndexBuffer(d3dBuffer.Buffer, D3D11Utils.ToD3D(format), offset);
     }
 
-    public override void SetConstantBuffer(uint slot, Buffer buffer)
+    public override void PushDescriptors(uint slot, Pipeline pipeline, in ReadOnlySpan<Descriptor> descriptors)
     {
         throw new NotImplementedException();
     }

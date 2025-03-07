@@ -142,9 +142,54 @@ internal sealed unsafe class VulkanCommandList : CommandList
         _vk.CmdBindIndexBuffer(Buffer, vkBuffer.Buffer, offset, type);
     }
 
-    public override void SetConstantBuffer(uint slot, Buffer buffer)
+    public override void PushDescriptors(uint slot, Pipeline pipeline, in ReadOnlySpan<Descriptor> descriptors)
     {
-        _pushDescriptor.CmdPushDescriptorSet();
+        VulkanPipeline vkPipeline = (VulkanPipeline) pipeline;
+        
+        int numDescriptors = descriptors.Length;
+        WriteDescriptorSet* writeDescriptors = stackalloc WriteDescriptorSet[numDescriptors];
+
+        DescriptorBufferInfo bufferInfo = default;
+        
+        for (int i = 0; i < numDescriptors; i++)
+        {
+            ref readonly Descriptor descriptor = ref descriptors[i];
+
+            writeDescriptors[i] = new WriteDescriptorSet()
+            {
+                SType = StructureType.WriteDescriptorSet,
+                DstBinding = descriptor.Slot,
+                DescriptorCount = 1,
+                DescriptorType = descriptor.Type.ToVk(),
+            };
+
+            switch (descriptor.Type)
+            {
+                case DescriptorType.ConstantBuffer:
+                {
+                    Debug.Assert(descriptor.Buffer != null);
+
+                    VulkanBuffer vkBuffer = (VulkanBuffer) descriptor.Buffer;
+                    
+                    bufferInfo = new DescriptorBufferInfo()
+                    {
+                        Buffer = vkBuffer.Buffer,
+                        Offset = 0,
+                        Range = Vk.WholeSize
+                    };
+
+                    writeDescriptors[i].PBufferInfo = &bufferInfo;
+                    break;
+                }
+                case DescriptorType.Texture:
+                    throw new NotImplementedException();
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            _pushDescriptor.CmdPushDescriptorSet(Buffer, PipelineBindPoint.Graphics, vkPipeline.Layout, slot,
+                (uint) numDescriptors, writeDescriptors);
+        }
     }
 
     public override void Draw(uint numVertices)
