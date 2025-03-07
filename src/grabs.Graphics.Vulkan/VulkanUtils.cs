@@ -187,4 +187,7 @@ internal static class VulkanUtils
 
     public static Extent2D ToVk(this Size2D size)
         => new Extent2D(size.Width, size.Height);
+
+    public static Extent3D ToVk(this Size3D size)
+        => new Extent3D(size.Width, size.Height, size.Depth);
 }

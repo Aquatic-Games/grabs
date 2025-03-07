@@ -205,6 +205,11 @@ internal sealed unsafe class VulkanDevice : Device
         return new VulkanBuffer(_vk, this, in info, data);
     }
 
+    public override Texture CreateTexture(in TextureInfo info, void* pData)
+    {
+        throw new NotImplementedException();
+    }
+
     public override Pipeline CreatePipeline(in PipelineInfo info)
     {
         return new VulkanPipeline(_vk, Device, in info);

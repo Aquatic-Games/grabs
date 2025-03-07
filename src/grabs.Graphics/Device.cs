@@ -85,6 +85,14 @@ public abstract class Device : IDisposable
     /// <returns>The created buffer.</returns>
     public unsafe Buffer CreateBuffer<T>(BufferType type, T data, BufferUsage usage = BufferUsage.Default) where T : unmanaged
         => CreateBuffer(new BufferInfo(type, (uint) sizeof(T), usage), Unsafe.AsPointer(ref data));
+
+    public abstract unsafe Texture CreateTexture(in TextureInfo info, void* pData);
+
+    public unsafe Texture CreateTexture<T>(in TextureInfo info, in ReadOnlySpan<T> data) where T : unmanaged
+    {
+        fixed (void* pData = data)
+            return CreateTexture(in info, pData);
+    }
     
     /// <summary>
     /// Create a graphics pipeline used for rendering.

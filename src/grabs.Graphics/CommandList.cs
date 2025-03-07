@@ -42,7 +42,7 @@ public abstract class CommandList : IDisposable
     /// Set the vertex buffer to use on next draw.
     /// </summary>
     /// <param name="slot">The slot to bind the buffer at.</param>
-    /// <param name="bufferBuffer">The buffer to use.</param>
+    /// <param name="buffer">The buffer to use.</param>
     /// <param name="offset">The offset, in bytes, to bind the buffer at.</param>
     public abstract void SetVertexBuffer(uint slot, Buffer buffer, uint offset = 0);
 

@@ -49,7 +49,12 @@ internal sealed class D3D11Device : Device
     {
         return new D3D11Buffer(Device, Context, in info, pData);
     }
-    
+
+    public override unsafe Texture CreateTexture(in TextureInfo info, void* pData)
+    {
+        throw new NotImplementedException();
+    }
+
     public override Pipeline CreatePipeline(in PipelineInfo info)
     {
         return new D3D11Pipeline(Device, in info);
