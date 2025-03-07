@@ -55,7 +55,7 @@ internal sealed unsafe class VulkanDevice : Device
 
         for (uint i = 0; i < numQueueFamilies; i++)
         {
-            if (queueFamilies[i].QueueFlags.HasFlag(QueueFlags.TransferBit))
+            if (queueFamilies[i].QueueFlags.HasFlag(QueueFlags.GraphicsBit))
                 graphicsQueueIndex = i;
 
             khrSurface.GetPhysicalDeviceSurfaceSupport(PhysicalDevice, i, surface.Surface, out Bool32 supported);
