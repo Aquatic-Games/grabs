@@ -207,7 +207,7 @@ internal sealed unsafe class VulkanDevice : Device
 
     public override Texture CreateTexture(in TextureInfo info, void* pData)
     {
-        throw new NotImplementedException();
+        return new VulkanTexture(_vk, Device, Allocator, in info, pData);
     }
 
     public override Pipeline CreatePipeline(in PipelineInfo info)

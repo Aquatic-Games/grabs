@@ -6,6 +6,7 @@ using grabs.Graphics.Exceptions;
 using grabs.Graphics.Vulkan;
 using grabs.ShaderCompiler;
 using Silk.NET.SDL;
+using StbImageSharp;
 using Buffer = grabs.Graphics.Buffer;
 using Surface = grabs.Graphics.Surface;
 using Texture = grabs.Graphics.Texture;
@@ -103,6 +104,13 @@ unsafe
     Buffer constantBuffer = device.CreateBuffer(BufferType.Constant, Matrix4x4.Identity, BufferUsage.Dynamic);
     MappedData cbData = device.MapResource(constantBuffer, MapMode.Write);
 
+    ImageResult result = ImageResult.FromMemory(File.ReadAllBytes("/home/aqua/Pictures/awesomeface.png"),
+        ColorComponents.RedGreenBlueAlpha);
+
+    Texture texture = device.CreateTexture<byte>(
+        TextureInfo.Texture2D(new Size2D((uint) result.Width, (uint) result.Height), Format.R8G8B8A8_UNorm,
+            TextureUsage.Sampled), result.Data.AsSpan());
+
     DescriptorLayout layout = device.CreateDescriptorLayout(
         new DescriptorLayoutInfo(new DescriptorBinding(0, DescriptorType.ConstantBuffer, ShaderStage.Vertex)));
     
@@ -161,11 +169,11 @@ unsafe
         Matrix4x4 trans = Matrix4x4.CreateRotationZ(h);
         GrabsUtils.CopyData(cbData.DataPtr, trans);
         
-        Texture texture = swapchain.GetNextTexture();
+        Texture swapchainTexture = swapchain.GetNextTexture();
         
         cl.Begin();
         
-        cl.BeginRenderPass(new RenderPassInfo(new ColorAttachmentInfo(texture, new ColorF(1.0f, 0.5f, 0.25f))));
+        cl.BeginRenderPass(new RenderPassInfo(new ColorAttachmentInfo(swapchainTexture, new ColorF(1.0f, 0.5f, 0.25f))));
         
         cl.SetViewport(new Viewport(0, 0, 1280, 720));
 
@@ -192,6 +200,7 @@ unsafe
     
     pipeline.Dispose();
     layout.Dispose();
+    texture.Dispose();
     constantBuffer.Dispose();
     indexBuffer.Dispose();
     vertexBuffer.Dispose();
