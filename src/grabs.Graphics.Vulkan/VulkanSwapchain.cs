@@ -185,7 +185,8 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
 
         _vk.BeginCommandBuffer(_commandBuffer, &beginInfo).Check("Begin command buffer");
 
-        ImageBarrier(_swapchainTextures[_currentImage].Image, ImageLayout.Undefined, ImageLayout.ColorAttachmentOptimal);
+        VulkanUtils.ImageBarrier(_vk, _commandBuffer, _swapchainTextures[_currentImage].Image, ImageLayout.Undefined,
+            ImageLayout.ColorAttachmentOptimal);
         
         _vk.EndCommandBuffer(_commandBuffer).Check("End command buffer");
 
@@ -219,7 +220,8 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
 
         _vk.BeginCommandBuffer(_commandBuffer, &beginInfo).Check("Begin command buffer");
 
-        ImageBarrier(_swapchainTextures[currentImage].Image, ImageLayout.ColorAttachmentOptimal, ImageLayout.PresentSrcKhr);
+        VulkanUtils.ImageBarrier(_vk, _commandBuffer, _swapchainTextures[currentImage].Image,
+            ImageLayout.ColorAttachmentOptimal, ImageLayout.PresentSrcKhr);
         
         _vk.EndCommandBuffer(_commandBuffer).Check("End command buffer");
 
@@ -249,22 +251,6 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         };
         
         _khrSwapchain.QueuePresent(_device.Queues.Present, &presentInfo).Check("Present");
-    }
-
-    private void ImageBarrier(Image image, ImageLayout old, ImageLayout @new)
-    {
-        ImageMemoryBarrier memoryBarrier = new ImageMemoryBarrier()
-        {
-            SType = StructureType.ImageMemoryBarrier,
-            Image = image,
-            OldLayout = old,
-            NewLayout = @new,
-            DstAccessMask = AccessFlags.ColorAttachmentWriteBit,
-            SubresourceRange = new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1)
-        };
-
-        _vk.CmdPipelineBarrier(_commandBuffer, PipelineStageFlags.ColorAttachmentOutputBit,
-            PipelineStageFlags.ColorAttachmentOutputBit, 0, 0, null, 0, null, 1, &memoryBarrier);
     }
 
     public override void Dispose()

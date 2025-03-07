@@ -12,7 +12,23 @@ internal static class VulkanUtils
         if (result != Result.Success)
             throw new VulkanOperationException(operation, result);
     }
+    
+    public static unsafe void ImageBarrier(Vk vk, CommandBuffer buffer, Image image, ImageLayout old, ImageLayout @new)
+    {
+        ImageMemoryBarrier memoryBarrier = new ImageMemoryBarrier()
+        {
+            SType = StructureType.ImageMemoryBarrier,
+            Image = image,
+            OldLayout = old,
+            NewLayout = @new,
+            DstAccessMask = AccessFlags.ColorAttachmentWriteBit,
+            SubresourceRange = new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1)
+        };
 
+        vk.CmdPipelineBarrier(buffer, PipelineStageFlags.ColorAttachmentOutputBit,
+            PipelineStageFlags.ColorAttachmentOutputBit, 0, 0, null, 0, null, 1, &memoryBarrier);
+    }
+    
     public static VkFormat ToVk(this Format format)
     {
         return format switch

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using grabs.Core;
 using grabs.VulkanMemoryAllocator;
 using Silk.NET.Vulkan;
@@ -20,10 +21,10 @@ internal sealed unsafe class VulkanTexture : Texture
     
     public override Size2D Size { get; }
 
-    public VulkanTexture(Vk vk, VkDevice device, VmaAllocator_T* allocator, ref readonly TextureInfo info, void* pData)
+    public VulkanTexture(Vk vk, VulkanDevice device, VmaAllocator_T* allocator, ref readonly TextureInfo info, void* pData)
     {
         _vk = vk;
-        _device = device;
+        _device = device.Device;
         _allocator = allocator;
         _isVmaAllocated = true;
         
@@ -56,8 +57,8 @@ internal sealed unsafe class VulkanTexture : Texture
 
         VmaAllocationCreateInfo allocInfo = new VmaAllocationCreateInfo()
         {
-            usage = VmaMemoryUsage.VMA_MEMORY_USAGE_AUTO,
-            flags = (uint) VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT
+            usage = VmaMemoryUsage.VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE,
+            flags = 0
         };
 
         Vma.CreateImage(allocator, &imageInfo, &allocInfo, out Image, out Allocation, out _)
@@ -65,7 +66,47 @@ internal sealed unsafe class VulkanTexture : Texture
 
         if (pData != null)
         {
+            uint dataSize = info.Size.Width * info.Size.Height * info.Size.Depth * info.Format.BytesPerPixel();
+
+            BufferCreateInfo bufferInfo = new BufferCreateInfo()
+            {
+                SType = StructureType.BufferCreateInfo,
+                Usage = BufferUsageFlags.TransferSrcBit,
+                Size = dataSize,
+                SharingMode = SharingMode.Exclusive
+            };
+
+            VmaAllocationCreateInfo bufferAllocInfo = new VmaAllocationCreateInfo()
+            {
+                usage = VmaMemoryUsage.VMA_MEMORY_USAGE_AUTO,
+                flags = (uint) (VMA_ALLOCATION_CREATE_MAPPED_BIT | VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT)
+            };
+
+            Vma.CreateBuffer(allocator, &bufferInfo, &bufferAllocInfo, out VkBuffer transferBuffer,
+                out VmaAllocation_T* allocation, out VmaAllocationInfo allocationInfo).Check("Create transfer buffer");
+
+            Unsafe.CopyBlock(allocationInfo.pMappedData, pData, dataSize);
+
+            CommandBuffer cb = device.BeginCommands();
+            VulkanUtils.ImageBarrier(_vk, cb, Image, ImageLayout.Undefined, ImageLayout.TransferDstOptimal);
+
+            BufferImageCopy biCopy = new BufferImageCopy()
+            {
+                BufferOffset = 0,
+                ImageExtent = imageInfo.Extent,
+                ImageSubresource = new ImageSubresourceLayers()
+                {
+                    AspectMask = ImageAspectFlags.ColorBit,
+                    LayerCount = 1
+                }
+            };
+            _vk.CmdCopyBufferToImage(cb, transferBuffer, Image, ImageLayout.TransferDstOptimal, 1, &biCopy);
+
+            VulkanUtils.ImageBarrier(_vk, cb, Image, ImageLayout.TransferDstOptimal, ImageLayout.ShaderReadOnlyOptimal);
             
+            device.EndCommands();
+            
+            Vma.DestroyBuffer(_allocator, transferBuffer, allocation);
         }
         else
             throw new NotImplementedException("Textures must be created with data.");
