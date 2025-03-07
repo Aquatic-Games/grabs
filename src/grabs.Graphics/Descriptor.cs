@@ -8,10 +8,13 @@ public record struct Descriptor
 
     public Buffer? Buffer;
 
-    public Descriptor(uint slot, DescriptorType type, Buffer? buffer = null)
+    public Texture? Texture;
+
+    public Descriptor(uint slot, DescriptorType type, Buffer? buffer = null, Texture? texture = null)
     {
         Slot = slot;
         Type = type;
         Buffer = buffer;
+        Texture = texture;
     }
 }

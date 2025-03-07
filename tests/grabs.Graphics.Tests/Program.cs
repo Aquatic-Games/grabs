@@ -87,10 +87,10 @@ unsafe
 
     float[] vertices =
     {
-        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-        -0.5f, +0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-        +0.5f, +0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
-        +0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f
+        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
+        -0.5f, +0.5f, 0.0f, 0.0f, 0.0f,
+        +0.5f, +0.5f, 0.0f, 1.0f, 0.0f,
+        +0.5f, -0.5f, 0.0f, 1.0f, 1.0f
     };
 
     ushort[] indices =
@@ -111,8 +111,14 @@ unsafe
         TextureInfo.Texture2D(new Size2D((uint) result.Width, (uint) result.Height), Format.R8G8B8A8_UNorm,
             TextureUsage.Sampled), result.Data.AsSpan());
 
-    DescriptorLayout layout = device.CreateDescriptorLayout(
-        new DescriptorLayoutInfo(new DescriptorBinding(0, DescriptorType.ConstantBuffer, ShaderStage.Vertex)));
+    DescriptorLayout layout = device.CreateDescriptorLayout(new DescriptorLayoutInfo()
+    {
+        Bindings =
+        [
+            new DescriptorBinding(0, DescriptorType.ConstantBuffer, ShaderStage.Vertex),
+            new DescriptorBinding(1, DescriptorType.Texture, ShaderStage.Pixel)
+        ]
+    });
     
     string hlsl = File.ReadAllText("Shader.hlsl");
 
@@ -127,11 +133,11 @@ unsafe
         VertexShader = vertexModule,
         PixelShader = pixelModule,
         ColorAttachmentFormats = [swapchain.SwapchainFormat],
-        VertexBuffers = [new VertexBufferInfo(0, 6 * sizeof(float))],
+        VertexBuffers = [new VertexBufferInfo(0, 5 * sizeof(float))],
         InputLayout =
         [
             new InputElement(Format.R32G32B32_Float, 0, 0),
-            new InputElement(Format.R32G32B32_Float, 12, 0)
+            new InputElement(Format.R32G32_Float, 12, 0)
         ],
         Descriptors = [layout]
     };
@@ -178,8 +184,12 @@ unsafe
         cl.SetViewport(new Viewport(0, 0, 1280, 720));
 
         cl.SetPipeline(pipeline);
-        
-        cl.PushDescriptor(0, pipeline, new Descriptor(0, DescriptorType.ConstantBuffer, constantBuffer));
+
+        cl.PushDescriptors(0, pipeline,
+        [
+            new Descriptor(0, DescriptorType.ConstantBuffer, buffer: constantBuffer),
+            new Descriptor(1, DescriptorType.Texture, texture: texture)
+        ]);
         
         cl.SetVertexBuffer(0, vertexBuffer);
         cl.SetIndexBuffer(indexBuffer, Format.R16_UInt);

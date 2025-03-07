@@ -36,6 +36,14 @@ internal sealed unsafe class VulkanTexture : Texture
             _ => throw new ArgumentOutOfRangeException()
         };
 
+        ImageViewType viewType = info.Type switch
+        {
+            TextureType.Texture1D => ImageViewType.Type1D,
+            TextureType.Texture2D => ImageViewType.Type2D,
+            TextureType.Texture3D => ImageViewType.Type3D,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+
         ImageUsageFlags usage = ImageUsageFlags.TransferDstBit;
         if (info.Usage.HasFlag(TextureUsage.Sampled))
             usage |= ImageUsageFlags.SampledBit;
@@ -61,13 +69,35 @@ internal sealed unsafe class VulkanTexture : Texture
             flags = 0
         };
 
+        GrabsLog.Log("Creating image.");
         Vma.CreateImage(allocator, &imageInfo, &allocInfo, out Image, out Allocation, out _)
             .Check("Create image");
 
+        ImageViewCreateInfo imageViewInfo = new ImageViewCreateInfo()
+        {
+            SType = StructureType.ImageViewCreateInfo,
+            Image = Image,
+            Format = imageInfo.Format,
+            ViewType = viewType,
+            SubresourceRange = new ImageSubresourceRange()
+            {
+                AspectMask = ImageAspectFlags.ColorBit,
+                LevelCount = 1,
+                LayerCount = 1
+            }
+        };
+        
+        GrabsLog.Log("Creating image view.");
+        _vk.CreateImageView(_device, &imageViewInfo, null, out ImageView).Check("Create image view");
+
+        Debug.Assert(pData != null);
+        
         if (pData != null)
         {
             uint dataSize = info.Size.Width * info.Size.Height * info.Size.Depth * info.Format.BytesPerPixel();
 
+            GrabsLog.Log($"pData was not null, creating staging buffer with size {dataSize}.");
+            
             BufferCreateInfo bufferInfo = new BufferCreateInfo()
             {
                 SType = StructureType.BufferCreateInfo,
@@ -108,8 +138,6 @@ internal sealed unsafe class VulkanTexture : Texture
             
             Vma.DestroyBuffer(_allocator, transferBuffer, allocation);
         }
-        else
-            throw new NotImplementedException("Textures must be created with data.");
     }
 
     public VulkanTexture(Vk vk, VkDevice device, Image image, ImageView view, Size2D size)

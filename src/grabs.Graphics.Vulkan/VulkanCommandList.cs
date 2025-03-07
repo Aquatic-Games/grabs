@@ -12,7 +12,7 @@ internal sealed unsafe class VulkanCommandList : CommandList
     private readonly CommandPool _pool;
     private readonly KhrPushDescriptor _pushDescriptor;
 
-    private VulkanPipeline? _currentlyBoundPipeline;
+    private readonly Sampler _tempSampler;
     
     public readonly CommandBuffer Buffer;
 
@@ -22,8 +22,6 @@ internal sealed unsafe class VulkanCommandList : CommandList
         _device = device;
         _pool = pool;
         _pushDescriptor = pushDescriptor;
-
-        _currentlyBoundPipeline = null;
         
         CommandBufferAllocateInfo allocInfo = new CommandBufferAllocateInfo()
         {
@@ -35,6 +33,19 @@ internal sealed unsafe class VulkanCommandList : CommandList
         
         GrabsLog.Log("Allocating command buffer");
         _vk.AllocateCommandBuffers(device, &allocInfo, out Buffer).Check("Allocate command buffer");
+
+        SamplerCreateInfo samplerInfo = new SamplerCreateInfo()
+        {
+            SType = StructureType.SamplerCreateInfo,
+            MinFilter = Filter.Linear,
+            MagFilter = Filter.Linear,
+            AddressModeU = SamplerAddressMode.Repeat,
+            AddressModeV = SamplerAddressMode.Repeat,
+            AddressModeW = SamplerAddressMode.Repeat,
+            MipmapMode = SamplerMipmapMode.Linear
+        };
+
+        _vk.CreateSampler(_device, &samplerInfo, null, out _tempSampler).Check("Create sampler");
     }
 
     public override void Begin()
@@ -182,14 +193,29 @@ internal sealed unsafe class VulkanCommandList : CommandList
                     break;
                 }
                 case DescriptorType.Texture:
-                    throw new NotImplementedException();
+                {
+                    Debug.Assert(descriptor.Texture != null);
+                    
+                    VulkanTexture texture = (VulkanTexture) descriptor.Texture;
+
+                    DescriptorImageInfo imageInfo = new DescriptorImageInfo()
+                    {
+                        ImageLayout = ImageLayout.ShaderReadOnlyOptimal,
+                        ImageView = texture.ImageView,
+                        Sampler = _tempSampler
+                    };
+
+                    writeDescriptors[i].PImageInfo = &imageInfo;
+                    
+                    break;
+                }
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
-            _pushDescriptor.CmdPushDescriptorSet(Buffer, PipelineBindPoint.Graphics, vkPipeline.Layout, slot,
-                (uint) numDescriptors, writeDescriptors);
         }
+        
+        _pushDescriptor.CmdPushDescriptorSet(Buffer, PipelineBindPoint.Graphics, vkPipeline.Layout, slot,
+            (uint) numDescriptors, writeDescriptors);
     }
 
     public override void Draw(uint numVertices)
@@ -204,6 +230,8 @@ internal sealed unsafe class VulkanCommandList : CommandList
 
     public override void Dispose()
     {
+        _vk.DestroySampler(_device, _tempSampler, null);
+        
         fixed (CommandBuffer* buffer = &Buffer)
             _vk.FreeCommandBuffers(_device, _pool, 1, buffer);
     }
