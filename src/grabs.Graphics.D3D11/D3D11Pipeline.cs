@@ -11,8 +11,6 @@ internal sealed class D3D11Pipeline : Pipeline
     public readonly Dictionary<uint, Dictionary<uint, uint>> PixelRemappings;
 
     public readonly ID3D11InputLayout? Layout;
-
-    public readonly Dictionary<uint, VertexBufferInfo>? VertexBuffers;
     
     public D3D11Pipeline(ID3D11Device device, ref readonly PipelineInfo info)
     {
@@ -24,14 +22,6 @@ internal sealed class D3D11Pipeline : Pipeline
         
         PixelShader = device.CreatePixelShader(pixelModule.Blob);
         PixelRemappings = pixelModule.Remappings;
-
-        if (info.VertexBuffers.Length > 0)
-        {
-            VertexBuffers = new Dictionary<uint, VertexBufferInfo>(info.VertexBuffers.Length);
-
-            foreach (VertexBufferInfo bufferInfo in info.VertexBuffers)
-                VertexBuffers.Add(bufferInfo.Binding, bufferInfo);
-        }
 
         if (info.InputLayout.Length > 0)
         {

@@ -133,7 +133,6 @@ unsafe
         VertexShader = vertexModule,
         PixelShader = pixelModule,
         ColorAttachmentFormats = [swapchain.SwapchainFormat],
-        VertexBuffers = [new VertexBufferInfo(0, 5 * sizeof(float))],
         InputLayout =
         [
             new InputElement(Format.R32G32B32_Float, 0, 0),
@@ -191,7 +190,7 @@ unsafe
             new Descriptor(1, DescriptorType.Texture, texture: texture)
         ]);
         
-        cl.SetVertexBuffer(0, vertexBuffer);
+        cl.SetVertexBuffer(0, vertexBuffer, 5 * sizeof(float));
         cl.SetIndexBuffer(indexBuffer, Format.R16_UInt);
         cl.DrawIndexed(6);
         

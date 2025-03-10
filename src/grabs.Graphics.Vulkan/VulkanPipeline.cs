@@ -40,21 +40,13 @@ internal sealed unsafe class VulkanPipeline : Pipeline
                 PName = pPixelEntryPoint
             }
         };
-        
-        VertexInputBindingDescription* vertexBindingDescs =
-            stackalloc VertexInputBindingDescription[info.VertexBuffers.Length];
 
-        for (int i = 0; i < info.VertexBuffers.Length; i++)
+        VertexInputBindingDescription vertexBindingDesc = new VertexInputBindingDescription()
         {
-            ref readonly VertexBufferInfo buffer = ref info.VertexBuffers[i];
-
-            vertexBindingDescs[i] = new VertexInputBindingDescription()
-            {
-                Binding = buffer.Binding,
-                Stride = buffer.Stride,
-                InputRate = VertexInputRate.Vertex,
-            };
-        }
+            Binding = 0,
+            Stride = 0,
+            InputRate = VertexInputRate.Vertex
+        };
 
         VertexInputAttributeDescription* vertexAttribDescs =
             stackalloc VertexInputAttributeDescription[info.InputLayout.Length];
@@ -76,8 +68,8 @@ internal sealed unsafe class VulkanPipeline : Pipeline
         {
             SType = StructureType.PipelineVertexInputStateCreateInfo,
             
-            VertexBindingDescriptionCount = (uint) info.VertexBuffers.Length,
-            PVertexBindingDescriptions = vertexBindingDescs,
+            VertexBindingDescriptionCount = 1,
+            PVertexBindingDescriptions = &vertexBindingDesc,
             
             VertexAttributeDescriptionCount = (uint) info.InputLayout.Length,
             PVertexAttributeDescriptions = vertexAttribDescs
@@ -130,13 +122,14 @@ internal sealed unsafe class VulkanPipeline : Pipeline
         DynamicState* dynamicStates = stackalloc DynamicState[]
         {
             DynamicState.Viewport,
-            DynamicState.Scissor
+            DynamicState.Scissor,
+            DynamicState.VertexInputBindingStride
         };
 
         PipelineDynamicStateCreateInfo dynamicState = new PipelineDynamicStateCreateInfo()
         {
             SType = StructureType.PipelineDynamicStateCreateInfo,
-            DynamicStateCount = 2,
+            DynamicStateCount = 3,
             PDynamicStates = dynamicStates
         };
 

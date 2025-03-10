@@ -43,8 +43,9 @@ public abstract class CommandList : IDisposable
     /// </summary>
     /// <param name="slot">The slot to bind the buffer at.</param>
     /// <param name="buffer">The buffer to use.</param>
+    /// <param name="stride">The stride, in bytes, of the buffer.</param>
     /// <param name="offset">The offset, in bytes, to bind the buffer at.</param>
-    public abstract void SetVertexBuffer(uint slot, Buffer buffer, uint offset = 0);
+    public abstract void SetVertexBuffer(uint slot, Buffer buffer, uint stride, uint offset = 0);
 
     /// <summary>
     /// Set the index buffer to use on next draw.

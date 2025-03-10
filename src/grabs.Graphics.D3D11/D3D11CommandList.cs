@@ -8,8 +8,6 @@ namespace grabs.Graphics.D3D11;
 
 internal sealed class D3D11CommandList : CommandList
 {
-    private Dictionary<uint, VertexBufferInfo>? _vertexBuffers;
-    
     public const int MaxColorAttachments = 8;
     
     private readonly ID3D11RenderTargetView[] _targetCache;
@@ -88,17 +86,13 @@ internal sealed class D3D11CommandList : CommandList
         Context.PSSetShader(d3dPipeline.PixelShader);
         Context.IASetInputLayout(d3dPipeline.Layout);
         Context.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
-
-        _vertexBuffers = d3dPipeline.VertexBuffers;
     }
     
-    public override void SetVertexBuffer(uint slot, Buffer buffer, uint offset = 0)
+    public override void SetVertexBuffer(uint slot, Buffer buffer, uint stride, uint offset = 0)
     {
         D3D11Buffer d3dBuffer = (D3D11Buffer) buffer;
         
-        Debug.Assert(_vertexBuffers != null);
-        
-        Context.IASetVertexBuffer(slot, d3dBuffer.Buffer, _vertexBuffers[slot].Stride, offset);
+        Context.IASetVertexBuffer(slot, d3dBuffer.Buffer, stride, offset);
     }
     
     public override void SetIndexBuffer(Buffer buffer, Format format, uint offset = 0)
