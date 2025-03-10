@@ -8,9 +8,13 @@ internal sealed unsafe class D3D11Buffer : Buffer
     
     public readonly ID3D11Buffer Buffer;
 
+    public readonly bool IsDynamic;
+
     public D3D11Buffer(ID3D11Device device, ID3D11DeviceContext context, ref readonly BufferInfo info, void* pData)
     {
         _context = context;
+
+        IsDynamic = info.Usage == BufferUsage.Dynamic;
         
         BindFlags flags = info.Type switch
         {
@@ -24,8 +28,8 @@ internal sealed unsafe class D3D11Buffer : Buffer
         {
             BindFlags = flags,
             ByteWidth = info.Size,
-            Usage = info.Usage == BufferUsage.Dynamic ? ResourceUsage.Dynamic : ResourceUsage.Default,
-            CPUAccessFlags = info.Usage == BufferUsage.Dynamic ? CpuAccessFlags.Write : CpuAccessFlags.None
+            Usage = IsDynamic ? ResourceUsage.Dynamic : ResourceUsage.Default,
+            CPUAccessFlags = IsDynamic ? CpuAccessFlags.Write : CpuAccessFlags.None
         };
 
         Buffer = device.CreateBuffer(in description, (nint) pData);

@@ -102,9 +102,8 @@ unsafe
     Buffer vertexBuffer = device.CreateBuffer(BufferType.Vertex, vertices);
     Buffer indexBuffer = device.CreateBuffer(BufferType.Index, indices);
     Buffer constantBuffer = device.CreateBuffer(BufferType.Constant, Matrix4x4.Identity, BufferUsage.Dynamic);
-    MappedData cbData = device.MapResource(constantBuffer, MapMode.Write);
 
-    ImageResult result = ImageResult.FromMemory(File.ReadAllBytes("/home/aqua/Pictures/awesomeface.png"),
+    ImageResult result = ImageResult.FromMemory(File.ReadAllBytes("D:/home/aqua/Pictures/awesomeface.png"),
         ColorComponents.RedGreenBlueAlpha);
 
     Texture texture = device.CreateTexture<byte>(
@@ -169,14 +168,13 @@ unsafe
                 }
             }
         }
-
-        h += 0.05f;
-        Matrix4x4 trans = Matrix4x4.CreateRotationZ(h);
-        GrabsUtils.CopyData(cbData.DataPtr, trans);
         
         Texture swapchainTexture = swapchain.GetNextTexture();
         
         cl.Begin();
+        
+        h += 0.05f;
+        cl.UpdateBuffer(constantBuffer, Matrix4x4.CreateRotationZ(h));
         
         cl.BeginRenderPass(new RenderPassInfo(new ColorAttachmentInfo(swapchainTexture, new ColorF(1.0f, 0.5f, 0.25f))));
         
@@ -194,6 +192,9 @@ unsafe
         cl.SetIndexBuffer(indexBuffer, Format.R16_UInt);
         cl.DrawIndexed(6);
         
+        cl.UpdateBuffer(constantBuffer, Matrix4x4.CreateTranslation(float.Sin(h), 0, 0));
+        cl.DrawIndexed(6);
+        
         cl.EndRenderPass();
         
         cl.End();
@@ -204,8 +205,6 @@ unsafe
     }
     
     device.WaitForIdle();
-    
-    device.UnmapResource(constantBuffer);
     
     pipeline.Dispose();
     layout.Dispose();

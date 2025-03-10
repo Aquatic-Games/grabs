@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using grabs.Core;
 using Vortice.Direct3D;
 using Vortice.Direct3D11;
@@ -100,6 +101,23 @@ internal sealed class D3D11CommandList : CommandList
         D3D11Buffer d3dBuffer = (D3D11Buffer) buffer;
         
         Context.IASetIndexBuffer(d3dBuffer.Buffer, format.ToD3D(), offset);
+    }
+
+    public override unsafe void UpdateBuffer(Buffer buffer, uint sizeInBytes, void* pData)
+    {
+        D3D11Buffer d3dBuffer = (D3D11Buffer) buffer;
+
+        if (d3dBuffer.IsDynamic)
+        {
+            MappedSubresource pMap = Context.Map(d3dBuffer.Buffer, Vortice.Direct3D11.MapMode.WriteDiscard);
+            Unsafe.CopyBlock((void*) pMap.DataPointer, pData, sizeInBytes);
+            Context.Unmap(d3dBuffer.Buffer);
+        }
+        else
+        {
+            Context.UpdateSubresource(d3dBuffer.Buffer, 0, null, (nint) pData, 0,
+                0);
+        }
     }
 
     public override void PushDescriptors(uint slot, Pipeline pipeline, in ReadOnlySpan<Descriptor> descriptors)
