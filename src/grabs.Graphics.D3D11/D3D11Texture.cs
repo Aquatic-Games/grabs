@@ -44,7 +44,7 @@ internal sealed class D3D11Texture : Texture
                     MiscFlags = ResourceOptionFlags.None
                 };
 
-                SubresourceData subData = new SubresourceData(pData);
+                SubresourceData subData = new SubresourceData(pData, info.Size.Width * info.Format.BytesPerPixel());
                 Texture = device.CreateTexture2D(in desc, subData);
 
                 viewDesc.ViewDimension = ShaderResourceViewDimension.Texture2D;

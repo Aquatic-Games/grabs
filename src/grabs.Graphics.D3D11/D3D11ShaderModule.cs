@@ -8,9 +8,11 @@ internal sealed class D3D11ShaderModule : ShaderModule
 {
     public readonly Blob Blob;
 
+    public readonly Dictionary<uint, Dictionary<uint, uint>> Remappings;
+
     public D3D11ShaderModule(ShaderStage stage, ReadOnlySpan<byte> spirv, string entryPoint)
     {
-        string hlsl = CompilerUtils.HlslFromSpirv(stage, in spirv, entryPoint);
+        string hlsl = CompilerUtils.HlslFromSpirv(stage, in spirv, entryPoint, out Remappings);
 
         string profile = stage switch
         {

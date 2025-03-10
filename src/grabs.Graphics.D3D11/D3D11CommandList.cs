@@ -105,12 +105,36 @@ internal sealed class D3D11CommandList : CommandList
     {
         D3D11Buffer d3dBuffer = (D3D11Buffer) buffer;
         
-        Context.IASetIndexBuffer(d3dBuffer.Buffer, D3D11Utils.ToD3D(format), offset);
+        Context.IASetIndexBuffer(d3dBuffer.Buffer, format.ToD3D(), offset);
     }
 
     public override void PushDescriptors(uint slot, Pipeline pipeline, in ReadOnlySpan<Descriptor> descriptors)
     {
-        throw new NotImplementedException();
+        D3D11Pipeline d3dPipeline = (D3D11Pipeline) pipeline;
+        
+        foreach (Descriptor descriptor in descriptors)
+        {
+            switch (descriptor.Type)
+            {
+                // TODO: This code assumes that the CB will be in the vtx shader and the Texture will be in the pix shader.
+                case DescriptorType.ConstantBuffer:
+                {
+                    Debug.Assert(descriptor.Buffer != null);
+                    Dictionary<uint, uint> remapping = d3dPipeline.VertexRemappings[slot];
+                    Context.VSSetConstantBuffer(remapping[descriptor.Slot], ((D3D11Buffer) descriptor.Buffer).Buffer);
+                    break;
+                }
+                case DescriptorType.Texture:
+                {
+                    Debug.Assert(descriptor.Texture != null);
+                    Dictionary<uint, uint> remapping = d3dPipeline.PixelRemappings[slot];
+                    Context.PSSetShaderResource(remapping[descriptor.Slot], ((D3D11Texture) descriptor.Texture).ResourceView);
+                    break;
+                }
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
     }
 
     public override void Draw(uint numVertices)

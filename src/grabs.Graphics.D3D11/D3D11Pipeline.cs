@@ -5,8 +5,10 @@ namespace grabs.Graphics.D3D11;
 internal sealed class D3D11Pipeline : Pipeline
 {
     public readonly ID3D11VertexShader VertexShader;
+    public readonly Dictionary<uint, Dictionary<uint, uint>> VertexRemappings;
 
     public readonly ID3D11PixelShader PixelShader;
+    public readonly Dictionary<uint, Dictionary<uint, uint>> PixelRemappings;
 
     public readonly ID3D11InputLayout? Layout;
 
@@ -18,7 +20,10 @@ internal sealed class D3D11Pipeline : Pipeline
         D3D11ShaderModule pixelModule = (D3D11ShaderModule) info.PixelShader;
 
         VertexShader = device.CreateVertexShader(vertexModule.Blob);
+        VertexRemappings = vertexModule.Remappings;
+        
         PixelShader = device.CreatePixelShader(pixelModule.Blob);
+        PixelRemappings = pixelModule.Remappings;
 
         if (info.VertexBuffers.Length > 0)
         {
@@ -40,7 +45,7 @@ internal sealed class D3D11Pipeline : Pipeline
                 {
                     SemanticName = "TEXCOORD",
                     SemanticIndex = (uint) i,
-                    Format = D3D11Utils.ToD3D(element.Format),
+                    Format = element.Format.ToD3D(),
                     Slot = element.Slot,
                     AlignedByteOffset = element.Offset,
                     Classification = InputClassification.PerVertexData

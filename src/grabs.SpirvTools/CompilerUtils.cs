@@ -5,7 +5,7 @@ using Silk.NET.SPIRV.Cross;
 
 namespace grabs.SpirvTools;
 
-public static class CompilerUtils
+public static unsafe class CompilerUtils
 {
     private static readonly Cross _spirv;
 
@@ -14,7 +14,7 @@ public static class CompilerUtils
         _spirv = Cross.GetApi();
     }
     
-    public static unsafe string HlslFromSpirv(ShaderStage stage, in ReadOnlySpan<byte> spirv, string entryPoint)
+    public static string HlslFromSpirv(ShaderStage stage, in ReadOnlySpan<byte> spirv, string entryPoint, out Dictionary<uint, Dictionary<uint, uint>> remappings)
     {
         Context* context;
         if (_spirv.ContextCreate(&context) != Result.Success)
@@ -50,6 +50,30 @@ public static class CompilerUtils
 
             _spirv.CompilerSetEntryPoint(compiler, pEntryPoint, model);
 
+            uint id;
+            //_spirv.CompilerBuildDummySamplerForCombinedImages(compiler, &id);
+            //_spirv.CompilerBuildCombinedImageSamplers(compiler);
+            
+            //Console.WriteLine(id);
+
+            CombinedImageSampler* sampled;
+            nuint numImages;
+            _spirv.CompilerGetCombinedImageSamplers(compiler, &sampled, &numImages);
+            
+            for (uint i = 0; i < numImages; i++)
+            {
+                Console.WriteLine(
+                    $"combid: {sampled[i].CombinedId}, sid: {sampled[i].SamplerId}, iid: {sampled[i].ImageId}, set: {_spirv.CompilerGetDecoration(compiler, sampled[i].CombinedId, Decoration.Binding)}");
+            }
+
+            remappings = new Dictionary<uint, Dictionary<uint, uint>>();
+
+            Resources* resources;
+            _spirv.CompilerCreateShaderResources(compiler, &resources);
+            RemapType(compiler, resources, ResourceType.UniformBuffer, ref remappings);
+            RemapType(compiler, resources, ResourceType.SeparateImage, ref remappings);
+            RemapType(compiler, resources, ResourceType.SeparateSamplers, ref remappings);
+
             byte* source;
             if (_spirv.CompilerCompile(compiler, &source) != Result.Success)
                 throw new Exception($"Failed to compile: {_spirv.ContextGetLastErrorStringS(context)}");
@@ -61,6 +85,35 @@ public static class CompilerUtils
         finally
         {
             _spirv.ContextDestroy(context);
+        }
+    }
+
+    private static void RemapType(Compiler* compiler, Resources* resources, ResourceType type, ref Dictionary<uint, Dictionary<uint, uint>> remappings)
+    {
+        ReflectedResource* reflectedResources;
+        nuint numResources;
+        _spirv.ResourcesGetResourceListForType(resources, type, &reflectedResources, &numResources);
+
+        uint bindNum = 0;
+        for (uint i = 0; i < numResources; i++)
+        {
+            uint id = reflectedResources[i].Id;
+            Console.WriteLine(id);
+
+            uint set = _spirv.CompilerGetDecoration(compiler, id, Decoration.DescriptorSet);
+            uint binding = _spirv.CompilerGetDecoration(compiler, id, Decoration.Binding);
+
+            uint newBinding = bindNum++;
+            _spirv.CompilerSetDecoration(compiler, id, Decoration.DescriptorSet, 0);
+            _spirv.CompilerSetDecoration(compiler, id, Decoration.Binding, newBinding);
+
+            if (!remappings.TryGetValue(set, out Dictionary<uint, uint> remapping))
+            {
+                remapping = new Dictionary<uint, uint>();
+                remappings[set] = remapping;
+            }
+
+            remapping[binding] = newBinding;
         }
     }
 }
