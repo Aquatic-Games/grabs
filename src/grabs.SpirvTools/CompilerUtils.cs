@@ -1,8 +1,9 @@
 ﻿using grabs.Core;
+using grabs.Graphics;
 using Silk.NET.SPIRV;
 using Silk.NET.SPIRV.Cross;
 
-namespace grabs.Graphics.Internal;
+namespace grabs.SpirvTools;
 
 public static class CompilerUtils
 {
@@ -30,8 +31,7 @@ public static class CompilerUtils
             }
 
             Compiler* compiler;
-            _spirv.ContextCreateCompiler(context, Silk.NET.SPIRV.Cross.Backend.Hlsl, ir, CaptureMode.TakeOwnership,
-                &compiler);
+            _spirv.ContextCreateCompiler(context, Backend.Hlsl, ir, CaptureMode.TakeOwnership, &compiler);
 
             CompilerOptions* options;
             _spirv.CompilerCreateCompilerOptions(compiler, &options);

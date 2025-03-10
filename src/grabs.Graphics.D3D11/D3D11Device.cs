@@ -63,7 +63,7 @@ internal sealed class D3D11Device : Device
 
     public override DescriptorLayout CreateDescriptorLayout(in DescriptorLayoutInfo info)
     {
-        throw new NotImplementedException();
+        return new D3D11DescriptorLayout(in info);
     }
 
     public override void ExecuteCommandList(CommandList list)

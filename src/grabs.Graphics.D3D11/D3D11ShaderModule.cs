@@ -1,4 +1,4 @@
-﻿using grabs.Graphics.Internal;
+﻿using grabs.SpirvTools;
 using Vortice.D3DCompiler;
 using Vortice.Direct3D;
 
