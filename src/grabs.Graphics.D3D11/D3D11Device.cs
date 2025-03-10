@@ -18,6 +18,7 @@ internal sealed class D3D11Device : Device
     public D3D11Device(IDXGIFactory factory, in Adapter adapter, bool debug)
     {
         _factory = factory;
+        Adapter = adapter;
         
         DeviceCreationFlags creationFlags = DeviceCreationFlags.BgraSupport;
         if (debug)
@@ -52,7 +53,7 @@ internal sealed class D3D11Device : Device
 
     public override unsafe Texture CreateTexture(in TextureInfo info, void* pData)
     {
-        throw new NotImplementedException();
+        return new D3D11Texture(Device, in info, pData);
     }
 
     public override Pipeline CreatePipeline(in PipelineInfo info)

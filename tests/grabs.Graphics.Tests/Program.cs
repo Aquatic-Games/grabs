@@ -27,7 +27,7 @@ unsafe
     if (window == null)
         throw new Exception($"Failed to create window: {sdl.GetErrorS()}");
     
-    //Instance.RegisterBackend<D3D11Backend>();
+    Instance.RegisterBackend<D3D11Backend>();
     Instance.RegisterBackend<VulkanBackend>();
     
     InstanceInfo info = new InstanceInfo("grabs.Graphics.Tests", debug: true);

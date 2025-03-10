@@ -1,5 +1,7 @@
 ﻿using grabs.Core;
 using grabs.Graphics;
+using grabs.Graphics.D3D11;
+using grabs.Graphics.Vulkan;
 using grabs.Windowing;
 using grabs.Windowing.Events;
 
@@ -9,6 +11,8 @@ WindowInfo windowInfo = new WindowInfo(new Size2D(1280, 720), "grabs.Windowing.T
 
 using Window window = new Window(in windowInfo);
 
+Instance.RegisterBackend<D3D11Backend>();
+Instance.RegisterBackend<VulkanBackend>();
 using Instance instance = Instance.Create(new InstanceInfo("grabs.Windowing.Tests", debug: true));
 
 using Surface surface = window.CreateSurface(instance);
