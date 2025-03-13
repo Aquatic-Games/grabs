@@ -103,7 +103,7 @@ unsafe
     Buffer indexBuffer = device.CreateBuffer(BufferType.Index, indices);
     Buffer constantBuffer = device.CreateBuffer(BufferType.Constant, Matrix4x4.Identity, BufferUsage.Dynamic);
 
-    ImageResult result = ImageResult.FromMemory(File.ReadAllBytes("D:/home/aqua/Pictures/awesomeface.png"),
+    ImageResult result = ImageResult.FromMemory(File.ReadAllBytes("/home/aqua/Pictures/BAGELMIP.png"),
         ColorComponents.RedGreenBlueAlpha);
 
     Texture texture = device.CreateTexture<byte>(
@@ -178,7 +178,7 @@ unsafe
         
         cl.BeginRenderPass(new RenderPassInfo(new ColorAttachmentInfo(swapchainTexture, new ColorF(1.0f, 0.5f, 0.25f))));
         
-        cl.SetViewport(new Viewport(0, 0, 1280, 720));
+        cl.SetViewport(new Viewport(0, 0, swapchainTexture.Size.Width, swapchainTexture.Size.Height));
 
         cl.SetPipeline(pipeline);
 
@@ -192,7 +192,12 @@ unsafe
         cl.SetIndexBuffer(indexBuffer, Format.R16_UInt);
         cl.DrawIndexed(6);
         
+        cl.EndRenderPass();
+        
         cl.UpdateBuffer(constantBuffer, Matrix4x4.CreateTranslation(float.Sin(h), 0, 0));
+        
+        cl.BeginRenderPass(new RenderPassInfo(new ColorAttachmentInfo(swapchainTexture, new ColorF(), LoadOp.Load)));
+        
         cl.DrawIndexed(6);
         
         cl.EndRenderPass();

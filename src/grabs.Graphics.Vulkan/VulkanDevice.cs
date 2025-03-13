@@ -96,9 +96,24 @@ internal sealed unsafe class VulkanDevice : Device
         using PinnedStringArray extensions =
             new PinnedStringArray(KhrSwapchain.ExtensionName, KhrPushDescriptor.ExtensionName);
 
+        PhysicalDeviceSynchronization2Features sync2Features = new()
+        {
+            SType = StructureType.PhysicalDeviceSynchronization2Features,
+            Synchronization2 = true
+        };
+        
+        // We must manually enable dynamic rendering.
+        PhysicalDeviceDynamicRenderingFeatures dynamicRenderingFeatures = new PhysicalDeviceDynamicRenderingFeatures()
+        {
+            SType = StructureType.PhysicalDeviceDynamicRenderingFeatures,
+            PNext = &sync2Features,
+            DynamicRendering = true
+        };
+
         DeviceCreateInfo deviceInfo = new DeviceCreateInfo()
         {
             SType = StructureType.DeviceCreateInfo,
+            PNext = &dynamicRenderingFeatures,
 
             PQueueCreateInfos = queueInfos,
             QueueCreateInfoCount = (uint) uniqueQueueFamilies.Count,
@@ -108,15 +123,6 @@ internal sealed unsafe class VulkanDevice : Device
             PpEnabledExtensionNames = extensions,
             EnabledExtensionCount = extensions.Length
         };
-
-        // We must manually enable dynamic rendering.
-        PhysicalDeviceDynamicRenderingFeatures dynamicRenderingFeatures = new PhysicalDeviceDynamicRenderingFeatures()
-        {
-            SType = StructureType.PhysicalDeviceDynamicRenderingFeatures,
-            DynamicRendering = true
-        };
-        
-        deviceInfo.PNext = &dynamicRenderingFeatures;
 
         GrabsLog.Log("Creating device.");
         _vk.CreateDevice(PhysicalDevice, &deviceInfo, null, out Device).Check("Create device");

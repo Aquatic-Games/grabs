@@ -157,7 +157,7 @@ internal sealed unsafe class VulkanCommandList : CommandList
     public override void UpdateBuffer(Buffer buffer, uint sizeInBytes, void* pData)
     {
         VulkanBuffer vkBuffer = (VulkanBuffer) buffer;
-        
+        vkBuffer.Update(Buffer, sizeInBytes, pData);
     }
 
     public override void PushDescriptors(uint slot, Pipeline pipeline, in ReadOnlySpan<Descriptor> descriptors)
