@@ -154,11 +154,11 @@ internal sealed unsafe class VulkanCommandList : CommandList
         _vk.CmdBindIndexBuffer(Buffer, vkBuffer.Buffer, offset, type);
     }
 
-    public override void UpdateBuffer(Buffer buffer, uint sizeInBytes, void* pData)
+    /*public override void UpdateBuffer(Buffer buffer, uint sizeInBytes, void* pData)
     {
         VulkanBuffer vkBuffer = (VulkanBuffer) buffer;
         vkBuffer.Update(Buffer, sizeInBytes, pData);
-    }
+    }*/
 
     public override void PushDescriptors(uint slot, Pipeline pipeline, in ReadOnlySpan<Descriptor> descriptors)
     {

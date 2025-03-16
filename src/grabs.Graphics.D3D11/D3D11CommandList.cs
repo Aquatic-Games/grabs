@@ -103,7 +103,7 @@ internal sealed class D3D11CommandList : CommandList
         Context.IASetIndexBuffer(d3dBuffer.Buffer, format.ToD3D(), offset);
     }
 
-    public override unsafe void UpdateBuffer(Buffer buffer, uint sizeInBytes, void* pData)
+    /*public override unsafe void UpdateBuffer(Buffer buffer, uint sizeInBytes, void* pData)
     {
         D3D11Buffer d3dBuffer = (D3D11Buffer) buffer;
 
@@ -118,7 +118,7 @@ internal sealed class D3D11CommandList : CommandList
             Context.UpdateSubresource(d3dBuffer.Buffer, 0, null, (nint) pData, 0,
                 0);
         }
-    }
+    }*/
 
     public override void PushDescriptors(uint slot, Pipeline pipeline, in ReadOnlySpan<Descriptor> descriptors)
     {

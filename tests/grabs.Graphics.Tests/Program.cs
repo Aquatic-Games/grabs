@@ -174,7 +174,7 @@ unsafe
         cl.Begin();
         
         h += 0.05f;
-        cl.UpdateBuffer(constantBuffer, Matrix4x4.CreateRotationZ(h));
+        //cl.UpdateBuffer(constantBuffer, Matrix4x4.CreateRotationZ(h));
         
         cl.BeginRenderPass(new RenderPassInfo(new ColorAttachmentInfo(swapchainTexture, new ColorF(1.0f, 0.5f, 0.25f))));
         
@@ -194,7 +194,7 @@ unsafe
         
         cl.EndRenderPass();
         
-        cl.UpdateBuffer(constantBuffer, Matrix4x4.CreateTranslation(float.Sin(h), 0, 0));
+        //cl.UpdateBuffer(constantBuffer, Matrix4x4.CreateTranslation(float.Sin(h), 0, 0));
         
         cl.BeginRenderPass(new RenderPassInfo(new ColorAttachmentInfo(swapchainTexture, new ColorF(), LoadOp.Load)));
         

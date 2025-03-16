@@ -57,7 +57,7 @@ public abstract class CommandList : IDisposable
     /// <param name="offset">The offset, in bytes, to bind the buffer at.</param>
     public abstract void SetIndexBuffer(Buffer buffer, Format format, uint offset = 0);
 
-    public abstract unsafe void UpdateBuffer(Buffer buffer, uint sizeInBytes, void* pData);
+    /*public abstract unsafe void UpdateBuffer(Buffer buffer, uint sizeInBytes, void* pData);
 
     public unsafe void UpdateBuffer<T>(Buffer buffer, T data) where T : unmanaged
         => UpdateBuffer(buffer, (uint) sizeof(T), Unsafe.AsPointer(ref data));
@@ -71,7 +71,7 @@ public abstract class CommandList : IDisposable
     }
 
     public void UpdateBuffer<T>(Buffer buffer, T[] data) where T : unmanaged
-        => UpdateBuffer<T>(buffer, data.AsSpan());
+        => UpdateBuffer<T>(buffer, data.AsSpan());*/
 
     public abstract void PushDescriptors(uint slot, Pipeline pipeline, in ReadOnlySpan<Descriptor> descriptors);
 
