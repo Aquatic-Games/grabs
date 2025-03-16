@@ -247,6 +247,11 @@ internal sealed unsafe class VulkanDevice : Device
         _vk.ResetFences(Device, 1, in _fence);
     }
 
+    public override void UpdateBuffer(Buffer buffer, uint offset, uint size, void* pData)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void WaitForIdle()
     {
         _vk.DeviceWaitIdle(Device).Check("Wait for idle");

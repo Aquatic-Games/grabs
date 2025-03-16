@@ -130,6 +130,22 @@ public abstract class Device : IDisposable
     public void UnmapResource(MappableResource resource)
         => resource.Unmap();
 
+    public abstract unsafe void UpdateBuffer(Buffer buffer, uint offset, uint size, void* pData);
+
+    public unsafe void UpdateBuffer<T>(Buffer buffer, uint offset, T data) where T : unmanaged
+        => UpdateBuffer(buffer, offset, (uint) sizeof(T), Unsafe.AsPointer(ref data));
+
+    public unsafe void UpdateBuffer<T>(Buffer buffer, uint offset, in ReadOnlySpan<T> data) where T : unmanaged
+    {
+        uint dataSize = (uint) (data.Length * sizeof(T));
+        
+        fixed (void* pData = data)
+            UpdateBuffer(buffer, offset, dataSize, pData);
+    }
+
+    public void UpdateBuffer<T>(Buffer buffer, uint offset, T[] data) where T : unmanaged
+        => UpdateBuffer<T>(buffer, offset, data.AsSpan());
+
     /// <summary>
     /// Wait for the device to finish all queued actions.
     /// </summary>

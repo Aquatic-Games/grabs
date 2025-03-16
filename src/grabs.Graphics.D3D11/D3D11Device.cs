@@ -74,7 +74,12 @@ internal sealed class D3D11Device : Device
         
         Context.ExecuteCommandList(d3dList.CommandList, false);
     }
-    
+
+    public override unsafe void UpdateBuffer(Buffer buffer, uint offset, uint size, void* pData)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void WaitForIdle()
     {
         Context.Flush();
