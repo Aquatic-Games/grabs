@@ -73,6 +73,11 @@ public abstract class CommandList : IDisposable
     public void UpdateBuffer<T>(Buffer buffer, T[] data) where T : unmanaged
         => UpdateBuffer<T>(buffer, data.AsSpan());*/
 
+    public abstract unsafe void PushConstant(Pipeline pipeline, ShaderStage stage, uint offset, uint size, void* pData);
+
+    public unsafe void PushConstant<T>(Pipeline pipeline, ShaderStage stage, uint offset, T data) where T : unmanaged
+        => PushConstant(pipeline, stage, offset, (uint) sizeof(T), Unsafe.AsPointer(ref data));
+
     public abstract void PushDescriptors(uint slot, Pipeline pipeline, in ReadOnlySpan<Descriptor> descriptors);
 
     public void PushDescriptor(uint slot, Pipeline pipeline, in Descriptor descriptor)

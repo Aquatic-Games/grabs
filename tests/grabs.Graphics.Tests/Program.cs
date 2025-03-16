@@ -137,7 +137,8 @@ unsafe
             new InputElement(Format.R32G32B32_Float, 0, 0),
             new InputElement(Format.R32G32_Float, 12, 0)
         ],
-        Descriptors = [layout]
+        Descriptors = [layout],
+        Constants = [new ConstantLayout(ShaderStage.Vertex, 0, (uint) sizeof(Matrix4x4))]
     };
     
     Pipeline pipeline = device.CreatePipeline(in pipelineInfo);
@@ -175,6 +176,7 @@ unsafe
         
         h += 0.05f;
         //cl.UpdateBuffer(constantBuffer, Matrix4x4.CreateRotationZ(h));
+        cl.PushConstant(pipeline, ShaderStage.Vertex, 0, Matrix4x4.CreateRotationZ(h));
         
         cl.BeginRenderPass(new RenderPassInfo(new ColorAttachmentInfo(swapchainTexture, new ColorF(1.0f, 0.5f, 0.25f))));
         
@@ -192,11 +194,8 @@ unsafe
         cl.SetIndexBuffer(indexBuffer, Format.R16_UInt);
         cl.DrawIndexed(6);
         
-        cl.EndRenderPass();
-        
         //cl.UpdateBuffer(constantBuffer, Matrix4x4.CreateTranslation(float.Sin(h), 0, 0));
-        
-        cl.BeginRenderPass(new RenderPassInfo(new ColorAttachmentInfo(swapchainTexture, new ColorF(), LoadOp.Load)));
+        cl.PushConstant(pipeline, ShaderStage.Vertex, 0, Matrix4x4.CreateTranslation(float.Sin(h), 0, 0));
         
         cl.DrawIndexed(6);
         

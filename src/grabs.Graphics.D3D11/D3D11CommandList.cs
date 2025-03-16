@@ -103,6 +103,11 @@ internal sealed class D3D11CommandList : CommandList
         Context.IASetIndexBuffer(d3dBuffer.Buffer, format.ToD3D(), offset);
     }
 
+    public override unsafe void PushConstant(Pipeline pipeline, ShaderStage stage, uint offset, uint size, void* pData)
+    {
+        throw new NotImplementedException();
+    }
+
     /*public override unsafe void UpdateBuffer(Buffer buffer, uint sizeInBytes, void* pData)
     {
         D3D11Buffer d3dBuffer = (D3D11Buffer) buffer;

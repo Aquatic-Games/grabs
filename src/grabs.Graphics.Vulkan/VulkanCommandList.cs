@@ -154,6 +154,12 @@ internal sealed unsafe class VulkanCommandList : CommandList
         _vk.CmdBindIndexBuffer(Buffer, vkBuffer.Buffer, offset, type);
     }
 
+    public override void PushConstant(Pipeline pipeline, ShaderStage stage, uint offset, uint size, void* pData)
+    {
+        VulkanPipeline vkPipeline = (VulkanPipeline) pipeline;
+        _vk.CmdPushConstants(Buffer, vkPipeline.Layout, stage.ToVk(), offset, size, pData);
+    }
+
     /*public override void UpdateBuffer(Buffer buffer, uint sizeInBytes, void* pData)
     {
         VulkanBuffer vkBuffer = (VulkanBuffer) buffer;

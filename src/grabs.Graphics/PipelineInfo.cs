@@ -31,6 +31,11 @@ public ref struct PipelineInfo
     public ReadOnlySpan<DescriptorLayout> Descriptors;
 
     /// <summary>
+    /// The constants that are defined in the shader.
+    /// </summary>
+    public ReadOnlySpan<ConstantLayout> Constants;
+
+    /// <summary>
     /// Create a new <see cref="PipelineInfo"/>.
     /// </summary>
     /// <param name="vertexShader">The vertex shader to use.</param>
@@ -38,14 +43,16 @@ public ref struct PipelineInfo
     /// <param name="colorAttachmentFormats">The formats of the color attachments that will be used with the pipeline.</param>
     /// <param name="inputLayout">The shader input layout.</param>
     /// <param name="descriptors">The descriptor layouts used.</param>
+    /// <param name="constants">The constants that are defined in the shader.</param>
     public PipelineInfo(ShaderModule vertexShader, ShaderModule pixelShader,
         ReadOnlySpan<Format> colorAttachmentFormats, ReadOnlySpan<InputElement> inputLayout,
-        ReadOnlySpan<DescriptorLayout> descriptors)
+        ReadOnlySpan<DescriptorLayout> descriptors, ReadOnlySpan<ConstantLayout> constants)
     {
         VertexShader = vertexShader;
         PixelShader = pixelShader;
         ColorAttachmentFormats = colorAttachmentFormats;
         InputLayout = inputLayout;
         Descriptors = descriptors;
+        Constants = constants;
     }
 }

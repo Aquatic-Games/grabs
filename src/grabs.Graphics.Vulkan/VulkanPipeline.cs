@@ -152,11 +152,30 @@ internal sealed unsafe class VulkanPipeline : Pipeline
         for (int i = 0; i < numDescriptors; i++)
             descriptors[i] = ((VulkanDescriptorLayout) info.Descriptors[i]).Layout;
 
+        int numConstants = info.Constants.Length;
+        PushConstantRange* constants = stackalloc PushConstantRange[numConstants];
+
+        for (int i = 0; i < numConstants; i++)
+        {
+            ref readonly ConstantLayout constant = ref info.Constants[i];
+
+            constants[i] = new PushConstantRange()
+            {
+                StageFlags = constant.Stages.ToVk(),
+                Offset = constant.Offset,
+                Size = constant.Size
+            };
+        }
+
         PipelineLayoutCreateInfo layoutInfo = new PipelineLayoutCreateInfo()
         {
             SType = StructureType.PipelineLayoutCreateInfo,
+            
             SetLayoutCount = (uint) numDescriptors,
-            PSetLayouts = descriptors
+            PSetLayouts = descriptors,
+            
+            PushConstantRangeCount = (uint) numConstants,
+            PPushConstantRanges = constants
         };
 
         _vk.CreatePipelineLayout(_device, &layoutInfo, null, out Layout)
