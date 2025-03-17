@@ -22,7 +22,7 @@ unsafe
     if (sdl.Init(Sdl.InitVideo | Sdl.InitEvents) < 0)
         throw new Exception($"Failed to initialize SDL. {sdl.GetErrorS()}");
 
-    Window* window = sdl.CreateWindow("grabs.Graphics.Tests", Sdl.WindowposCentered, Sdl.WindowposCentered, 1280, 720, 0);
+    Window* window = sdl.CreateWindow("grabs.Graphics.Tests", Sdl.WindowposCentered, Sdl.WindowposCentered, 1280, 720, (uint) WindowFlags.Resizable);
 
     if (window == null)
         throw new Exception($"Failed to create window: {sdl.GetErrorS()}");

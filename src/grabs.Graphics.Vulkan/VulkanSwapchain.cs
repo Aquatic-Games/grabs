@@ -12,6 +12,9 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
     private readonly VulkanDevice _device;
     private readonly SurfaceKHR _surface;
 
+    private readonly uint _numBuffers;
+    private readonly PresentMode _presentMode;
+
     private VulkanTexture[] _swapchainTextures;
     private uint _currentImage;
 
@@ -31,6 +34,11 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         _device = device;
         _khrSwapchain = _device.KhrSwapchain;
         _surface = ((VulkanSurface) info.Surface).Surface;
+
+        _numBuffers = info.NumBuffers;
+        _presentMode = info.PresentMode;
+
+        _swapchainTextures = [];
 
         Size = info.Size;
         SwapchainFormat = info.Format;
@@ -58,8 +66,12 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
 
     public override Texture GetNextTexture()
     {
-        _khrSwapchain.AcquireNextImage(_device.Device, Swapchain, ulong.MaxValue, new Semaphore(), _fence, ref _currentImage)
-            .Check("Acquire next image");
+        Result result = _khrSwapchain.AcquireNextImage(_device.Device, Swapchain, ulong.MaxValue, new Semaphore(), _fence, ref _currentImage);
+
+        if (result is Result.SuboptimalKhr or Result.ErrorOutOfDateKhr)
+            RecreateSwapchain();
+        else
+            result.Check("Acquire next image");
         
         _vk.WaitForFences(_device.Device, 1, in _fence, true, ulong.MaxValue)
             .Check("Wait for fence");
@@ -136,22 +148,15 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
 
             PImageIndices = &currentImage,
         };
-        
-        _khrSwapchain.QueuePresent(_device.Queues.Present, &presentInfo).Check("Present");
-    }
 
-    public override void Dispose()
-    {
-        _vk.FreeCommandBuffers(_device.Device, _device.CommandPool, 1, in _commandBuffer);
+        Result result = _khrSwapchain.QueuePresent(_device.Queues.Present, &presentInfo);
         
-        _vk.DestroyFence(_device.Device, _fence, null);
-        
-        foreach (VulkanTexture texture in _swapchainTextures)
-            texture.Dispose();
-        
-        _khrSwapchain.DestroySwapchain(_device.Device, Swapchain, null);
+        if (result is Result.SuboptimalKhr or Result.ErrorOutOfDateKhr)
+            RecreateSwapchain();
+        else
+            result.Check("Present");
     }
-
+    
     private void CreateSwapchain()
     {
         PhysicalDevice physicalDevice = _device.PhysicalDevice;
@@ -160,7 +165,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         SurfaceCapabilitiesKHR surfaceCapabilities;
         khrSurface.GetPhysicalDeviceSurfaceCapabilities(physicalDevice, _surface, &surfaceCapabilities);
 
-        uint desiredNumImages = info.NumBuffers;
+        uint desiredNumImages = _numBuffers;
         if (desiredNumImages < surfaceCapabilities.MinImageCount)
         {
             GrabsLog.Log(GrabsLog.Severity.Warning, GrabsLog.Type.General,
@@ -185,7 +190,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         PresentModeKHR* presentModes = stackalloc PresentModeKHR[(int) numPresentModes];
         khrSurface.GetPhysicalDeviceSurfacePresentModes(physicalDevice, _surface, &numPresentModes, presentModes);
 
-        PresentModeKHR desiredPresentMode = info.PresentMode switch
+        PresentModeKHR desiredPresentMode = _presentMode switch
         {
             PresentMode.Immediate => PresentModeKHR.ImmediateKhr,
             PresentMode.Fifo => PresentModeKHR.FifoKhr,
@@ -235,6 +240,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
             PreTransform = SurfaceTransformFlagsKHR.IdentityBitKhr,
 
             Flags = SwapchainCreateFlagsKHR.None,
+            OldSwapchain = Swapchain
         };
 
         if (_device.Queues.PresentIndex == _device.Queues.GraphicsIndex)
@@ -273,5 +279,27 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
 
             _swapchainTextures[i] = new VulkanTexture(_vk, _device.Device, swapchainImages[i], view, Size);
         }
+    }
+
+    private void RecreateSwapchain()
+    {
+        foreach (VulkanTexture texture in _swapchainTextures)
+            texture.Dispose();
+
+        SwapchainKHR oldChain = Swapchain;
+        CreateSwapchain();
+        _khrSwapchain.DestroySwapchain(_device.Device, oldChain, null);
+    }
+
+    public override void Dispose()
+    {
+        _vk.FreeCommandBuffers(_device.Device, _device.CommandPool, 1, in _commandBuffer);
+        
+        _vk.DestroyFence(_device.Device, _fence, null);
+        
+        foreach (VulkanTexture texture in _swapchainTextures)
+            texture.Dispose();
+        
+        _khrSwapchain.DestroySwapchain(_device.Device, Swapchain, null);
     }
 }
