@@ -14,13 +14,13 @@ internal sealed unsafe class D3D11Buffer : Buffer
     {
         _context = context;
 
-        IsDynamic = info.Usage == BufferUsage.Dynamic;
+        //IsDynamic = info.Usage == BufferUsage.Dynamic;
         
-        BindFlags flags = info.Type switch
+        BindFlags flags = info.Usage switch
         {
-            BufferType.Vertex => BindFlags.VertexBuffer,
-            BufferType.Index => BindFlags.IndexBuffer,
-            BufferType.Constant => BindFlags.ConstantBuffer,
+            BufferUsage.Vertex => BindFlags.VertexBuffer,
+            BufferUsage.Index => BindFlags.IndexBuffer,
+            BufferUsage.Constant => BindFlags.ConstantBuffer,
             _ => throw new ArgumentOutOfRangeException()
         };
 

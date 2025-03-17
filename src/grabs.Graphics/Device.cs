@@ -53,38 +53,38 @@ public abstract class Device : IDisposable
     /// <summary>
     /// Create a buffer with the given data.
     /// </summary>
-    /// <param name="type">The <see cref="BufferType"/> to create the buffer with.</param>
+    /// <param name="usage">The <see cref="BufferUsage"/> to create the buffer with.</param>
     /// <param name="data">The data to initialize the buffer with.</param>
     /// <param name="usage">The way the buffer will be used.</param>
     /// <typeparam name="T">A primitive or sequential struct.</typeparam>
     /// <returns>The created buffer.</returns>
-    public unsafe Buffer CreateBuffer<T>(BufferType type, in ReadOnlySpan<T> data, BufferUsage usage = BufferUsage.Default) where T : unmanaged
+    public unsafe Buffer CreateBuffer<T>(BufferUsage usage, in ReadOnlySpan<T> data) where T : unmanaged
     {
         fixed (void* pData = data)
-            return CreateBuffer(new BufferInfo(type, (uint) (data.Length * sizeof(T)), usage), pData);
+            return CreateBuffer(new BufferInfo(usage, (uint) (data.Length * sizeof(T))), pData);
     }
 
     /// <summary>
     /// Create a buffer with the given data.
     /// </summary>
-    /// <param name="type">The <see cref="BufferType"/> to create the buffer with.</param>
+    /// <param name="usage">The <see cref="BufferUsage"/> to create the buffer with.</param>
     /// <param name="data">The data to initialize the buffer with.</param>
     /// <param name="usage">The way the buffer will be used.</param>
     /// <typeparam name="T">A primitive or sequential struct.</typeparam>
     /// <returns>The created buffer.</returns>
-    public Buffer CreateBuffer<T>(BufferType type, T[] data, BufferUsage usage = BufferUsage.Default) where T : unmanaged
-        => CreateBuffer<T>(type, data.AsSpan(), usage);
+    public Buffer CreateBuffer<T>(BufferUsage usage, T[] data) where T : unmanaged
+        => CreateBuffer<T>(usage, data.AsSpan());
 
     /// <summary>
     /// Create a buffer with the given data.
     /// </summary>
-    /// <param name="type">The <see cref="BufferType"/> to create the buffer with.</param>
+    /// <param name="usage">The <see cref="BufferUsage"/> to create the buffer with.</param>
     /// <param name="data">The data to initialize the buffer with.</param>
     /// <param name="usage">The way the buffer will be used.</param>
     /// <typeparam name="T">A primitive or sequential struct.</typeparam>
     /// <returns>The created buffer.</returns>
-    public unsafe Buffer CreateBuffer<T>(BufferType type, T data, BufferUsage usage = BufferUsage.Default) where T : unmanaged
-        => CreateBuffer(new BufferInfo(type, (uint) sizeof(T), usage), Unsafe.AsPointer(ref data));
+    public unsafe Buffer CreateBuffer<T>(BufferUsage usage, T data) where T : unmanaged
+        => CreateBuffer(new BufferInfo(usage, (uint) sizeof(T)), Unsafe.AsPointer(ref data));
 
     public abstract unsafe Texture CreateTexture(in TextureInfo info, void* pData);
 

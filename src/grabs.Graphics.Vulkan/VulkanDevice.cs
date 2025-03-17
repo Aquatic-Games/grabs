@@ -1,5 +1,6 @@
 global using VkDevice = Silk.NET.Vulkan.Device;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using grabs.Core;
 using grabs.VulkanMemoryAllocator;
@@ -249,7 +250,25 @@ internal sealed unsafe class VulkanDevice : Device
 
     public override void UpdateBuffer(Buffer buffer, uint offset, uint size, void* pData)
     {
-        throw new NotImplementedException();
+        VulkanBuffer vkBuffer = (VulkanBuffer) buffer;
+        VulkanBuffer transfer = (VulkanBuffer) CreateBuffer(new BufferInfo(BufferUsage.TransferSrc, size));
+        
+        Debug.Assert(transfer.IsPersistentMapped);
+        Unsafe.CopyBlock(transfer.MappedPtr, pData, size);
+
+        CommandBuffer cb = BeginCommands();
+
+        BufferCopy copy = new()
+        {
+            DstOffset = offset,
+            Size = size
+        };
+        
+        _vk.CmdCopyBuffer(cb, transfer.Buffer, vkBuffer.Buffer, 1, &copy);
+        
+        EndCommands();
+        
+        transfer.Dispose();
     }
 
     public override void WaitForIdle()

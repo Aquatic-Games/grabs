@@ -99,9 +99,9 @@ unsafe
         1, 2, 3
     };
 
-    Buffer vertexBuffer = device.CreateBuffer(BufferType.Vertex, vertices);
-    Buffer indexBuffer = device.CreateBuffer(BufferType.Index, indices);
-    Buffer constantBuffer = device.CreateBuffer(BufferType.Constant, Matrix4x4.Identity, BufferUsage.Dynamic);
+    Buffer vertexBuffer = device.CreateBuffer(BufferUsage.Vertex, vertices);
+    Buffer indexBuffer = device.CreateBuffer(BufferUsage.Index, indices);
+    //Buffer constantBuffer = device.CreateBuffer(BufferUsage.Constant, Matrix4x4.Identity);
 
     ImageResult result = ImageResult.FromMemory(File.ReadAllBytes("/home/aqua/Pictures/BAGELMIP.png"),
         ColorComponents.RedGreenBlueAlpha);
@@ -186,7 +186,7 @@ unsafe
 
         cl.PushDescriptors(0, pipeline,
         [
-            new Descriptor(0, DescriptorType.ConstantBuffer, buffer: constantBuffer),
+            //new Descriptor(0, DescriptorType.ConstantBuffer, buffer: constantBuffer),
             new Descriptor(1, DescriptorType.Texture, texture: texture)
         ]);
         
@@ -213,7 +213,7 @@ unsafe
     pipeline.Dispose();
     layout.Dispose();
     texture.Dispose();
-    constantBuffer.Dispose();
+    //constantBuffer.Dispose();
     indexBuffer.Dispose();
     vertexBuffer.Dispose();
     cl.Dispose();

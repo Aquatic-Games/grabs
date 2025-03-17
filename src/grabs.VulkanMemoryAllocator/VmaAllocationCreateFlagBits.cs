@@ -3,6 +3,7 @@ using Silk.NET.Vulkan;
 namespace grabs.VulkanMemoryAllocator
 {
     [NativeTypeName("unsigned int")]
+    [Flags]
     public enum VmaAllocationCreateFlagBits : uint
     {
         VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT = 0x00000001,

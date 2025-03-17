@@ -8,7 +8,7 @@ public record struct BufferInfo
     /// <summary>
     /// The type of buffer to create.
     /// </summary>
-    public BufferType Type;
+    public BufferUsage Usage;
 
     /// <summary>
     /// The size of the buffer, in bytes.
@@ -16,20 +16,13 @@ public record struct BufferInfo
     public uint Size;
 
     /// <summary>
-    /// The way the buffer will be used.
-    /// </summary>
-    public BufferUsage Usage;
-
-    /// <summary>
     /// 
     /// </summary>
-    /// <param name="type">The type of buffer to create.</param>
+    /// <param name="usage">The type of buffer to create.</param>
     /// <param name="size">The size of the buffer, in bytes.</param>
-    /// <param name="usage">The way the buffer will be used.</param>
-    public BufferInfo(BufferType type, uint size, BufferUsage usage)
+    public BufferInfo(BufferUsage usage, uint size)
     {
-        Type = type;
-        Size = size;
         Usage = usage;
+        Size = size;
     }
 }
