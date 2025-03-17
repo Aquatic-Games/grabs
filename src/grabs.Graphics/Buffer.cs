@@ -5,6 +5,13 @@ namespace grabs.Graphics;
 /// </summary>
 public abstract class Buffer : MappableResource, IDisposable
 {
+    public readonly BufferInfo Info;
+
+    protected Buffer(ref readonly BufferInfo info)
+    {
+        Info = info;
+    }
+    
     /// <summary>
     /// Release this buffer from memory.
     /// </summary>

@@ -19,7 +19,7 @@ internal sealed unsafe class VulkanBuffer : Buffer
     public readonly bool IsPersistentMapped;
     public readonly void* MappedPtr;
 
-    public VulkanBuffer(Vk vk, VulkanDevice device, ref readonly BufferInfo info, void* data)
+    public VulkanBuffer(Vk vk, VulkanDevice device, ref readonly BufferInfo info, void* data) : base(in info)
     {
         _vk = vk;
         _allocator = device.Allocator;

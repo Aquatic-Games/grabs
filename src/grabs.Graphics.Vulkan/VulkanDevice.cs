@@ -17,6 +17,9 @@ internal sealed unsafe class VulkanDevice : Device
 
     private GCHandle _instanceFnHandle;
     private GCHandle _deviceFnHandle;
+    private readonly Fence _fence;
+
+    private readonly List<VulkanBuffer> _transferBuffers;
     
     public readonly PhysicalDevice PhysicalDevice;
     
@@ -32,8 +35,6 @@ internal sealed unsafe class VulkanDevice : Device
     public readonly CommandBuffer DeviceCommandBuffer;
 
     public readonly VmaAllocator_T* Allocator;
-
-    private readonly Fence _fence;
     
     public override Adapter Adapter { get; }
 
@@ -45,6 +46,8 @@ internal sealed unsafe class VulkanDevice : Device
         Adapter = adapter;
         PhysicalDevice = new PhysicalDevice(adapter.Handle);
         KhrSurface = khrSurface;
+
+        _transferBuffers = new List<VulkanBuffer>();
 
         uint? graphicsQueueIndex = null;
         uint? presentQueueIndex = null;
@@ -251,7 +254,7 @@ internal sealed unsafe class VulkanDevice : Device
     public override void UpdateBuffer(Buffer buffer, uint offset, uint size, void* pData)
     {
         VulkanBuffer vkBuffer = (VulkanBuffer) buffer;
-        VulkanBuffer transfer = (VulkanBuffer) CreateBuffer(new BufferInfo(BufferUsage.TransferSrc, size));
+        VulkanBuffer transfer = AcquireTransferBuffer(size);
         
         Debug.Assert(transfer.IsPersistentMapped);
         Unsafe.CopyBlock(transfer.MappedPtr, pData, size);
@@ -267,8 +270,6 @@ internal sealed unsafe class VulkanDevice : Device
         _vk.CmdCopyBuffer(cb, transfer.Buffer, vkBuffer.Buffer, 1, &copy);
         
         EndCommands();
-        
-        transfer.Dispose();
     }
 
     public override void WaitForIdle()
@@ -308,10 +309,12 @@ internal sealed unsafe class VulkanDevice : Device
 
     public override void Dispose()
     {
+        foreach (VulkanBuffer buffer in _transferBuffers)
+            buffer.Dispose();
+        
         Vma.DestroyAllocator(Allocator);
         _deviceFnHandle.Free();
         _instanceFnHandle.Free();
-        
         
         _vk.DestroyFence(Device, _fence, null);
         _vk.DestroyCommandPool(Device, CommandPool, null);
@@ -320,6 +323,29 @@ internal sealed unsafe class VulkanDevice : Device
         KhrSwapchain.Dispose();
         
         _vk.DestroyDevice(Device, null);
+    }
+
+    private VulkanBuffer AcquireTransferBuffer(uint size)
+    {
+        foreach (VulkanBuffer buffer in _transferBuffers)
+        {
+            if (buffer.Info.Size >= size)
+                return buffer;
+        }
+
+        GrabsLog.Log(GrabsLog.Severity.Warning, GrabsLog.Type.Performance,
+            $"Could not find any pooled transfer buffers with size {size}. Creating a new one.");
+
+        BufferInfo info = new()
+        {
+            Usage = BufferUsage.TransferSrc,
+            Size = size
+        };
+        VulkanBuffer buf = new VulkanBuffer(_vk, this, in info, null);
+        
+        _transferBuffers.Add(buf);
+
+        return buf;
     }
 
     private void* GetInstanceProcAddress(VkInstance instance, byte* name)

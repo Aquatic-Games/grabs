@@ -10,7 +10,8 @@ internal sealed unsafe class D3D11Buffer : Buffer
 
     public readonly bool IsDynamic;
 
-    public D3D11Buffer(ID3D11Device device, ID3D11DeviceContext context, ref readonly BufferInfo info, void* pData)
+    public D3D11Buffer(ID3D11Device device, ID3D11DeviceContext context, ref readonly BufferInfo info, void* pData) 
+        : base(in info)
     {
         _context = context;
 
