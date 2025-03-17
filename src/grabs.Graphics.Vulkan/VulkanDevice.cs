@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using grabs.Core;
 using grabs.VulkanMemoryAllocator;
 using Silk.NET.Core;
-using Silk.NET.Core.Native;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.KHR;
 
@@ -86,7 +85,7 @@ internal sealed unsafe class VulkanDevice : Device
         {
             float queuePriority = 1.0f;
 
-            queueInfos[familyIndex] = new DeviceQueueCreateInfo()
+            queueInfos[familyIndex++] = new DeviceQueueCreateInfo()
             {
                 SType = StructureType.DeviceQueueCreateInfo,
                 QueueCount = 1,
@@ -185,7 +184,7 @@ internal sealed unsafe class VulkanDevice : Device
             instance = instance,
             physicalDevice = PhysicalDevice,
             device = Device,
-            vulkanApiVersion = Vk.MakeVersion(1, 3),
+            vulkanApiVersion = Vk.Version13,
             pVulkanFunctions = &functions
         };
 

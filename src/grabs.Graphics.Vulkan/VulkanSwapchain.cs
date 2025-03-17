@@ -10,145 +10,32 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
     private readonly Vk _vk;
     private readonly KhrSwapchain _khrSwapchain;
     private readonly VulkanDevice _device;
+    private readonly SurfaceKHR _surface;
 
-    private readonly VulkanTexture[] _swapchainTextures;
+    private VulkanTexture[] _swapchainTextures;
     private uint _currentImage;
 
     private readonly Fence _fence;
 
     private readonly CommandBuffer _commandBuffer;
     
-    public readonly SwapchainKHR Swapchain;
+    public SwapchainKHR Swapchain;
     
     public override Format SwapchainFormat { get; }
+    
+    public override Size2D Size { get; }
 
     public VulkanSwapchain(Vk vk, VulkanDevice device, ref readonly SwapchainInfo info)
     {
         _vk = vk;
         _device = device;
         _khrSwapchain = _device.KhrSwapchain;
+        _surface = ((VulkanSurface) info.Surface).Surface;
 
-        PhysicalDevice physicalDevice = _device.PhysicalDevice;
-        KhrSurface khrSurface = _device.KhrSurface;
-        VulkanSurface surface = (VulkanSurface) info.Surface;
-        
-        SurfaceCapabilitiesKHR surfaceCapabilities;
-        khrSurface.GetPhysicalDeviceSurfaceCapabilities(physicalDevice, surface.Surface, &surfaceCapabilities);
-
-        uint desiredNumImages = info.NumBuffers;
-        if (desiredNumImages < surfaceCapabilities.MinImageCount)
-        {
-            GrabsLog.Log(GrabsLog.Severity.Warning, GrabsLog.Type.General,
-                $"Desired buffer count ({desiredNumImages}) is under the minimum allowed buffer count ({surfaceCapabilities.MinImageCount}). Clamping to the minimum.");
-
-            desiredNumImages = surfaceCapabilities.MinImageCount;
-        }
-        // If max image count is 0, there is no limit.
-        else if (desiredNumImages > surfaceCapabilities.MaxImageCount && surfaceCapabilities.MaxImageCount != 0)
-        {
-            GrabsLog.Log(GrabsLog.Severity.Warning, GrabsLog.Type.General,
-                $"Desired buffer count ({desiredNumImages}) is above the maximum allowed buffer count ({surfaceCapabilities.MaxImageCount}). Clamping to the maximum.");
-
-            desiredNumImages = surfaceCapabilities.MaxImageCount;
-        }
-        
-        GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Type.General,
-            "Checking supported present modes over selected present mode.");
-        
-        uint numPresentModes;
-        khrSurface.GetPhysicalDeviceSurfacePresentModes(physicalDevice, surface.Surface, &numPresentModes, null);
-        PresentModeKHR* presentModes = stackalloc PresentModeKHR[(int) numPresentModes];
-        khrSurface.GetPhysicalDeviceSurfacePresentModes(physicalDevice, surface.Surface, &numPresentModes, presentModes);
-
-        PresentModeKHR desiredPresentMode = info.PresentMode switch
-        {
-            PresentMode.Immediate => PresentModeKHR.ImmediateKhr,
-            PresentMode.Fifo => PresentModeKHR.FifoKhr,
-            PresentMode.FifoRelaxed => PresentModeKHR.FifoRelaxedKhr,
-            PresentMode.Mailbox => PresentModeKHR.MailboxKhr,
-            _ => throw new ArgumentOutOfRangeException()
-        };
-        
-        // TODO: Make this smarter so FifoRelaxed will prefer Fifo if not present, etc.
-        for (uint i = 0; i < numPresentModes; i++)
-        {
-            if (desiredPresentMode == presentModes[i])
-                goto PRESENT_MODE_FOUND;
-        }
-
-        GrabsLog.Log(GrabsLog.Severity.Warning, GrabsLog.Type.Performance,
-            $"Desired present mode {desiredPresentMode} is not supported by the GPU - present mode {presentModes[0]} will be used instead.");
-
-        desiredPresentMode = presentModes[0];
-        
-        PRESENT_MODE_FOUND: ;
-
+        Size = info.Size;
         SwapchainFormat = info.Format;
-        VkFormat format = info.Format.ToVk();
 
-        // TODO: Compare desiredExtent vs the Min and Max extents.
-        Extent2D desiredExtent = info.Size.ToVk();
-
-        SwapchainCreateInfoKHR swapchainInfo = new SwapchainCreateInfoKHR()
-        {
-            SType = StructureType.SwapchainCreateInfoKhr,
-
-            Surface = surface.Surface,
-
-            MinImageCount = desiredNumImages,
-            PresentMode = desiredPresentMode,
-
-            ImageFormat = format,
-            ImageColorSpace = ColorSpaceKHR.SpaceSrgbNonlinearKhr,
-
-            ImageExtent = desiredExtent,
-
-            ImageUsage = ImageUsageFlags.ColorAttachmentBit,
-            ImageArrayLayers = 1,
-
-            Clipped = true,
-            CompositeAlpha = CompositeAlphaFlagsKHR.OpaqueBitKhr,
-            PreTransform = SurfaceTransformFlagsKHR.IdentityBitKhr,
-
-            Flags = SwapchainCreateFlagsKHR.None,
-        };
-
-        if (_device.Queues.PresentIndex == _device.Queues.GraphicsIndex)
-            swapchainInfo.ImageSharingMode = SharingMode.Exclusive;
-        else
-            throw new NotImplementedException("GRABS does not yet support separate graphics and present queues.");
-
-        GrabsLog.Log("Creating swapchain.");
-        _khrSwapchain.CreateSwapchain(_device.Device, &swapchainInfo, null, out Swapchain)
-            .Check("Create swapchain");
-
-        GrabsLog.Log("Getting swapchain images");
-        uint numImages;
-        _khrSwapchain.GetSwapchainImages(_device.Device, Swapchain, &numImages, null);
-        Image* swapchainImages = stackalloc Image[(int) numImages];
-        _khrSwapchain.GetSwapchainImages(_device.Device, Swapchain, &numImages, swapchainImages);
-
-        GrabsLog.Log("Creating swapchain image views.");
-        _swapchainTextures = new VulkanTexture[numImages];
-        for (int i = 0; i < numImages; i++)
-        {
-            ImageViewCreateInfo imageViewInfo = new ImageViewCreateInfo()
-            {
-                SType = StructureType.ImageViewCreateInfo,
-                Image = swapchainImages[i],
-
-                Format = format,
-                ViewType = ImageViewType.Type2D,
-                Components = new ComponentMapping(ComponentSwizzle.Identity, ComponentSwizzle.Identity, ComponentSwizzle.Identity, ComponentSwizzle.Identity),
-
-                SubresourceRange = new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1)
-            };
-            
-            _vk.CreateImageView(_device.Device, &imageViewInfo, null, out ImageView view)
-                .Check("Create image view");
-
-            _swapchainTextures[i] = new VulkanTexture(_vk, _device.Device, swapchainImages[i], view, info.Size);
-        }
+        CreateSwapchain();
 
         FenceCreateInfo fenceInfo = new FenceCreateInfo()
         {
@@ -263,5 +150,128 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
             texture.Dispose();
         
         _khrSwapchain.DestroySwapchain(_device.Device, Swapchain, null);
+    }
+
+    private void CreateSwapchain()
+    {
+        PhysicalDevice physicalDevice = _device.PhysicalDevice;
+        KhrSurface khrSurface = _device.KhrSurface;
+        
+        SurfaceCapabilitiesKHR surfaceCapabilities;
+        khrSurface.GetPhysicalDeviceSurfaceCapabilities(physicalDevice, _surface, &surfaceCapabilities);
+
+        uint desiredNumImages = info.NumBuffers;
+        if (desiredNumImages < surfaceCapabilities.MinImageCount)
+        {
+            GrabsLog.Log(GrabsLog.Severity.Warning, GrabsLog.Type.General,
+                $"Desired buffer count ({desiredNumImages}) is under the minimum allowed buffer count ({surfaceCapabilities.MinImageCount}). Clamping to the minimum.");
+
+            desiredNumImages = surfaceCapabilities.MinImageCount;
+        }
+        // If max image count is 0, there is no limit.
+        else if (desiredNumImages > surfaceCapabilities.MaxImageCount && surfaceCapabilities.MaxImageCount != 0)
+        {
+            GrabsLog.Log(GrabsLog.Severity.Warning, GrabsLog.Type.General,
+                $"Desired buffer count ({desiredNumImages}) is above the maximum allowed buffer count ({surfaceCapabilities.MaxImageCount}). Clamping to the maximum.");
+
+            desiredNumImages = surfaceCapabilities.MaxImageCount;
+        }
+        
+        GrabsLog.Log(GrabsLog.Severity.Verbose, GrabsLog.Type.General,
+            "Checking supported present modes over selected present mode.");
+        
+        uint numPresentModes;
+        khrSurface.GetPhysicalDeviceSurfacePresentModes(physicalDevice, _surface, &numPresentModes, null);
+        PresentModeKHR* presentModes = stackalloc PresentModeKHR[(int) numPresentModes];
+        khrSurface.GetPhysicalDeviceSurfacePresentModes(physicalDevice, _surface, &numPresentModes, presentModes);
+
+        PresentModeKHR desiredPresentMode = info.PresentMode switch
+        {
+            PresentMode.Immediate => PresentModeKHR.ImmediateKhr,
+            PresentMode.Fifo => PresentModeKHR.FifoKhr,
+            PresentMode.FifoRelaxed => PresentModeKHR.FifoRelaxedKhr,
+            PresentMode.Mailbox => PresentModeKHR.MailboxKhr,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+        
+        // TODO: Make this smarter so FifoRelaxed will prefer Fifo if not present, etc.
+        for (uint i = 0; i < numPresentModes; i++)
+        {
+            if (desiredPresentMode == presentModes[i])
+                goto PRESENT_MODE_FOUND;
+        }
+
+        GrabsLog.Log(GrabsLog.Severity.Warning, GrabsLog.Type.Performance,
+            $"Desired present mode {desiredPresentMode} is not supported by the GPU - present mode {presentModes[0]} will be used instead.");
+
+        desiredPresentMode = presentModes[0];
+        
+        PRESENT_MODE_FOUND: ;
+        
+        VkFormat format = SwapchainFormat.ToVk();
+
+        // TODO: Compare desiredExtent vs the Min and Max extents.
+        Extent2D desiredExtent = Size.ToVk();
+
+        SwapchainCreateInfoKHR swapchainInfo = new SwapchainCreateInfoKHR()
+        {
+            SType = StructureType.SwapchainCreateInfoKhr,
+
+            Surface = _surface,
+
+            MinImageCount = desiredNumImages,
+            PresentMode = desiredPresentMode,
+
+            ImageFormat = format,
+            ImageColorSpace = ColorSpaceKHR.SpaceSrgbNonlinearKhr,
+
+            ImageExtent = desiredExtent,
+
+            ImageUsage = ImageUsageFlags.ColorAttachmentBit,
+            ImageArrayLayers = 1,
+
+            Clipped = true,
+            CompositeAlpha = CompositeAlphaFlagsKHR.OpaqueBitKhr,
+            PreTransform = SurfaceTransformFlagsKHR.IdentityBitKhr,
+
+            Flags = SwapchainCreateFlagsKHR.None,
+        };
+
+        if (_device.Queues.PresentIndex == _device.Queues.GraphicsIndex)
+            swapchainInfo.ImageSharingMode = SharingMode.Exclusive;
+        else
+            throw new NotImplementedException("GRABS does not yet support separate graphics and present queues.");
+
+        GrabsLog.Log("Creating swapchain.");
+        _khrSwapchain.CreateSwapchain(_device.Device, &swapchainInfo, null, out Swapchain)
+            .Check("Create swapchain");
+
+        GrabsLog.Log("Getting swapchain images");
+        uint numImages;
+        _khrSwapchain.GetSwapchainImages(_device.Device, Swapchain, &numImages, null);
+        Image* swapchainImages = stackalloc Image[(int) numImages];
+        _khrSwapchain.GetSwapchainImages(_device.Device, Swapchain, &numImages, swapchainImages);
+
+        GrabsLog.Log("Creating swapchain image views.");
+        _swapchainTextures = new VulkanTexture[numImages];
+        for (int i = 0; i < numImages; i++)
+        {
+            ImageViewCreateInfo imageViewInfo = new ImageViewCreateInfo()
+            {
+                SType = StructureType.ImageViewCreateInfo,
+                Image = swapchainImages[i],
+
+                Format = format,
+                ViewType = ImageViewType.Type2D,
+                Components = new ComponentMapping(ComponentSwizzle.Identity, ComponentSwizzle.Identity, ComponentSwizzle.Identity, ComponentSwizzle.Identity),
+
+                SubresourceRange = new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1)
+            };
+            
+            _vk.CreateImageView(_device.Device, &imageViewInfo, null, out ImageView view)
+                .Check("Create image view");
+
+            _swapchainTextures[i] = new VulkanTexture(_vk, _device.Device, swapchainImages[i], view, Size);
+        }
     }
 }

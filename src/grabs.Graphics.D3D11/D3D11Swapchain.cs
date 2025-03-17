@@ -1,4 +1,5 @@
-﻿using Vortice.Direct3D11;
+﻿using grabs.Core;
+using Vortice.Direct3D11;
 using Vortice.DXGI;
 
 namespace grabs.Graphics.D3D11;
@@ -13,6 +14,8 @@ internal sealed class D3D11Swapchain : Swapchain
     
     public override Format SwapchainFormat { get; }
     
+    public override Size2D Size { get; }
+
     public D3D11Swapchain(IDXGIFactory factory, ID3D11Device device, ref readonly SwapchainInfo info)
     {
         _presentInterval = info.PresentMode switch
@@ -25,6 +28,7 @@ internal sealed class D3D11Swapchain : Swapchain
         };
         
         SwapchainFormat = info.Format;
+        Size = info.Size;
 
         D3D11Surface surface = (D3D11Surface) info.Surface;
         

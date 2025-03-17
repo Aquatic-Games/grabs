@@ -1,3 +1,5 @@
+using grabs.Core;
+
 namespace grabs.Graphics;
 
 /// <summary>
@@ -10,6 +12,8 @@ public abstract class Swapchain : IDisposable
     /// The surface <see cref="Format"/> used in this swapchain.
     /// </summary>
     public abstract Format SwapchainFormat { get; }
+    
+    public abstract Size2D Size { get; }
 
     /// <summary>
     /// Get the next texture used for rendering. Depending on the <see cref="SwapchainInfo.PresentMode"/>, this may
