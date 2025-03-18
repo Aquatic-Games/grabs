@@ -182,7 +182,12 @@ internal sealed class D3D11CommandList : CommandList
     {
         Context.DrawIndexed(numIndices, 0, 0);
     }
-    
+
+    public override void DrawIndexed(uint numIndices, uint startIndex, int baseVertex)
+    {
+        Context.DrawIndexed(numIndices, startIndex, baseVertex);
+    }
+
     public override void Dispose()
     {
         CommandList?.Dispose();

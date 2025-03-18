@@ -94,6 +94,8 @@ public abstract class CommandList : IDisposable
     /// </summary>
     /// <param name="numIndices">The number of indices to draw.</param>
     public abstract void DrawIndexed(uint numIndices);
+
+    public abstract void DrawIndexed(uint numIndices, uint startIndex, int baseVertex);
     
     /// <summary>
     /// Dispose of the command list.

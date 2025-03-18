@@ -256,6 +256,11 @@ internal sealed unsafe class VulkanCommandList : CommandList
         _vk.CmdDrawIndexed(Buffer, numIndices, 1, 0, 0, 0);
     }
 
+    public override void DrawIndexed(uint numIndices, uint startIndex, int baseVertex)
+    {
+        _vk.CmdDrawIndexed(Buffer, numIndices, 1, startIndex, baseVertex, 0);
+    }
+
     public override void Dispose()
     {
         _vk.DestroySampler(_device, _tempSampler, null);
