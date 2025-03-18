@@ -13,6 +13,7 @@ internal sealed class D3D11ShaderModule : ShaderModule
     public D3D11ShaderModule(ShaderStage stage, ReadOnlySpan<byte> spirv, string entryPoint)
     {
         string hlsl = CompilerUtils.HlslFromSpirv(stage, in spirv, entryPoint, out Remappings);
+        Console.WriteLine(hlsl);
 
         string profile = stage switch
         {

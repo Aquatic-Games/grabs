@@ -7,6 +7,8 @@ namespace grabs.SpirvTools;
 
 public static unsafe class CompilerUtils
 {
+    public const uint PushConstantBindingPoint = 0;
+    
     private static readonly Cross _spirv;
 
     static CompilerUtils()
@@ -70,9 +72,10 @@ public static unsafe class CompilerUtils
 
             Resources* resources;
             _spirv.CompilerCreateShaderResources(compiler, &resources);
-            RemapType(compiler, resources, ResourceType.UniformBuffer, ref remappings);
-            RemapType(compiler, resources, ResourceType.SeparateImage, ref remappings);
-            RemapType(compiler, resources, ResourceType.SeparateSamplers, ref remappings);
+            RemapType(compiler, resources, ResourceType.UniformBuffer, 1, ref remappings);
+            RemapType(compiler, resources, ResourceType.SeparateImage, 0, ref remappings);
+            RemapType(compiler, resources, ResourceType.SeparateSamplers, 0, ref remappings);
+            RemapType(compiler, resources, ResourceType.PushConstant, PushConstantBindingPoint, ref remappings);
 
             byte* source;
             if (_spirv.CompilerCompile(compiler, &source) != Result.Success)
@@ -88,13 +91,13 @@ public static unsafe class CompilerUtils
         }
     }
 
-    private static void RemapType(Compiler* compiler, Resources* resources, ResourceType type, ref Dictionary<uint, Dictionary<uint, uint>> remappings)
+    private static void RemapType(Compiler* compiler, Resources* resources, ResourceType type, uint startOffset, ref Dictionary<uint, Dictionary<uint, uint>> remappings)
     {
         ReflectedResource* reflectedResources;
         nuint numResources;
         _spirv.ResourcesGetResourceListForType(resources, type, &reflectedResources, &numResources);
 
-        uint bindNum = 0;
+        uint bindNum = startOffset;
         for (uint i = 0; i < numResources; i++)
         {
             uint id = reflectedResources[i].Id;

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using grabs.Core;
+using grabs.SpirvTools;
 using Vortice.Direct3D;
 using Vortice.Direct3D11;
 using Vortice.Mathematics;
@@ -105,7 +106,25 @@ internal sealed class D3D11CommandList : CommandList
 
     public override unsafe void PushConstant(Pipeline pipeline, ShaderStage stage, uint offset, uint size, void* pData)
     {
-        throw new NotImplementedException();
+        D3D11Pipeline d3dPipeline = (D3D11Pipeline) pipeline;
+        Debug.Assert(d3dPipeline.PushConstantBuffer != null);
+        
+        ID3D11Buffer pushConstantBuffer = d3dPipeline.PushConstantBuffer;
+
+        Context.UpdateSubresource(pushConstantBuffer, 0, new Box((int) offset, 0, 0, (int) (offset + size), 1, 1),
+            (nint) pData, 0, 0);
+
+        switch (stage)
+        {
+            case ShaderStage.Vertex:
+                Context.VSSetConstantBuffer(CompilerUtils.PushConstantBindingPoint, pushConstantBuffer);
+                break;
+            case ShaderStage.Pixel:
+                Context.PSSetConstantBuffer(CompilerUtils.PushConstantBindingPoint, pushConstantBuffer);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(stage), stage, null);
+        }
     }
 
     /*public override unsafe void UpdateBuffer(Buffer buffer, uint sizeInBytes, void* pData)

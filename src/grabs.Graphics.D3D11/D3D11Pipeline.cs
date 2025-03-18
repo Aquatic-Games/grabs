@@ -1,4 +1,6 @@
-﻿using Vortice.Direct3D11;
+﻿using System.Diagnostics;
+using grabs.Core;
+using Vortice.Direct3D11;
 
 namespace grabs.Graphics.D3D11;
 
@@ -14,7 +16,7 @@ internal sealed class D3D11Pipeline : Pipeline
 
     public readonly ID3D11InputLayout? Layout;
 
-    public readonly Dictionary<ShaderStage, ID3D11Buffer> PushConstantBuffers;
+    public readonly ID3D11Buffer? PushConstantBuffer;
     
     public D3D11Pipeline(ID3D11Device device, ref readonly PipelineInfo info)
     {
@@ -49,23 +51,33 @@ internal sealed class D3D11Pipeline : Pipeline
             Layout = device.CreateInputLayout(elementDescs, vertexModule.Blob);
         }
 
-        /*PushConstantBuffers = [];
-        uint vertexConstSize = 0;
-        uint pixelConstSize = 0;
-        
-        for (int i = 0; i < info.Constants.Length; i++)
+        if (info.Constants.Length > 0)
         {
-            ref readonly ConstantLayout constant = ref info.Constants[i];
-
-            switch (constant.Stages)
+            uint pushConstantSize = 0;
+            for (int i = 0; i < info.Constants.Length; i++)
             {
-                
+                ref readonly ConstantLayout constant = ref info.Constants[i];
+                pushConstantSize += constant.Size;
             }
-        }*/
+
+            Debug.Assert(pushConstantSize <= MaxPushConstantSize);
+            
+            BufferDescription bufferDesc = new()
+            {
+                BindFlags = BindFlags.ConstantBuffer,
+                Usage = ResourceUsage.Dynamic,
+                ByteWidth = pushConstantSize,
+                CPUAccessFlags = CpuAccessFlags.Write
+            };
+
+            GrabsLog.Log($"Creating push constant buffer with size {pushConstantSize}");
+            PushConstantBuffer = device.CreateBuffer(in bufferDesc);
+        }
     }
     
     public override void Dispose()
     {
+        PushConstantBuffer?.Dispose();
         Layout?.Dispose();
         PixelShader.Dispose();
         VertexShader.Dispose();
