@@ -12,6 +12,8 @@ internal sealed unsafe class VulkanCommandList : CommandList
     private readonly CommandPool _pool;
     private readonly KhrPushDescriptor _pushDescriptor;
 
+    private VulkanTexture? _currentSwapchainTexture;
+
     private readonly Sampler _tempSampler;
     
     public readonly CommandBuffer Buffer;
@@ -60,6 +62,13 @@ internal sealed unsafe class VulkanCommandList : CommandList
 
     public override void End()
     {
+        if (_currentSwapchainTexture != null)
+        {
+            _currentSwapchainTexture.TransitionImage(Buffer, ImageLayout.ColorAttachmentOptimal,
+                ImageLayout.PresentSrcKhr);
+            _currentSwapchainTexture = null;
+        }
+        
         _vk.EndCommandBuffer(Buffer).Check("End command buffer");
     }
 
@@ -75,6 +84,12 @@ internal sealed unsafe class VulkanCommandList : CommandList
             ColorF clearColor = attachmentInfo.ClearColor;
 
             VulkanTexture texture = (VulkanTexture) attachmentInfo.Texture;
+
+            if (texture.IsSwapchainTexture)
+            {
+                texture.TransitionImage(Buffer, ImageLayout.Undefined, ImageLayout.ColorAttachmentOptimal);
+                _currentSwapchainTexture = texture;
+            }
 
             colorAttachments[i] = new RenderingAttachmentInfo()
             {

@@ -18,15 +18,15 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
     private VulkanTexture[] _swapchainTextures;
     private uint _currentImage;
 
-    private readonly Fence _fence;
+    private Size2D _size;
 
-    private readonly CommandBuffer _commandBuffer;
+    private readonly Fence _fence;
     
     public SwapchainKHR Swapchain;
     
     public override Format SwapchainFormat { get; }
-    
-    public override Size2D Size { get; }
+
+    public override Size2D Size => _size;
 
     public VulkanSwapchain(Vk vk, VulkanDevice device, ref readonly SwapchainInfo info)
     {
@@ -40,7 +40,7 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
 
         _swapchainTextures = [];
 
-        Size = info.Size;
+        _size = info.Size;
         SwapchainFormat = info.Format;
 
         CreateSwapchain();
@@ -52,16 +52,6 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         
         GrabsLog.Log("Creating fence");
         _vk.CreateFence(_device.Device, &fenceInfo, null, out _fence).Check("Create fence");
-
-        CommandBufferAllocateInfo allocInfo = new CommandBufferAllocateInfo()
-        {
-            SType = StructureType.CommandBufferAllocateInfo,
-            CommandPool = _device.CommandPool,
-            CommandBufferCount = 1,
-            Level = CommandBufferLevel.Primary,
-        };
-
-        _vk.AllocateCommandBuffers(_device.Device, &allocInfo, out _commandBuffer).Check("Allocate command buffer");
     }
 
     public override Texture GetNextTexture()
@@ -77,33 +67,6 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
             .Check("Wait for fence");
         _vk.ResetFences(_device.Device, 1, in _fence);
 
-        CommandBufferBeginInfo beginInfo = new CommandBufferBeginInfo()
-        {
-            SType = StructureType.CommandBufferBeginInfo,
-        };
-
-        _vk.BeginCommandBuffer(_commandBuffer, &beginInfo).Check("Begin command buffer");
-
-        VulkanUtils.ImageBarrier(_vk, _commandBuffer, _swapchainTextures[_currentImage].Image, ImageLayout.Undefined,
-            ImageLayout.ColorAttachmentOptimal);
-        
-        _vk.EndCommandBuffer(_commandBuffer).Check("End command buffer");
-
-        CommandBuffer buffer = _commandBuffer;
-
-        SubmitInfo submitInfo = new SubmitInfo()
-        {
-            SType = StructureType.SubmitInfo,
-
-            CommandBufferCount = 1,
-            PCommandBuffers = &buffer
-        };
-        
-        _vk.QueueSubmit(_device.Queues.Graphics, 1, &submitInfo, _fence).Check("Submit queue");
-
-        _vk.WaitForFences(_device.Device, 1, in _fence, true, ulong.MaxValue);
-        _vk.ResetFences(_device.Device, 1, in _fence);
-
         return _swapchainTextures[_currentImage];
     }
 
@@ -111,33 +74,6 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
     {
         SwapchainKHR swapchain = Swapchain;
         uint currentImage = _currentImage;
-        
-        CommandBufferBeginInfo beginInfo = new CommandBufferBeginInfo()
-        {
-            SType = StructureType.CommandBufferBeginInfo,
-        };
-
-        _vk.BeginCommandBuffer(_commandBuffer, &beginInfo).Check("Begin command buffer");
-
-        VulkanUtils.ImageBarrier(_vk, _commandBuffer, _swapchainTextures[currentImage].Image,
-            ImageLayout.ColorAttachmentOptimal, ImageLayout.PresentSrcKhr);
-        
-        _vk.EndCommandBuffer(_commandBuffer).Check("End command buffer");
-
-        CommandBuffer buffer = _commandBuffer;
-
-        SubmitInfo submitInfo = new SubmitInfo()
-        {
-            SType = StructureType.SubmitInfo,
-
-            CommandBufferCount = 1,
-            PCommandBuffers = &buffer
-        };
-        
-        _vk.QueueSubmit(_device.Queues.Graphics, 1, &submitInfo, _fence).Check("Submit queue");
-
-        _vk.WaitForFences(_device.Device, 1, in _fence, true, ulong.MaxValue);
-        _vk.ResetFences(_device.Device, 1, in _fence);
 
         PresentInfoKHR presentInfo = new PresentInfoKHR()
         {
@@ -215,8 +151,14 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
         
         VkFormat format = SwapchainFormat.ToVk();
 
+        ref readonly Extent2D minExtent = ref surfaceCapabilities.MinImageExtent;
+        ref readonly Extent2D maxExtent = ref surfaceCapabilities.MaxImageExtent;
+        
         // TODO: Compare desiredExtent vs the Min and Max extents.
-        Extent2D desiredExtent = Size.ToVk();
+        _size.Width = uint.Clamp(_size.Width, minExtent.Width, maxExtent.Width);
+        _size.Height = uint.Clamp(_size.Height, minExtent.Height, maxExtent.Height);
+        
+        Extent2D desiredExtent = _size.ToVk();
 
         SwapchainCreateInfoKHR swapchainInfo = new SwapchainCreateInfoKHR()
         {
@@ -293,8 +235,6 @@ internal sealed unsafe class VulkanSwapchain : Swapchain
 
     public override void Dispose()
     {
-        _vk.FreeCommandBuffers(_device.Device, _device.CommandPool, 1, in _commandBuffer);
-        
         _vk.DestroyFence(_device.Device, _fence, null);
         
         foreach (VulkanTexture texture in _swapchainTextures)

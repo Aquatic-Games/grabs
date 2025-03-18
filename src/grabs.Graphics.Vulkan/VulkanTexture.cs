@@ -18,6 +18,8 @@ internal sealed unsafe class VulkanTexture : Texture
 
     public readonly Image Image;
     public readonly ImageView ImageView;
+
+    public readonly bool IsSwapchainTexture;
     
     public override Size2D Size { get; }
 
@@ -118,7 +120,7 @@ internal sealed unsafe class VulkanTexture : Texture
             Unsafe.CopyBlock(allocationInfo.pMappedData, pData, dataSize);
 
             CommandBuffer cb = device.BeginCommands();
-            VulkanUtils.ImageBarrier(_vk, cb, Image, ImageLayout.Undefined, ImageLayout.TransferDstOptimal);
+            TransitionImage(cb, ImageLayout.Undefined, ImageLayout.TransferDstOptimal);
 
             BufferImageCopy biCopy = new BufferImageCopy()
             {
@@ -132,7 +134,7 @@ internal sealed unsafe class VulkanTexture : Texture
             };
             _vk.CmdCopyBufferToImage(cb, transferBuffer, Image, ImageLayout.TransferDstOptimal, 1, &biCopy);
 
-            VulkanUtils.ImageBarrier(_vk, cb, Image, ImageLayout.TransferDstOptimal, ImageLayout.ShaderReadOnlyOptimal);
+            TransitionImage(cb, ImageLayout.TransferDstOptimal, ImageLayout.ShaderReadOnlyOptimal);
             
             device.EndCommands();
             
@@ -149,6 +151,23 @@ internal sealed unsafe class VulkanTexture : Texture
         Image = image;
         ImageView = view;
         Size = size;
+        IsSwapchainTexture = true;
+    }
+    
+    public void TransitionImage(CommandBuffer buffer, ImageLayout old, ImageLayout @new)
+    {
+        ImageMemoryBarrier memoryBarrier = new ImageMemoryBarrier()
+        {
+            SType = StructureType.ImageMemoryBarrier,
+            Image = Image,
+            OldLayout = old,
+            NewLayout = @new,
+            DstAccessMask = AccessFlags.ColorAttachmentWriteBit,
+            SubresourceRange = new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1)
+        };
+
+        _vk.CmdPipelineBarrier(buffer, PipelineStageFlags.ColorAttachmentOutputBit,
+            PipelineStageFlags.ColorAttachmentOutputBit, 0, 0, null, 0, null, 1, &memoryBarrier);
     }
 
     public override void Dispose()
