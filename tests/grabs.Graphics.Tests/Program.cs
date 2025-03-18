@@ -22,12 +22,12 @@ unsafe
     if (sdl.Init(Sdl.InitVideo | Sdl.InitEvents) < 0)
         throw new Exception($"Failed to initialize SDL. {sdl.GetErrorS()}");
 
-    Window* window = sdl.CreateWindow("grabs.Graphics.Tests", Sdl.WindowposCentered, Sdl.WindowposCentered, 1280, 720, (uint) WindowFlags.Resizable);
+    Window* window = sdl.CreateWindow("grabs.Graphics.Tests", Sdl.WindowposCentered, Sdl.WindowposCentered, 800, 600, (uint) WindowFlags.None);
 
     if (window == null)
         throw new Exception($"Failed to create window: {sdl.GetErrorS()}");
     
-    //Instance.RegisterBackend<D3D11Backend>();
+    Instance.RegisterBackend<D3D11Backend>();
     Instance.RegisterBackend<VulkanBackend>();
     
     InstanceInfo info = new InstanceInfo("grabs.Graphics.Tests", debug: true);
@@ -103,7 +103,7 @@ unsafe
     Buffer indexBuffer = device.CreateBuffer(BufferUsage.Index, indices);
     //Buffer constantBuffer = device.CreateBuffer(BufferUsage.Constant, Matrix4x4.Identity);
 
-    ImageResult result = ImageResult.FromMemory(File.ReadAllBytes("D:/home/aqua/Pictures/BAGELMIP.png"),
+    ImageResult result = ImageResult.FromMemory(File.ReadAllBytes("/home/aqua/Pictures/BAGELMIP.png"),
         ColorComponents.RedGreenBlueAlpha);
 
     Texture texture = device.CreateTexture<byte>(

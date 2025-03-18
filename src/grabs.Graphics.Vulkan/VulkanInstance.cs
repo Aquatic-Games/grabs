@@ -228,6 +228,9 @@ internal sealed unsafe class VulkanInstance : Instance
             PhysicalDeviceMemoryProperties memProps;
             Vk.GetPhysicalDeviceMemoryProperties(devices[i], &memProps);
 
+            PhysicalDeviceFeatures vFeatures;
+            Vk.GetPhysicalDeviceFeatures(devices[i], &vFeatures);
+
             string name = new string((sbyte*) props.DeviceName);
 
             AdapterType type = props.DeviceType switch
@@ -242,7 +245,19 @@ internal sealed unsafe class VulkanInstance : Instance
 
             ulong dedicatedMemory = memProps.MemoryHeaps[0].Size;
 
-            adapters.Add(new Adapter(devices[i].Handle, i, name, type, dedicatedMemory));
+            AdapterFeatures features = new AdapterFeatures(
+                textureAnisotropy: vFeatures.SamplerAnisotropy, 
+                geometryShader: vFeatures.GeometryShader,
+                computeShader: true
+            );
+            
+            AdapterLimits limits = new AdapterLimits(
+                maxColorAttachments: props.Limits.MaxColorAttachments,
+                maxPushConstantSize: props.Limits.MaxPushConstantsSize,
+                maxAnisotropyLevels: (uint) props.Limits.MaxSamplerAnisotropy
+            );
+
+            adapters.Add(new Adapter(devices[i].Handle, i, name, type, dedicatedMemory, features, limits));
         }
         
         if (adapters.Count == 0)

@@ -1,4 +1,5 @@
 ﻿using grabs.Core;
+using Vortice.Direct3D11;
 using Vortice.DXGI;
 
 namespace grabs.Graphics.D3D11;
@@ -34,8 +35,20 @@ internal sealed class D3D11Instance : Instance
                 type = AdapterType.Software;
 
             ulong memory = desc.DedicatedVideoMemory;
+
+            AdapterFeatures features = new AdapterFeatures(
+                textureAnisotropy: true,
+                geometryShader: true,
+                computeShader: true
+            );
             
-            adapters.Add(new Adapter(adapter.NativePointer, i, name, type, memory));
+            AdapterLimits limits = new AdapterLimits(
+                maxColorAttachments: D3D11CommandList.MaxColorAttachments,
+                maxPushConstantSize: D3D11Pipeline.MaxPushConstantSize,
+                maxAnisotropyLevels: ID3D11SamplerState.MaxMaxAnisotropy
+            );
+            
+            adapters.Add(new Adapter(adapter.NativePointer, i, name, type, memory, features, limits));
         }
 
         return adapters.ToArray();

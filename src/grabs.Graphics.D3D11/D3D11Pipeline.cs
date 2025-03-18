@@ -4,6 +4,8 @@ namespace grabs.Graphics.D3D11;
 
 internal sealed class D3D11Pipeline : Pipeline
 {
+    public const uint MaxPushConstantSize = 256;
+    
     public readonly ID3D11VertexShader VertexShader;
     public readonly Dictionary<uint, Dictionary<uint, uint>> VertexRemappings;
 
@@ -11,6 +13,8 @@ internal sealed class D3D11Pipeline : Pipeline
     public readonly Dictionary<uint, Dictionary<uint, uint>> PixelRemappings;
 
     public readonly ID3D11InputLayout? Layout;
+
+    public readonly Dictionary<ShaderStage, ID3D11Buffer> PushConstantBuffers;
     
     public D3D11Pipeline(ID3D11Device device, ref readonly PipelineInfo info)
     {
@@ -44,6 +48,20 @@ internal sealed class D3D11Pipeline : Pipeline
 
             Layout = device.CreateInputLayout(elementDescs, vertexModule.Blob);
         }
+
+        /*PushConstantBuffers = [];
+        uint vertexConstSize = 0;
+        uint pixelConstSize = 0;
+        
+        for (int i = 0; i < info.Constants.Length; i++)
+        {
+            ref readonly ConstantLayout constant = ref info.Constants[i];
+
+            switch (constant.Stages)
+            {
+                
+            }
+        }*/
     }
     
     public override void Dispose()
