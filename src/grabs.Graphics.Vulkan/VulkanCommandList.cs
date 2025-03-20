@@ -214,7 +214,7 @@ internal sealed unsafe class VulkanCommandList : CommandList
                     {
                         Buffer = vkBuffer.Buffer,
                         Offset = vkBuffer.ReadOffset,
-                        Range = vkBuffer.BufferSize
+                        Range = vkBuffer.Info.Size
                     };
 
                     writeDescriptors[i].PBufferInfo = &bufferInfo;

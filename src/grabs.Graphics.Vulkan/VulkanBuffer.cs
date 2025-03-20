@@ -120,12 +120,12 @@ internal sealed unsafe class VulkanBuffer : Buffer
         Debug.Assert(Info.Usage.HasFlag(BufferUsage.UpdateBuffer));
         Debug.Assert(IsPersistentMapped);
 
-        if (WriteOffset + size > BufferSize)
+        if (WriteOffset + size >= BufferSize)
             WriteOffset = 0;
 
         ReadOffset = WriteOffset;
         
-        Unsafe.CopyBlock(MappedPtr, pData, size);
+        Unsafe.CopyBlock((byte*) MappedPtr + WriteOffset, pData, size);
 
         WriteOffset += size;
     }

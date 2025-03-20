@@ -101,7 +101,7 @@ unsafe
 
     Buffer vertexBuffer = device.CreateBuffer(BufferUsage.Vertex, vertices);
     Buffer indexBuffer = device.CreateBuffer(BufferUsage.Index, indices);
-    //Buffer constantBuffer = device.CreateBuffer(BufferUsage.Constant, Matrix4x4.Identity);
+    Buffer constantBuffer = device.CreateBuffer(BufferUsage.Constant | BufferUsage.UpdateBuffer, Matrix4x4.Identity);
 
     ImageResult result = ImageResult.FromMemory(File.ReadAllBytes("/home/aqua/Pictures/BAGELMIP.png"),
         ColorComponents.RedGreenBlueAlpha);
@@ -138,7 +138,7 @@ unsafe
             new InputElement(Format.R32G32_Float, 12, 0)
         ],
         Descriptors = [layout],
-        Constants = [new ConstantLayout(ShaderStage.Vertex, 0, (uint) sizeof(Matrix4x4))]
+        //Constants = [new ConstantLayout(ShaderStage.Vertex, 0, (uint) sizeof(Matrix4x4))]
     };
     
     Pipeline pipeline = device.CreatePipeline(in pipelineInfo);
@@ -175,8 +175,8 @@ unsafe
         cl.Begin();
         
         h += 0.05f;
-        //cl.UpdateBuffer(constantBuffer, Matrix4x4.CreateRotationZ(h));
-        cl.PushConstant(pipeline, ShaderStage.Vertex, 0, Matrix4x4.CreateRotationZ(h));
+        cl.UpdateBuffer(constantBuffer, Matrix4x4.CreateRotationZ(h));
+        //cl.PushConstant(pipeline, ShaderStage.Vertex, 0, Matrix4x4.CreateRotationZ(h));
         
         cl.BeginRenderPass(new RenderPassInfo(new ColorAttachmentInfo(swapchainTexture, new ColorF(1.0f, 0.5f, 0.25f))));
         
@@ -186,7 +186,7 @@ unsafe
 
         cl.PushDescriptors(0, pipeline,
         [
-            //new Descriptor(0, DescriptorType.ConstantBuffer, buffer: constantBuffer),
+            new Descriptor(0, DescriptorType.ConstantBuffer, buffer: constantBuffer),
             new Descriptor(1, DescriptorType.Texture, texture: texture)
         ]);
         
@@ -194,8 +194,13 @@ unsafe
         cl.SetIndexBuffer(indexBuffer, Format.R16_UInt);
         cl.DrawIndexed(6);
         
-        //cl.UpdateBuffer(constantBuffer, Matrix4x4.CreateTranslation(float.Sin(h), 0, 0));
-        cl.PushConstant(pipeline, ShaderStage.Vertex, 0, Matrix4x4.CreateTranslation(float.Sin(h), 0, 0));
+        cl.UpdateBuffer(constantBuffer, Matrix4x4.CreateTranslation(float.Sin(h), 0, 0));
+        cl.PushDescriptors(0, pipeline,
+        [
+            new Descriptor(0, DescriptorType.ConstantBuffer, buffer: constantBuffer),
+            new Descriptor(1, DescriptorType.Texture, texture: texture)
+        ]);
+        //cl.PushConstant(pipeline, ShaderStage.Vertex, 0, Matrix4x4.CreateTranslation(float.Sin(h), 0, 0));
         
         cl.DrawIndexed(6);
         
@@ -213,7 +218,7 @@ unsafe
     pipeline.Dispose();
     layout.Dispose();
     texture.Dispose();
-    //constantBuffer.Dispose();
+    constantBuffer.Dispose();
     indexBuffer.Dispose();
     vertexBuffer.Dispose();
     cl.Dispose();
