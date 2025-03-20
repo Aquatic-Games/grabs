@@ -74,12 +74,7 @@ internal sealed unsafe class VulkanBuffer : Buffer
 
         if (info.Usage.HasFlag(BufferUsage.UpdateBuffer))
         {
-            bufferFlags |= VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT |
-                           VMA_ALLOCATION_CREATE_HOST_ACCESS_ALLOW_TRANSFER_INSTEAD_BIT |
-                           VMA_ALLOCATION_CREATE_MAPPED_BIT;
-            IsPersistentMapped = true;
-
-            BufferSize *= 16;
+            BufferSize *= VulkanBackend.RingBufferSizeMultiplier;
         }
 
         // Automatically enable transfer if we provide initial data.

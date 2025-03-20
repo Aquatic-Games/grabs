@@ -39,5 +39,10 @@ public enum BufferUsage
     /// <summary>
     /// The buffer can be updated with <see cref="CommandList.UpdateBuffer"/>.
     /// </summary>
-    UpdateBuffer = 1 << 16
+    UpdateBuffer = 1 << 16,
+    
+    /// <summary>
+    /// The buffer is dynamic and will be updated one or more times per frame.
+    /// </summary>
+    Dynamic = UpdateBuffer | MapWrite
 }

@@ -148,11 +148,12 @@ internal sealed unsafe class VulkanCommandList : CommandList
 
     public override void SetVertexBuffer(uint slot, Buffer buffer, uint stride, uint offset = 0)
     {
-        VkBuffer vkBuffer = ((VulkanBuffer) buffer).Buffer;
+        VulkanBuffer vkBuffer = (VulkanBuffer) buffer;
+        VkBuffer buf = vkBuffer.Buffer;
 
-        ulong bufferOffset = offset;
+        ulong bufferOffset = offset + vkBuffer.ReadOffset;
         ulong bufferStride = stride;
-        _vk.CmdBindVertexBuffers2(Buffer, slot, 1, &vkBuffer, &bufferOffset, null, &bufferStride);
+        _vk.CmdBindVertexBuffers2(Buffer, slot, 1, &buf, &bufferOffset, null, &bufferStride);
     }
 
     public override void SetIndexBuffer(Buffer buffer, Format format, uint offset = 0)
@@ -166,7 +167,7 @@ internal sealed unsafe class VulkanCommandList : CommandList
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
         };
         
-        _vk.CmdBindIndexBuffer(Buffer, vkBuffer.Buffer, offset, type);
+        _vk.CmdBindIndexBuffer(Buffer, vkBuffer.Buffer, offset + vkBuffer.ReadOffset, type);
     }
 
     public override void PushConstant(Pipeline pipeline, ShaderStage stage, uint offset, uint size, void* pData)
