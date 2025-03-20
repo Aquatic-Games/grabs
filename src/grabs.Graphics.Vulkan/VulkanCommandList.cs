@@ -85,7 +85,7 @@ internal sealed unsafe class VulkanCommandList : CommandList
 
             VulkanTexture texture = (VulkanTexture) attachmentInfo.Texture;
 
-            if (texture.IsSwapchainTexture)
+            if (texture.IsSwapchainTexture && _currentSwapchainTexture == null)
             {
                 texture.TransitionImage(Buffer, ImageLayout.Undefined, ImageLayout.ColorAttachmentOptimal);
                 _currentSwapchainTexture = texture;
