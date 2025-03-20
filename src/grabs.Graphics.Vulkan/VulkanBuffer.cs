@@ -58,6 +58,14 @@ internal sealed unsafe class VulkanBuffer : Buffer
             IsPersistentMapped = true;
         }
 
+        if (info.Usage.HasFlag(BufferUsage.MapWrite))
+        {
+            bufferFlags |= VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT |
+                           VMA_ALLOCATION_CREATE_HOST_ACCESS_ALLOW_TRANSFER_INSTEAD_BIT |
+                           VMA_ALLOCATION_CREATE_MAPPED_BIT;
+            IsPersistentMapped = true;
+        }
+
         // Automatically enable transfer if we provide initial data.
         if (data != null && isBufferType)
             usage |= BufferUsageFlags.TransferDstBit;
@@ -91,8 +99,11 @@ internal sealed unsafe class VulkanBuffer : Buffer
             throw new NotImplementedException();
     }
     
-    protected override MappedData Map(MapMode mode)
+    protected override MappedData Map()
     {
+        if (IsPersistentMapped)
+            return new MappedData((nint) MappedPtr);
+        
         void* pData;
         Vma.MapMemory(_allocator, _allocation, &pData).Check("Map buffer");
 
@@ -101,6 +112,9 @@ internal sealed unsafe class VulkanBuffer : Buffer
 
     protected override void Unmap()
     {
+        if (IsPersistentMapped)
+            return;
+        
         Vma.UnmapMemory(_allocator, _allocation);
     }
 

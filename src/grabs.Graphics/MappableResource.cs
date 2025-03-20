@@ -8,9 +8,8 @@ public abstract class MappableResource
     /// <summary>
     /// Map the resource into memory.
     /// </summary>
-    /// <param name="mode">The mode to use when mapping.</param>
     /// <returns>Data about the mapped resource.</returns>
-    protected internal abstract MappedData Map(MapMode mode);
+    protected internal abstract MappedData Map();
 
     /// <summary>
     /// Unmap the resource from memory.

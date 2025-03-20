@@ -118,10 +118,9 @@ public abstract class Device : IDisposable
     /// Map the given resource into CPU accessible memory, so it can be written to/read from.
     /// </summary>
     /// <param name="resource">The <see cref="MappableResource"/> to map.</param>
-    /// <param name="mode">The <see cref="MapMode"/> to map with, which defines how the buffer will be accessed.</param>
     /// <returns>A struct containing information about the mapped data.</returns>
-    public MappedData MapResource(MappableResource resource, MapMode mode)
-        => resource.Map(mode);
+    public MappedData MapResource(MappableResource resource)
+        => resource.Map();
 
     /// <summary>
     /// Unmap a currently mapped resource.

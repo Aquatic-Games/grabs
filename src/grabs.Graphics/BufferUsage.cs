@@ -30,4 +30,9 @@ public enum BufferUsage
     /// Transfer source buffer.
     /// </summary>
     TransferSrc = 1 << 9,
+    
+    /// <summary>
+    /// The buffer can be mapped for writing.
+    /// </summary>
+    MapWrite = 1 << 10
 }
