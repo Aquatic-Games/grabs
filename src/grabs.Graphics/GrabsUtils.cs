@@ -28,6 +28,12 @@ public static class GrabsUtils
         }
     }
 
+    /// <summary>
+    /// Get the number of bits per pixel (BPP) for a format.
+    /// </summary>
+    /// <param name="format">The format to get for.</param>
+    /// <returns>The number of bits per pixel.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if an invalid format is provided.</exception>
     public static uint BitsPerPixel(this Format format)
     {
         switch (format)
@@ -116,34 +122,48 @@ public static class GrabsUtils
         }
     }
 
+    /// <summary>
+    /// Get the number of bytes per pixel of a format.
+    /// </summary>
+    /// <param name="format">The format to get for.</param>
+    /// <returns>The number of bytes per pixel.</returns>
     public static uint BytesPerPixel(this Format format)
         => format.BitsPerPixel() / 8;
 
-    public static unsafe void CopyData<T>(nint dataPtr, T data) where T : unmanaged
+    /// <summary>
+    /// Copy managed data into an unmanaged region of memory.
+    /// </summary>
+    /// <param name="dataPtr">The pointer to the unmanaged data.</param>
+    /// <param name="offset">The offset, in bytes, from the start of the data region.</param>
+    /// <param name="data">The managed data to copy.</param>
+    /// <typeparam name="T">Any unmanaged type.</typeparam>
+    public static unsafe void CopyData<T>(nint dataPtr, uint offset, T data) where T : unmanaged
     {
-        Unsafe.CopyBlock((void*) dataPtr, Unsafe.AsPointer(ref data), (uint) sizeof(T));
+        Unsafe.CopyBlock((byte*) dataPtr + offset, Unsafe.AsPointer(ref data), (uint) sizeof(T));
     }
 
     /// <summary>
     /// Copy managed data into an unmanaged region of memory.
     /// </summary>
     /// <param name="dataPtr">The pointer to the unmanaged data.</param>
+    /// <param name="offset">The offset, in bytes, from the start of the data region.</param>
     /// <param name="data">The managed data to copy.</param>
     /// <typeparam name="T">Any unmanaged type.</typeparam>
-    public static unsafe void CopyData<T>(nint dataPtr, in ReadOnlySpan<T> data) where T : unmanaged
+    public static unsafe void CopyData<T>(nint dataPtr, uint offset, in ReadOnlySpan<T> data) where T : unmanaged
     {
         uint dataSize = (uint) (data.Length * sizeof(T));
         
         fixed (void* pData = data)
-            Unsafe.CopyBlock((void*) dataPtr, pData, dataSize);
+            Unsafe.CopyBlock((byte*) dataPtr + offset, pData, dataSize);
     }
 
     /// <summary>
     /// Copy managed data into an unmanaged region of memory.
     /// </summary>
     /// <param name="dataPtr">The pointer to the unmanaged data.</param>
+    /// <param name="offset">The offset, in bytes, from the start of the data region.</param>
     /// <param name="data">The managed data to copy.</param>
     /// <typeparam name="T">Any unmanaged type.</typeparam>
-    public static void CopyData<T>(nint dataPtr, T[] data) where T : unmanaged
-        => CopyData<T>(dataPtr, data.AsSpan());
+    public static void CopyData<T>(nint dataPtr, uint offset, T[] data) where T : unmanaged
+        => CopyData<T>(dataPtr, offset, data.AsSpan());
 }
