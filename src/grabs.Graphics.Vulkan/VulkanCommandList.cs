@@ -175,11 +175,11 @@ internal sealed unsafe class VulkanCommandList : CommandList
         _vk.CmdPushConstants(Buffer, vkPipeline.Layout, stage.ToVk(), offset, size, pData);
     }
 
-    /*public override void UpdateBuffer(Buffer buffer, uint sizeInBytes, void* pData)
+    public override void UpdateBuffer(Buffer buffer, uint sizeInBytes, void* pData)
     {
         VulkanBuffer vkBuffer = (VulkanBuffer) buffer;
         vkBuffer.Update(Buffer, sizeInBytes, pData);
-    }*/
+    }
 
     public override void PushDescriptors(uint slot, Pipeline pipeline, in ReadOnlySpan<Descriptor> descriptors)
     {
@@ -213,8 +213,8 @@ internal sealed unsafe class VulkanCommandList : CommandList
                     bufferInfo = new DescriptorBufferInfo()
                     {
                         Buffer = vkBuffer.Buffer,
-                        Offset = 0,
-                        Range = Vk.WholeSize
+                        Offset = vkBuffer.ReadOffset,
+                        Range = vkBuffer.BufferSize
                     };
 
                     writeDescriptors[i].PBufferInfo = &bufferInfo;

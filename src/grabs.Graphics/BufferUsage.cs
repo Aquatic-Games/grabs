@@ -34,5 +34,10 @@ public enum BufferUsage
     /// <summary>
     /// The buffer can be mapped for writing.
     /// </summary>
-    MapWrite = 1 << 10
+    MapWrite = 1 << 10,
+    
+    /// <summary>
+    /// The buffer can be updated with <see cref="CommandList.UpdateBuffer"/>.
+    /// </summary>
+    UpdateBuffer = 1 << 16
 }

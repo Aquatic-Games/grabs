@@ -1,4 +1,5 @@
 global using VkBuffer = Silk.NET.Vulkan.Buffer;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using grabs.Core;
 using grabs.VulkanMemoryAllocator;
@@ -10,7 +11,6 @@ namespace grabs.Graphics.Vulkan;
 
 internal sealed unsafe class VulkanBuffer : Buffer
 {
-    private readonly Vk _vk;
     private readonly VmaAllocator_T* _allocator;
     private readonly VmaAllocation_T* _allocation;
     
@@ -19,10 +19,16 @@ internal sealed unsafe class VulkanBuffer : Buffer
     public readonly bool IsPersistentMapped;
     public readonly void* MappedPtr;
 
-    public VulkanBuffer(Vk vk, VulkanDevice device, ref readonly BufferInfo info, void* data) : base(in info)
+    public readonly uint BufferSize;
+    public ulong WriteOffset;
+    public ulong ReadOffset;
+
+    public VulkanBuffer(VulkanDevice device, ref readonly BufferInfo info, void* data) : base(in info)
     {
-        _vk = vk;
         _allocator = device.Allocator;
+        BufferSize = info.Size;
+        WriteOffset = 0;
+        ReadOffset = 0;
 
         BufferUsageFlags usage = 0;
         VmaMemoryUsage bufferUsage = VMA_MEMORY_USAGE_AUTO;
@@ -66,6 +72,16 @@ internal sealed unsafe class VulkanBuffer : Buffer
             IsPersistentMapped = true;
         }
 
+        if (info.Usage.HasFlag(BufferUsage.UpdateBuffer))
+        {
+            bufferFlags |= VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT |
+                           VMA_ALLOCATION_CREATE_HOST_ACCESS_ALLOW_TRANSFER_INSTEAD_BIT |
+                           VMA_ALLOCATION_CREATE_MAPPED_BIT;
+            IsPersistentMapped = true;
+
+            BufferSize *= 16;
+        }
+
         // Automatically enable transfer if we provide initial data.
         if (data != null && isBufferType)
             usage |= BufferUsageFlags.TransferDstBit;
@@ -73,7 +89,7 @@ internal sealed unsafe class VulkanBuffer : Buffer
         BufferCreateInfo bufferInfo = new BufferCreateInfo()
         {
             SType = StructureType.BufferCreateInfo,
-            Size = info.Size,
+            Size = BufferSize,
             Usage = usage
         };
 
@@ -97,6 +113,21 @@ internal sealed unsafe class VulkanBuffer : Buffer
             device.UpdateBuffer(this, 0, info.Size, data);
         else
             throw new NotImplementedException();
+    }
+
+    public void Update(CommandBuffer cb, uint size, void* pData)
+    {
+        Debug.Assert(Info.Usage.HasFlag(BufferUsage.UpdateBuffer));
+        Debug.Assert(IsPersistentMapped);
+
+        if (WriteOffset + size > BufferSize)
+            WriteOffset = 0;
+
+        ReadOffset = WriteOffset;
+        
+        Unsafe.CopyBlock(MappedPtr, pData, size);
+
+        WriteOffset += size;
     }
     
     protected override MappedData Map()

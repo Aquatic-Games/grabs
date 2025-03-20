@@ -211,7 +211,7 @@ internal sealed unsafe class VulkanDevice : Device
 
     public override Buffer CreateBuffer(in BufferInfo info, void* data)
     {
-        return new VulkanBuffer(_vk, this, in info, data);
+        return new VulkanBuffer(this, in info, data);
     }
 
     public override Texture CreateTexture(in TextureInfo info, void* pData)
@@ -328,7 +328,7 @@ internal sealed unsafe class VulkanDevice : Device
     {
         foreach (VulkanBuffer buffer in _transferBuffers)
         {
-            if (buffer.Info.Size >= size)
+            if (buffer.BufferSize >= size)
                 return buffer;
         }
 
@@ -340,7 +340,7 @@ internal sealed unsafe class VulkanDevice : Device
             Usage = BufferUsage.TransferSrc,
             Size = size
         };
-        VulkanBuffer buf = new VulkanBuffer(_vk, this, in info, null);
+        VulkanBuffer buf = new VulkanBuffer(this, in info, null);
         
         _transferBuffers.Add(buf);
 
