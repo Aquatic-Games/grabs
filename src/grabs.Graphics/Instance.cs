@@ -59,6 +59,11 @@ public abstract class Instance : IDisposable
         _backends.Add(T.Name, new T());
     }
 
+    public static void RegisterBackend<T>(T backend) where T : IBackend
+    {
+        _backends.Add(T.Name, backend);
+    }
+
     /// <summary>
     /// Create a new GRABS <see cref="Instance"/>.
     /// </summary>
