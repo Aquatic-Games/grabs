@@ -24,7 +24,7 @@ internal sealed unsafe class GLInstance : Instance
     
     public override Device CreateDevice(Surface surface, Adapter? adapter = null)
     {
-        throw new NotImplementedException();
+        return new GLDevice(Gl);
     }
     
     public override Surface CreateSurface(in SurfaceInfo info)
