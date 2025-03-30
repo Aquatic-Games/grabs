@@ -24,6 +24,16 @@ public unsafe class Window : IDisposable
         
         set => SDL_SetWindowSize(_window, (int) value.Width, (int) value.Width);
     }
+
+    public Size2D SizeInPixels
+    {
+        get
+        {
+            int w, h;
+            SDL_GetWindowSizeInPixels(_window, &w, &h);
+            return new Size2D((uint) w, (uint) h);
+        }
+    }
     
     public Window(in WindowInfo info)
     {
