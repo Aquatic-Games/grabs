@@ -25,7 +25,8 @@ public static unsafe class Compiler
         return NativeLibrary.Load(libraryname, assembly, DllImportSearchPath.AssemblyDirectory);
     }
 
-    public static byte[] CompileHlsl(ShaderStage stage, string hlsl, string entryPoint, bool debug = false)
+    public static byte[] CompileHlsl(ShaderStage stage, string hlsl, string entryPoint, string? includeDir = null,
+        bool debug = false)
     {
         Guid dxcUtils = CLSID_DxcUtils;
         Guid dxcCompiler = CLSID_DxcCompiler;
@@ -50,7 +51,13 @@ public static unsafe class Compiler
         };
 
         List<string> args = ["-spirv"];
-        
+
+        if (includeDir != null)
+        {
+            args.Add("-I");
+            args.Add(includeDir);
+        }
+
         if (debug)
             args.Add("-Od");
 
@@ -68,6 +75,15 @@ public static unsafe class Compiler
             throw new Exception("Failed to build arguments.");
         }
 
+        IDxcIncludeHandler* includeHandler;
+        if (utils->CreateDefaultIncludeHandler(&includeHandler).FAILED)
+        {
+            compiler->Release();
+            utils->Release();
+
+            throw new Exception("Failed to create default include handler.");
+        }
+
         DxcBuffer buffer = new DxcBuffer()
         {
             Ptr = pHlsl,
@@ -76,9 +92,10 @@ public static unsafe class Compiler
         };
 
         IDxcResult* result;
-        if (compiler->Compile(&buffer, compilerArgs->GetArguments(), compilerArgs->GetCount(), null,
+        if (compiler->Compile(&buffer, compilerArgs->GetArguments(), compilerArgs->GetCount(), includeHandler,
                 __uuidof<IDxcResult>(), (void**) &result).FAILED)
         {
+            includeHandler->Release();
             compilerArgs->Release();
             compiler->Release();
             utils->Release();
@@ -90,6 +107,7 @@ public static unsafe class Compiler
         if (result->GetStatus(&status).FAILED)
         {
             result->Release();
+            includeHandler->Release();
             compilerArgs->Release();
             compiler->Release();
             utils->Release();
@@ -105,6 +123,7 @@ public static unsafe class Compiler
 
             errorBlob->Release();
             result->Release();
+            includeHandler->Release();
             compilerArgs->Release();
             compiler->Release();
             utils->Release();
@@ -121,6 +140,7 @@ public static unsafe class Compiler
 
         outResult->Release();
         result->Release();
+        includeHandler->Release();
         compilerArgs->Release();
         compiler->Release();
         utils->Release();
