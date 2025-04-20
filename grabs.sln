@@ -28,8 +28,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Graphics.D3D11", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.SpirvTools", "src\grabs.SpirvTools\grabs.SpirvTools.csproj", "{D9F12D7E-DC40-474D-8B0A-0AFD52116C46}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Graphics.OpenGL", "src\grabs.Graphics.OpenGL\grabs.Graphics.OpenGL.csproj", "{39DD5AC4-AEF3-466E-AF50-FBAF96AF2496}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,10 +78,6 @@ Global
 		{D9F12D7E-DC40-474D-8B0A-0AFD52116C46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9F12D7E-DC40-474D-8B0A-0AFD52116C46}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9F12D7E-DC40-474D-8B0A-0AFD52116C46}.Release|Any CPU.Build.0 = Release|Any CPU
-		{39DD5AC4-AEF3-466E-AF50-FBAF96AF2496}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{39DD5AC4-AEF3-466E-AF50-FBAF96AF2496}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{39DD5AC4-AEF3-466E-AF50-FBAF96AF2496}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{39DD5AC4-AEF3-466E-AF50-FBAF96AF2496}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{2D30C3DD-9470-4285-BFD0-C475CA591C7B} = {34B024AA-E2BC-40C5-BA96-BDD06D79BE47}

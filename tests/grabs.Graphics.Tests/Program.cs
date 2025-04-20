@@ -3,7 +3,6 @@ using grabs.Core;
 using grabs.Graphics;
 using grabs.Graphics.D3D11;
 using grabs.Graphics.Exceptions;
-using grabs.Graphics.OpenGL;
 using grabs.Graphics.Vulkan;
 using grabs.ShaderCompiler;
 using Silk.NET.SDL;
@@ -22,24 +21,14 @@ unsafe
 
     if (sdl.Init(Sdl.InitVideo | Sdl.InitEvents) < 0)
         throw new Exception($"Failed to initialize SDL. {sdl.GetErrorS()}");
-
-    sdl.GLSetAttribute(GLattr.ContextMajorVersion, 4);
-    sdl.GLSetAttribute(GLattr.ContextMinorVersion, 3);
-    sdl.GLSetAttribute(GLattr.ContextProfileMask, (int) GLprofile.Core);
     
-    Window* window = sdl.CreateWindow("grabs.Graphics.Tests", Sdl.WindowposCentered, Sdl.WindowposCentered, 1280, 720, (uint) WindowFlags.Opengl);
-    void* glContext = null;
+    Window* window = sdl.CreateWindow("grabs.Graphics.Tests", Sdl.WindowposCentered, Sdl.WindowposCentered, 1280, 720, 0);
     
     if (window == null)
         throw new Exception($"Failed to create window: {sdl.GetErrorS()}");
     
-    Instance.RegisterBackend(new OpenGLBackend(s => (nint) sdl.GLGetProcAddress(s), i =>
-    {
-        sdl.GLSetSwapInterval(i);
-        sdl.GLSwapWindow(window);
-    }));
-    //Instance.RegisterBackend<D3D11Backend>();
-    //Instance.RegisterBackend<VulkanBackend>();
+    Instance.RegisterBackend<D3D11Backend>();
+    Instance.RegisterBackend<VulkanBackend>();
     
     InstanceInfo info = new InstanceInfo("grabs.Graphics.Tests", debug: true);
     
@@ -53,12 +42,6 @@ unsafe
     {
         sdl.ShowSimpleMessageBox((uint) MessageBoxFlags.Error, "Error", e.Message, null);
         throw;
-    }
-
-    if (instance.Backend == OpenGLBackend.Name)
-    {
-        glContext = sdl.GLCreateContext(window);
-        sdl.GLMakeCurrent(window, glContext);
     }
     
     Adapter[] adapters = instance.EnumerateAdapters();

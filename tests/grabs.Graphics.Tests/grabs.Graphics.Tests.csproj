@@ -11,7 +11,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\grabs.Graphics.D3D11\grabs.Graphics.D3D11.csproj" />
-      <ProjectReference Include="..\..\src\grabs.Graphics.OpenGL\grabs.Graphics.OpenGL.csproj" />
       <ProjectReference Include="..\..\src\grabs.Graphics.Vulkan\grabs.Graphics.Vulkan.csproj" />
       <ProjectReference Include="..\..\src\grabs.ShaderCompiler\grabs.ShaderCompiler.csproj" />
       <ProjectReference Include="..\..\src\grabs.Graphics\grabs.Graphics.csproj" />
