@@ -52,11 +52,11 @@ public abstract class Instance : IDisposable
         
         foreach ((_, IBackendBase backend) in _backends)
         {
-            try
+            //try
             {
                 return backend.CreateInstance(in info);
             }
-            catch (Exception e) { }
+            //catch (Exception e) { }
         }
 
         throw new PlatformNotSupportedException("No backends were supported by this platform.");

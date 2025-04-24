@@ -8,6 +8,6 @@ public sealed class VulkanBackend : IBackend
     /// <inheritdoc />
     public Instance CreateInstance(ref readonly InstanceInfo info)
     {
-        throw new NotImplementedException();
+        return new VkInstance(in info);
     }
 }

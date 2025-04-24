@@ -6,6 +6,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Graphics.Vulkan", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Core", "src\grabs.Core\grabs.Core.csproj", "{329EFE9B-3094-49EC-8E2D-679560587C28}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C44D31D3-DC8D-4A27-803C-EB82456C636B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Graphics.Tests", "tests\grabs.Graphics.Tests\grabs.Graphics.Tests.csproj", "{F4A23FE4-31BA-4D34-8619-8B997963F895}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +28,12 @@ Global
 		{329EFE9B-3094-49EC-8E2D-679560587C28}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{329EFE9B-3094-49EC-8E2D-679560587C28}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{329EFE9B-3094-49EC-8E2D-679560587C28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4A23FE4-31BA-4D34-8619-8B997963F895}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4A23FE4-31BA-4D34-8619-8B997963F895}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4A23FE4-31BA-4D34-8619-8B997963F895}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4A23FE4-31BA-4D34-8619-8B997963F895}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F4A23FE4-31BA-4D34-8619-8B997963F895} = {C44D31D3-DC8D-4A27-803C-EB82456C636B}
 	EndGlobalSection
 EndGlobal
