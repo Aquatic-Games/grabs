@@ -5,11 +5,16 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\grabs.Graphics.Vulkan\grabs.Graphics.Vulkan.csproj" />
       <ProjectReference Include="..\..\src\grabs.Graphics\grabs.Graphics.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Silk.NET.SDL" Version="2.22.0" />
     </ItemGroup>
 
 </Project>

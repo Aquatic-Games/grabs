@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using grabs.Core;
 
 namespace grabs.Graphics;
 
@@ -20,8 +21,15 @@ public abstract class Instance : IDisposable
     /// <summary>
     /// Enumerate the graphics adapters available on this system.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>An array of supported <see cref="Adapter"/>s.</returns>
     public abstract Adapter[] EnumerateAdapters();
+
+    /// <summary>
+    /// Create a <see cref="Surface"/>.
+    /// </summary>
+    /// <param name="info">The <see cref="SurfaceInfo"/> that describes the surface.</param>
+    /// <returns>The created <see cref="Surface"/>.</returns>
+    public abstract Surface CreateSurface(in SurfaceInfo info);
 
     /// <summary>
     /// Dispose of this <see cref="Instance"/>.
@@ -55,6 +63,8 @@ public abstract class Instance : IDisposable
     public static Instance Create(in InstanceInfo info)
     {
         Debug.Assert(_backends.Count > 0, "At least 1 backend must be registered!");
+        
+        GrabsLog.Log(GrabsLog.Severity.Info, $"Registered backends: {string.Join(", ", _backends.Keys)}");
         
         foreach ((_, IBackendBase backend) in _backends)
         {

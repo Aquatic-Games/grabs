@@ -13,6 +13,8 @@ internal sealed unsafe class VkInstance : Instance
 
     private readonly VulkanInstance _instance;
 
+    private readonly KhrSurface _khrSurface;
+
     private readonly ExtDebugUtils? _debugUtils;
     private readonly DebugUtilsMessengerEXT _debugMessenger;
     
@@ -92,6 +94,9 @@ internal sealed unsafe class VkInstance : Instance
         GrabsLog.Log("Creating instance");
         _vk.CreateInstance(&instanceInfo, null, out _instance).Check("Create instance");
 
+        if (!_vk.TryGetInstanceExtension(_instance, out _khrSurface))
+            throw new Exception("Failed to get Surface extension.");
+
         if (info.Debug)
         {
             GrabsLog.Log("Getting debug utils extension.");
@@ -159,6 +164,11 @@ internal sealed unsafe class VkInstance : Instance
         return adapters.ToArray();
     }
 
+    public override Surface CreateSurface(in SurfaceInfo info)
+    {
+        return new VkSurface(_vk, _khrSurface, _instance, in info);
+    }
+
     public override void Dispose()
     {
         if (IsDisposed)
@@ -172,6 +182,8 @@ internal sealed unsafe class VkInstance : Instance
             _debugUtils.DestroyDebugUtilsMessenger(_instance, _debugMessenger, null);
             _debugUtils.Dispose();
         }
+        
+        _khrSurface.Dispose();
         
         GrabsLog.Log("Destroying instance");
         _vk.DestroyInstance(_instance, null);

@@ -1,14 +1,50 @@
 ﻿using grabs.Core;
 using grabs.Graphics;
 using grabs.Graphics.Vulkan;
+using Silk.NET.SDL;
+using Surface = grabs.Graphics.Surface;
 
 GrabsLog.LogMessage += (severity, message, line, file) => Console.WriteLine($"{severity}: {message}");
-
 Instance.RegisterBackend<VulkanBackend>();
 
-using Instance instance = Instance.Create(new InstanceInfo("test", true));
+unsafe
+{
+    Sdl sdl = Sdl.GetApi();
 
-Adapter[] adapters = instance.EnumerateAdapters();
+    if (sdl.Init(Sdl.InitVideo | Sdl.InitEvents) < 0)
+        throw new Exception($"Failed to initialize SDL: {sdl.GetErrorS()}");
 
-foreach (Adapter adapter in adapters)
-    Console.WriteLine(adapter);
+    Window* window =
+        sdl.CreateWindow("grabs.Graphics.Tests", Sdl.WindowposCentered, Sdl.WindowposCentered, 1280, 720, 0);
+
+    if (window == null)
+        throw new Exception($"Failed to create window: {sdl.GetErrorS()}");
+    
+    Instance instance = Instance.Create(new InstanceInfo("test", true));
+
+    Adapter[] adapters = instance.EnumerateAdapters();
+
+    foreach (Adapter adapter in adapters)
+        Console.WriteLine(adapter);
+
+    SysWMInfo wmInfo = new SysWMInfo();
+    sdl.GetVersion(&wmInfo.Version);
+    sdl.GetWindowWMInfo(window, &wmInfo);
+
+    SurfaceInfo surfaceInfo = wmInfo.Subsystem switch
+    {
+        SysWMType.Windows => SurfaceInfo.Windows(wmInfo.Info.Win.HInstance, wmInfo.Info.Win.Hwnd),
+        SysWMType.X11 => SurfaceInfo.Xlib((nint) wmInfo.Info.X11.Display, (nint) wmInfo.Info.X11.Window),
+        SysWMType.Wayland => SurfaceInfo.Wayland((nint) wmInfo.Info.Wayland.Display, (nint) wmInfo.Info.Wayland.Surface),
+        _ => throw new NotSupportedException()
+    };
+
+    Surface surface = instance.CreateSurface(in surfaceInfo);
+    
+    surface.Dispose();
+    instance.Dispose();
+    
+    sdl.DestroyWindow(window);
+    sdl.Quit();
+    sdl.Dispose();
+}
