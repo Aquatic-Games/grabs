@@ -21,6 +21,8 @@ internal sealed unsafe class VkSurface : Surface
 
     public VkSurface(Vk vk, KhrSurface khrSurface, VulkanInstance instance, ref readonly SurfaceInfo info)
     {
+        ResourceManager.RegisterInstanceResource(instance, this);
+        
         _khrSurface = khrSurface;
         _instance = instance;
         
@@ -123,5 +125,7 @@ internal sealed unsafe class VkSurface : Surface
         _xcbSurface?.Dispose();
         _xlibSurface?.Dispose();
         _win32Surface?.Dispose();
+        
+        ResourceManager.DeregisterInstanceResource(_instance, this);
     }
 }

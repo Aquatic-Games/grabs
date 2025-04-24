@@ -175,6 +175,8 @@ internal sealed unsafe class VkInstance : Instance
             return;
 
         IsDisposed = true;
+        
+        ResourceManager.DisposeAllInstanceResources(_instance);
 
         if (_debugUtils != null)
         {
