@@ -10,8 +10,11 @@ public abstract class Instance : IDisposable
     /// <summary>
     /// Gets if this <see cref="Instance"/> has been disposed.
     /// </summary>
-    public abstract bool IsDisposed { get; }
+    public abstract bool IsDisposed { get; protected set; }
     
+    /// <summary>
+    /// Get the name of this backend.
+    /// </summary>
     public abstract string BackendName { get; }
 
     /// <summary>
