@@ -40,7 +40,32 @@ unsafe
     };
 
     Surface surface = instance.CreateSurface(in surfaceInfo);
+    Device device = instance.CreateDevice(surface);
+
+    bool alive = true;
+    while (alive)
+    {
+        Event sdlEvent;
+        while (sdl.PollEvent(&sdlEvent) != 0)
+        {
+            switch ((EventType) sdlEvent.Type)
+            {
+                case EventType.Windowevent:
+                {
+                    switch ((WindowEventID) sdlEvent.Window.Event)
+                    {
+                        case WindowEventID.Close:
+                            alive = false;
+                            break;
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
     
+    device.Dispose();
     surface.Dispose();
     instance.Dispose();
     

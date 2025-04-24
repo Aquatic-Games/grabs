@@ -32,6 +32,17 @@ public abstract class Instance : IDisposable
     public abstract Surface CreateSurface(in SurfaceInfo info);
 
     /// <summary>
+    /// Create a logical <see cref="Device"/>.
+    /// </summary>
+    /// <param name="surface">The <see cref="Surface"/> to use during device creation.</param>
+    /// <param name="adapter">The <see cref="Adapter"/> this device will be created on. If none is provided, the default
+    /// will be used.</param>
+    /// <returns>The created <see cref="Device"/>.</returns>
+    /// <remarks>The <paramref name="surface"/> is only used during creation. It does <b>not</b> need to be the same
+    /// surface used to create a <see cref="Swapchain"/>.</remarks>
+    public abstract Device CreateDevice(Surface surface, Adapter? adapter = null);
+
+    /// <summary>
     /// Dispose of this <see cref="Instance"/>.
     /// </summary>
     public abstract void Dispose();

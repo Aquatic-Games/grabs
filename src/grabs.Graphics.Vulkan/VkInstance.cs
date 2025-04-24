@@ -169,6 +169,14 @@ internal sealed unsafe class VkInstance : Instance
         return new VkSurface(_vk, _khrSurface, _instance, in info);
     }
 
+    public override Device CreateDevice(Surface surface, Adapter? adapter = null)
+    {
+        Adapter pAdapter = adapter ?? EnumerateAdapters()[0];
+        PhysicalDevice physicalDevice = new PhysicalDevice(pAdapter.Handle);
+
+        return new VkDevice(_vk, _instance, _khrSurface, physicalDevice, ((VkSurface) surface).Surface);
+    }
+
     public override void Dispose()
     {
         if (IsDisposed)
@@ -210,7 +218,7 @@ internal sealed unsafe class VkInstance : Instance
             _ => throw new ArgumentOutOfRangeException(nameof(messageSeverity), messageSeverity, null)
         };
         
-        GrabsLog.Log(severity, $"{messageTypes.ToString()[..^("BitExt".Length)]}");
+        GrabsLog.Log(severity, $"{messageTypes.ToString()[..^("BitExt".Length)]} - {message}");
         
         return Vk.True;
     }
