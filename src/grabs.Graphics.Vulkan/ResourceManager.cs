@@ -6,12 +6,14 @@ namespace grabs.Graphics.Vulkan;
 internal static class ResourceManager
 {
     private static readonly Dictionary<VulkanInstance, HashSet<IDisposable>> _instanceResources;
+    private static readonly Dictionary<VulkanDevice, HashSet<IDisposable>> _deviceResources;
 
     private static bool _isDisposingAllResources;
 
     static ResourceManager()
     {
         _instanceResources = [];
+        _deviceResources = [];
     }
     
     public static void RegisterInstanceResource(VulkanInstance instance, IDisposable resource)
@@ -33,6 +35,25 @@ internal static class ResourceManager
         
         _instanceResources[instance].Remove(resource);
     }
+    
+    public static void RegisterDeviceResource(VulkanDevice device, IDisposable resource)
+    {
+        if (!_deviceResources.TryGetValue(device, out HashSet<IDisposable> resources))
+        {
+            resources = [];
+            _deviceResources.Add(device, resources);
+        }
+
+        resources.Add(resource);
+    }
+
+    public static void DeregisterDeviceResource(VulkanDevice device, IDisposable resource)
+    {
+        if (_isDisposingAllResources)
+            return;
+
+        _deviceResources[device].Remove(resource);
+    }
 
     public static void DisposeAllInstanceResources(VulkanInstance instance)
     {
@@ -42,6 +63,17 @@ internal static class ResourceManager
             resource.Dispose();
 
         _isDisposingAllResources = false;
-        _instanceResources.Clear();
+        _instanceResources.Remove(instance);
+    }
+
+    public static void DisposeAllDeviceResources(VulkanDevice device)
+    {
+        _isDisposingAllResources = true;
+
+        foreach (IDisposable resource in _deviceResources[device])
+            resource.Dispose();
+
+        _isDisposingAllResources = false;
+        _deviceResources.Remove(device);
     }
 }
