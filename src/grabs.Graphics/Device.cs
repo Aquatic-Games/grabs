@@ -11,6 +11,13 @@ public abstract class Device : IDisposable
     public abstract bool IsDisposed { get; protected set; }
 
     /// <summary>
+    /// Create a <see cref="Swapchain"/>.
+    /// </summary>
+    /// <param name="info">The <see cref="SwapchainInfo"/> used to describe the swapchain.</param>
+    /// <returns>The created <see cref="Swapchain"/>.</returns>
+    public abstract Swapchain CreateSwapchain(in SwapchainInfo info);
+
+    /// <summary>
     /// Dispose of this <see cref="Device"/>.
     /// </summary>
     public abstract void Dispose();

@@ -13,8 +13,13 @@ internal sealed unsafe class VkDevice : Device
     private readonly Vk _vk;
     private readonly VulkanInstance _instance;
 
+    public readonly PhysicalDevice PhysicalDevice;
+    
     public readonly VulkanDevice Device;
     public readonly Queues Queues;
+
+    public readonly KhrSurface KhrSurface;
+    public readonly KhrSwapchain KhrSwapchain;
     
     public VkDevice(Vk vk, VulkanInstance instance, KhrSurface khrSurface, PhysicalDevice physicalDevice, SurfaceKHR surface)
     {
@@ -22,6 +27,9 @@ internal sealed unsafe class VkDevice : Device
         
         _vk = vk;
         _instance = instance;
+
+        PhysicalDevice = physicalDevice;
+        KhrSurface = khrSurface;
 
         uint? graphicsQueue = null;
         uint? presentQueue = null;
@@ -96,10 +104,20 @@ internal sealed unsafe class VkDevice : Device
         GrabsLog.Log("Getting queues.");
         _vk.GetDeviceQueue(Device, Queues.GraphicsIndex, 0, out Queues.Graphics);
         _vk.GetDeviceQueue(Device, Queues.PresentIndex, 0, out Queues.Present);
+
+        if (!_vk.TryGetDeviceExtension(_instance, Device, out KhrSwapchain))
+            throw new Exception("Failed to get swapchain extension.");
     }
-    
+
+    public override Swapchain CreateSwapchain(in SwapchainInfo info)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void Dispose()
     {
+        ResourceManager.DisposeAllDeviceResources(Device);
+        
         GrabsLog.Log("Destroying device.");
         _vk.DestroyDevice(Device, null);
         
