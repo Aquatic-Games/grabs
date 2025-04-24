@@ -1,4 +1,5 @@
-﻿using grabs.Core;
+﻿global using VulkanInstance = Silk.NET.Vulkan.Instance;
+using grabs.Core;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.KHR;
 
@@ -7,6 +8,8 @@ namespace grabs.Graphics.Vulkan;
 internal sealed unsafe class VkInstance : Instance
 {
     private readonly Vk _vk;
+
+    private readonly VulkanInstance _instance;
     
     public override bool IsDisposed { get; protected set; }
 
@@ -56,11 +59,19 @@ internal sealed unsafe class VkInstance : Instance
         GrabsLog.Log(GrabsLog.Severity.Debug,
             $"Enabled instance extensions: [{string.Join(", ", instanceExtensions)}]");
 
+        using Utf8Array pInstanceExtensions = new Utf8Array(instanceExtensions);
+
         InstanceCreateInfo instanceInfo = new()
         {
             SType = StructureType.InstanceCreateInfo,
-            PApplicationInfo = &appInfo
+            PApplicationInfo = &appInfo,
+            
+            EnabledExtensionCount = pInstanceExtensions.Length,
+            PpEnabledExtensionNames = pInstanceExtensions
         };
+        
+        GrabsLog.Log("Creating instance");
+        _vk.CreateInstance(&instanceInfo, null, out _instance).Check("Create instance");
     }
     
     public override void Dispose()
@@ -70,6 +81,8 @@ internal sealed unsafe class VkInstance : Instance
 
         IsDisposed = true;
         
+        GrabsLog.Log("Destroying instance");
+        _vk.DestroyInstance(_instance, null);
         _vk.Dispose();
     }
 }
