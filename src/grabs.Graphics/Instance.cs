@@ -18,6 +18,12 @@ public abstract class Instance : IDisposable
     public abstract string BackendName { get; }
 
     /// <summary>
+    /// Enumerate the graphics adapters available on this system.
+    /// </summary>
+    /// <returns></returns>
+    public abstract Adapter[] EnumerateAdapters();
+
+    /// <summary>
     /// Dispose of this <see cref="Instance"/>.
     /// </summary>
     public abstract void Dispose();

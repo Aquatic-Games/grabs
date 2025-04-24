@@ -7,3 +7,8 @@ GrabsLog.LogMessage += (severity, message, line, file) => Console.WriteLine($"{s
 Instance.RegisterBackend<VulkanBackend>();
 
 using Instance instance = Instance.Create(new InstanceInfo("test", true));
+
+Adapter[] adapters = instance.EnumerateAdapters();
+
+foreach (Adapter adapter in adapters)
+    Console.WriteLine(adapter);

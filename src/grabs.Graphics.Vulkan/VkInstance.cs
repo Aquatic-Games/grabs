@@ -1,6 +1,8 @@
 ﻿global using VulkanInstance = Silk.NET.Vulkan.Instance;
+using System.Diagnostics;
 using grabs.Core;
 using Silk.NET.Vulkan;
+using Silk.NET.Vulkan.Extensions.EXT;
 using Silk.NET.Vulkan.Extensions.KHR;
 
 namespace grabs.Graphics.Vulkan;
@@ -10,6 +12,9 @@ internal sealed unsafe class VkInstance : Instance
     private readonly Vk _vk;
 
     private readonly VulkanInstance _instance;
+
+    private readonly ExtDebugUtils? _debugUtils;
+    private readonly DebugUtilsMessengerEXT _debugMessenger;
     
     public override bool IsDisposed { get; protected set; }
 
@@ -33,6 +38,7 @@ internal sealed unsafe class VkInstance : Instance
         };
 
         List<string> instanceExtensions = [KhrSurface.ExtensionName];
+        List<string> layers = [];
 
         uint numInstanceExtensions;
         _vk.EnumerateInstanceExtensionProperties((byte*) null, &numInstanceExtensions, null);
@@ -56,10 +62,20 @@ internal sealed unsafe class VkInstance : Instance
             }
         }
 
+        // TODO: Perform checks for these.
+        if (info.Debug)
+        {
+            instanceExtensions.Add(ExtDebugUtils.ExtensionName);
+            layers.Add("VK_LAYER_KHRONOS_validation");
+        }
+
         GrabsLog.Log(GrabsLog.Severity.Debug,
             $"Enabled instance extensions: [{string.Join(", ", instanceExtensions)}]");
+        
+        GrabsLog.Log(GrabsLog.Severity.Debug, $"Enabled layers: [{string.Join(", ", layers)}]");
 
         using Utf8Array pInstanceExtensions = new Utf8Array(instanceExtensions);
+        using Utf8Array pLayers = new Utf8Array(layers);
 
         InstanceCreateInfo instanceInfo = new()
         {
@@ -67,22 +83,121 @@ internal sealed unsafe class VkInstance : Instance
             PApplicationInfo = &appInfo,
             
             EnabledExtensionCount = pInstanceExtensions.Length,
-            PpEnabledExtensionNames = pInstanceExtensions
+            PpEnabledExtensionNames = pInstanceExtensions,
+            
+            EnabledLayerCount = pLayers.Length,
+            PpEnabledLayerNames = pLayers
         };
         
         GrabsLog.Log("Creating instance");
         _vk.CreateInstance(&instanceInfo, null, out _instance).Check("Create instance");
+
+        if (info.Debug)
+        {
+            GrabsLog.Log("Getting debug utils extension.");
+            if (!_vk.TryGetInstanceExtension(_instance, out _debugUtils))
+                throw new Exception("Failed to get debug utils extension");
+            
+            Debug.Assert(_debugUtils != null);
+
+            DebugUtilsMessengerCreateInfoEXT messengerInfo = new()
+            {
+                SType = StructureType.DebugUtilsMessengerCreateInfoExt,
+                MessageSeverity = DebugUtilsMessageSeverityFlagsEXT.VerboseBitExt |
+                                  DebugUtilsMessageSeverityFlagsEXT.InfoBitExt |
+                                  DebugUtilsMessageSeverityFlagsEXT.WarningBitExt |
+                                  DebugUtilsMessageSeverityFlagsEXT.ErrorBitExt,
+                MessageType = DebugUtilsMessageTypeFlagsEXT.GeneralBitExt |
+                              DebugUtilsMessageTypeFlagsEXT.PerformanceBitExt |
+                              DebugUtilsMessageTypeFlagsEXT.ValidationBitExt,
+                PfnUserCallback = new PfnDebugUtilsMessengerCallbackEXT(DebugCallback)
+            };
+
+            GrabsLog.Log("Creating debug messenger.");
+            _debugUtils.CreateDebugUtilsMessenger(_instance, &messengerInfo, null, out _debugMessenger)
+                .Check("Create debug messenger");
+        }
     }
-    
+
+    public override Adapter[] EnumerateAdapters()
+    {
+        List<Adapter> adapters = [];
+
+        uint numDevices;
+        _vk.EnumeratePhysicalDevices(_instance, &numDevices, null);
+        PhysicalDevice* physicalDevices = stackalloc PhysicalDevice[(int) numDevices];
+        _vk.EnumeratePhysicalDevices(_instance, &numDevices, physicalDevices);
+
+        for (uint i = 0; i < numDevices; i++)
+        {
+            PhysicalDevice device = physicalDevices[i];
+
+            PhysicalDeviceProperties props;
+            _vk.GetPhysicalDeviceProperties(device, &props);
+
+            PhysicalDeviceMemoryProperties memProps;
+            _vk.GetPhysicalDeviceMemoryProperties(device, &memProps);
+
+            string name = new string((sbyte*) props.DeviceName);
+
+            AdapterType type = props.DeviceType switch
+            {
+                PhysicalDeviceType.Other => AdapterType.Other,
+                PhysicalDeviceType.IntegratedGpu => AdapterType.Integrated,
+                PhysicalDeviceType.DiscreteGpu => AdapterType.Dedicated,
+                PhysicalDeviceType.VirtualGpu => AdapterType.Other,
+                PhysicalDeviceType.Cpu => AdapterType.Software,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            // TODO: Use VMA to get the amount of memory?
+            ulong dedicatedMemory = memProps.MemoryHeaps[0].Size;
+            
+            adapters.Add(new Adapter(device.Handle, i, name, type, dedicatedMemory));
+        }
+        
+        return adapters.ToArray();
+    }
+
     public override void Dispose()
     {
         if (IsDisposed)
             return;
 
         IsDisposed = true;
+
+        if (_debugUtils != null)
+        {
+            GrabsLog.Log("Destroying debug messenger");
+            _debugUtils.DestroyDebugUtilsMessenger(_instance, _debugMessenger, null);
+            _debugUtils.Dispose();
+        }
         
         GrabsLog.Log("Destroying instance");
         _vk.DestroyInstance(_instance, null);
         _vk.Dispose();
+    }
+    
+    private static uint DebugCallback(DebugUtilsMessageSeverityFlagsEXT messageSeverity,
+        DebugUtilsMessageTypeFlagsEXT messageTypes, DebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
+    {
+        string message = new string((sbyte*) pCallbackData->PMessage);
+
+        if (messageSeverity == DebugUtilsMessageSeverityFlagsEXT.ErrorBitExt)
+            throw new Exception(message);
+
+        GrabsLog.Severity severity = messageSeverity switch
+        {
+            DebugUtilsMessageSeverityFlagsEXT.None => GrabsLog.Severity.Verbose,
+            DebugUtilsMessageSeverityFlagsEXT.VerboseBitExt => GrabsLog.Severity.Verbose,
+            DebugUtilsMessageSeverityFlagsEXT.InfoBitExt => GrabsLog.Severity.Verbose,
+            DebugUtilsMessageSeverityFlagsEXT.WarningBitExt => GrabsLog.Severity.Warning,
+            DebugUtilsMessageSeverityFlagsEXT.ErrorBitExt => GrabsLog.Severity.Error,
+            _ => throw new ArgumentOutOfRangeException(nameof(messageSeverity), messageSeverity, null)
+        };
+        
+        GrabsLog.Log(severity, $"{messageTypes.ToString()[..^("BitExt".Length)]}");
+        
+        return Vk.True;
     }
 }
