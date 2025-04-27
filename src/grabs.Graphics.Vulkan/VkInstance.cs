@@ -63,6 +63,7 @@ internal sealed unsafe class VkInstance : Instance
                 instanceExtensions.Add(extension);
             }
         }
+        
 
         // TODO: Perform checks for these.
         if (info.Debug)

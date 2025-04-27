@@ -1,4 +1,5 @@
 global using VkFormat = Silk.NET.Vulkan.Format;
+using grabs.Core;
 using Silk.NET.Vulkan;
 
 namespace grabs.Graphics.Vulkan;
@@ -81,4 +82,19 @@ internal static class VkUtils
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
         };
     }
+
+    public static PresentModeKHR ToVk(this PresentMode mode)
+    {
+        return mode switch
+        {
+            PresentMode.Fifo => PresentModeKHR.FifoKhr,
+            PresentMode.Immediate => PresentModeKHR.ImmediateKhr,
+            PresentMode.FifoRelaxed => PresentModeKHR.FifoRelaxedKhr,
+            PresentMode.Mailbox => PresentModeKHR.MailboxKhr,
+            _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null)
+        };
+    }
+
+    public static Extent2D ToVk(this Size2D size)
+        => new Extent2D(size.Width, size.Height);
 }

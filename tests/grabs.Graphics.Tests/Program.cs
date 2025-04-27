@@ -41,6 +41,9 @@ unsafe
 
     Surface surface = instance.CreateSurface(in surfaceInfo);
     Device device = instance.CreateDevice(surface);
+    Swapchain swapchain =
+        device.CreateSwapchain(new SwapchainInfo(surface, new Size2D(1280, 720), Format.B8G8R8A8_UNorm,
+            PresentMode.Fifo, 2));
 
     bool alive = true;
     while (alive)
@@ -65,6 +68,7 @@ unsafe
         }
     }
     
+    swapchain.Dispose();
     device.Dispose();
     surface.Dispose();
     instance.Dispose();

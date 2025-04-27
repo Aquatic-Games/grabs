@@ -111,7 +111,7 @@ internal sealed unsafe class VkDevice : Device
 
     public override Swapchain CreateSwapchain(in SwapchainInfo info)
     {
-        throw new NotImplementedException();
+        return new VkSwapchain(_vk, this, in info);
     }
 
     public override void Dispose()

@@ -1,19 +1,12 @@
 namespace grabs.Graphics;
 
-public struct SurfaceInfo
+public struct SurfaceInfo(SurfaceType type, nint display, nint window)
 {
-    public SurfaceType Type;
+    public SurfaceType Type = type;
 
-    public nint Display;
+    public nint Display = display;
 
-    public nint Window;
-
-    public SurfaceInfo(SurfaceType type, nint display, nint window)
-    {
-        Type = type;
-        Display = display;
-        Window = window;
-    }
+    public nint Window = window;
 
     public static SurfaceInfo Windows(nint hinstance, nint hwnd)
         => new SurfaceInfo(SurfaceType.Windows, hinstance, hwnd);
