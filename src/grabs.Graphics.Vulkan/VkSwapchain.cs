@@ -10,7 +10,9 @@ internal sealed unsafe class VkSwapchain : Swapchain
     
     private readonly VkDevice _device;
 
-    private readonly SwapchainKHR _swapchain;
+    private SwapchainKHR _swapchain;
+
+    private VkTexture[] _swapchainTextures;
 
     public VkSwapchain(Vk vk, VkDevice device, ref readonly SwapchainInfo info)
     {
@@ -111,10 +113,26 @@ internal sealed unsafe class VkSwapchain : Swapchain
 
         GrabsLog.Log("Creating swapchain");
         khrSwapchain.CreateSwapchain(device.Device, &swapchainInfo, null, out _swapchain).Check("Create swapchain");
+        
+        GrabsLog.Log("Getting swapchain images.");
+        uint numSwapchainImages;
+        khrSwapchain.GetSwapchainImages(device.Device, _swapchain, &numSwapchainImages, null)
+            .Check("Get swapchain images");
+        Image* swapchainImages = stackalloc Image[(int) numSwapchainImages];
+        khrSwapchain.GetSwapchainImages(device.Device, _swapchain, &numSwapchainImages, swapchainImages)
+            .Check("Get swapchain images");
+
+        _swapchainTextures = new VkTexture[numSwapchainImages];
+
+        for (uint i = 0; i < numSwapchainImages; i++)
+            _swapchainTextures[i] = new VkTexture(vk, _device.Device, swapchainImages[i], format);
     }
     
     public override void Dispose()
     {
+        foreach (VkTexture texture in _swapchainTextures)
+            texture.Dispose();
+        
         GrabsLog.Log("Destroying swapchain");
         _device.KhrSwapchain.DestroySwapchain(_device.Device, _swapchain, null);
         
