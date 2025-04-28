@@ -129,7 +129,7 @@ internal sealed unsafe class VkSwapchain : Swapchain
         _swapchainTextures = new VkTexture[numSwapchainImages];
 
         for (uint i = 0; i < numSwapchainImages; i++)
-            _swapchainTextures[i] = new VkTexture(_vk, _device.Device, swapchainImages[i], format);
+            _swapchainTextures[i] = new VkTexture(_vk, _device.Device, swapchainImages[i], format, new Size2D(extent.Width, extent.Height));
 
         FenceCreateInfo fenceInfo = new()
         {

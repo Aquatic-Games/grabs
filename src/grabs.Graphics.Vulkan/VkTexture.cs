@@ -13,8 +13,10 @@ internal sealed unsafe class VkTexture : Texture
     
     public readonly ImageView ImageView;
 
+    public readonly bool IsSwapchainTexture;
+
     // Used in swapchain creation
-    public VkTexture(Vk vk, VulkanDevice device, Image image, VkFormat format)
+    public VkTexture(Vk vk, VulkanDevice device, Image image, VkFormat format, Size2D size) : base(size)
     {
         ResourceTracker.RegisterDeviceResource(device, this);
         
@@ -22,6 +24,7 @@ internal sealed unsafe class VkTexture : Texture
         _device = device;
         _destroyImage = false;
         Image = image;
+        IsSwapchainTexture = true;
 
         ImageViewCreateInfo imageViewInfo = new()
         {
@@ -48,6 +51,22 @@ internal sealed unsafe class VkTexture : Texture
 
         GrabsLog.Log("Creating image view");
         _vk.CreateImageView(_device, &imageViewInfo, null, out ImageView).Check("Create image view");
+    }
+
+    public void Transition(CommandBuffer cb, ImageLayout old, ImageLayout @new)
+    {
+        ImageMemoryBarrier memoryBarrier = new()
+        {
+            SType = StructureType.ImageMemoryBarrier,
+            Image = Image,
+            OldLayout = old,
+            NewLayout = @new,
+            DstAccessMask = AccessFlags.ColorAttachmentWriteBit,
+            SubresourceRange = new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1)
+        };
+
+        _vk.CmdPipelineBarrier(cb, PipelineStageFlags.ColorAttachmentOutputBit,
+            PipelineStageFlags.ColorAttachmentOutputBit, 0, 0, null, 0, null, 1, &memoryBarrier);
     }
     
     public override void Dispose()

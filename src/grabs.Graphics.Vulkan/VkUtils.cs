@@ -95,6 +95,27 @@ internal static class VkUtils
         };
     }
 
+    public static AttachmentLoadOp ToVk(this LoadOp op)
+    {
+        return op switch
+        {
+            LoadOp.Clear => AttachmentLoadOp.Clear,
+            LoadOp.Load => AttachmentLoadOp.Load,
+            LoadOp.DontCare => AttachmentLoadOp.DontCare,
+            _ => throw new ArgumentOutOfRangeException(nameof(op), op, null)
+        };
+    }
+
+    public static AttachmentStoreOp ToVk(this StoreOp op)
+    {
+        return op switch
+        {
+            StoreOp.Store => AttachmentStoreOp.Store,
+            StoreOp.DontCare => AttachmentStoreOp.DontCare,
+            _ => throw new ArgumentOutOfRangeException(nameof(op), op, null)
+        };
+    }
+
     public static Extent2D ToVk(this Size2D size)
         => new Extent2D(size.Width, size.Height);
 }

@@ -71,14 +71,18 @@ unsafe
             }
         }
 
-        //Texture texture = swapchain.GetNextTexture();
+        Texture texture = swapchain.GetNextTexture();
         
         cl.Begin();
+        
+        cl.BeginRenderPass([new ColorTargetInfo(texture, new ColorF(1.0f, 0.5f, 0.25f))]);
+        cl.EndRenderPass();
+        
         cl.End();
         
         device.ExecuteCommandList(cl);
         
-        //swapchain.Present();
+        swapchain.Present();
     }
     
     swapchain.Dispose();

@@ -18,6 +18,10 @@ public abstract class CommandList : IDisposable
     /// </summary>
     public abstract void End();
 
+    public abstract void BeginRenderPass(in ReadOnlySpan<ColorTargetInfo> colorTargets);
+    
+    public abstract void EndRenderPass();
+
     /// <summary>
     /// Dispose of this <see cref="CommandList"/>.
     /// </summary>
