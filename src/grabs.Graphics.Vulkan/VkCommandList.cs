@@ -28,7 +28,22 @@ internal sealed unsafe class VkCommandList : CommandList
 
         _vk.AllocateCommandBuffers(_device, &cbAllocInfo, out CommandBuffer).Check("Allocate command buffer");
     }
+
+    public override void Begin()
+    {
+        CommandBufferBeginInfo beginInfo = new()
+        {
+            SType = StructureType.CommandBufferBeginInfo,
+        };
+
+        _vk.BeginCommandBuffer(CommandBuffer, &beginInfo).Check("Begin command buffer");
+    }
     
+    public override void End()
+    {
+        _vk.EndCommandBuffer(CommandBuffer).Check("End command buffer");
+    }
+
     public override void Dispose()
     {
         if (IsDisposed)

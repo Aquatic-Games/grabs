@@ -175,10 +175,14 @@ internal sealed unsafe class VkSwapchain : Swapchain
             return;
         IsDisposed = true;
         
+        GrabsLog.Log("Destroying swapchain textures.");
         foreach (VkTexture texture in _swapchainTextures)
             texture.Dispose();
         
-        GrabsLog.Log("Destroying swapchain");
+        GrabsLog.Log("Destroying fence.");
+        _vk.DestroyFence(_device.Device, _fence, null);
+        
+        GrabsLog.Log("Destroying swapchain.");
         _device.KhrSwapchain.DestroySwapchain(_device.Device, _swapchain, null);
         
         ResourceTracker.DeregisterDeviceResource(_device.Device, this);

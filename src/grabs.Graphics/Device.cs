@@ -24,6 +24,12 @@ public abstract class Device : IDisposable
     public abstract CommandList CreateCommandList();
 
     /// <summary>
+    /// Execute the commands in the command list.
+    /// </summary>
+    /// <param name="cl">The <see cref="CommandList"/> to execute.</param>
+    public abstract void ExecuteCommandList(CommandList cl);
+
+    /// <summary>
     /// Dispose of this <see cref="Device"/>.
     /// </summary>
     public abstract void Dispose();

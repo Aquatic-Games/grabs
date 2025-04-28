@@ -86,10 +86,17 @@ internal sealed unsafe class VkDevice : Device
         PhysicalDeviceFeatures features = new();
 
         using Utf8Array pExtensions = new(KhrSwapchain.ExtensionName);
+
+        PhysicalDeviceDynamicRenderingFeatures dynamicRendering = new()
+        {
+            SType = StructureType.PhysicalDeviceDynamicRenderingFeatures,
+            DynamicRendering = true
+        };
         
         DeviceCreateInfo deviceInfo = new()
         {
             SType = StructureType.DeviceCreateInfo,
+            PNext = &dynamicRendering,
             
             QueueCreateInfoCount = (uint) uniqueQueues.Count,
             PQueueCreateInfos = queueInfos,
@@ -131,9 +138,30 @@ internal sealed unsafe class VkDevice : Device
         return new VkCommandList(_vk, Device, _commandPool);
     }
 
+    public override void ExecuteCommandList(CommandList cl)
+    {
+        CommandBuffer buffer = ((VkCommandList) cl).CommandBuffer;
+
+        SubmitInfo submitInfo = new()
+        {
+            SType = StructureType.SubmitInfo,
+
+            CommandBufferCount = 1,
+            PCommandBuffers = &buffer,
+        };
+
+        // TODO: Semaphores
+        //   This is horribly inefficient and is only used temporarily during development.
+        _vk.QueueSubmit(Queues.Graphics, 1, &submitInfo, new Fence()).Check("Submit queue");
+        _vk.QueueWaitIdle(Queues.Graphics).Check("Wait for queue idle");
+    }
+
     public override void Dispose()
     {
         ResourceTracker.DisposeAllDeviceResources(Device);
+        
+        GrabsLog.Log("Destroying command pool.");
+        _vk.DestroyCommandPool(Device, _commandPool, null);
         
         GrabsLog.Log("Destroying device.");
         _vk.DestroyDevice(Device, null);

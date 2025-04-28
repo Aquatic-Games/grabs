@@ -71,9 +71,14 @@ unsafe
             }
         }
 
-        Texture texture = swapchain.GetNextTexture();
+        //Texture texture = swapchain.GetNextTexture();
         
-        swapchain.Present();
+        cl.Begin();
+        cl.End();
+        
+        device.ExecuteCommandList(cl);
+        
+        //swapchain.Present();
     }
     
     swapchain.Dispose();
