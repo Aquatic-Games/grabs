@@ -18,6 +18,12 @@ public abstract class Device : IDisposable
     public abstract Swapchain CreateSwapchain(in SwapchainInfo info);
 
     /// <summary>
+    /// Create a <see cref="CommandList"/>.
+    /// </summary>
+    /// <returns>The created <see cref="CommandList"/>.</returns>
+    public abstract CommandList CreateCommandList();
+
+    /// <summary>
     /// Dispose of this <see cref="Device"/>.
     /// </summary>
     public abstract void Dispose();

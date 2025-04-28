@@ -3,6 +3,7 @@ using grabs.Graphics;
 using grabs.Graphics.Vulkan;
 using Silk.NET.SDL;
 using Surface = grabs.Graphics.Surface;
+using Texture = grabs.Graphics.Texture;
 
 GrabsLog.LogMessage += (severity, message, line, file) => Console.WriteLine($"{severity}: {message}");
 Instance.RegisterBackend<VulkanBackend>();
@@ -41,6 +42,9 @@ unsafe
 
     Surface surface = instance.CreateSurface(in surfaceInfo);
     Device device = instance.CreateDevice(surface);
+
+    CommandList cl = device.CreateCommandList();
+    
     Swapchain swapchain =
         device.CreateSwapchain(new SwapchainInfo(surface, new Size2D(1280, 720), Format.B8G8R8A8_UNorm,
             PresentMode.Fifo, 2));
@@ -66,9 +70,14 @@ unsafe
                 }
             }
         }
+
+        Texture texture = swapchain.GetNextTexture();
+        
+        swapchain.Present();
     }
     
     swapchain.Dispose();
+    cl.Dispose();
     device.Dispose();
     surface.Dispose();
     instance.Dispose();

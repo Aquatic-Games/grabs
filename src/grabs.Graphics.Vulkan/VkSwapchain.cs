@@ -1,23 +1,27 @@
 using grabs.Core;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.KHR;
+using Semaphore = Silk.NET.Vulkan.Semaphore;
 
 namespace grabs.Graphics.Vulkan;
 
 internal sealed unsafe class VkSwapchain : Swapchain
 {
     public override bool IsDisposed { get; protected set; }
-    
+
+    private readonly Vk _vk;
     private readonly VkDevice _device;
+    private readonly Fence _fence;
 
     private SwapchainKHR _swapchain;
-
     private VkTexture[] _swapchainTextures;
+    private uint _currentImage;
 
     public VkSwapchain(Vk vk, VkDevice device, ref readonly SwapchainInfo info)
     {
-        ResourceManager.RegisterDeviceResource(device.Device, this);
+        ResourceTracker.RegisterDeviceResource(device.Device, this);
 
+        _vk = vk;
         _device = device;
 
         KhrSwapchain khrSwapchain = device.KhrSwapchain;
@@ -125,17 +129,58 @@ internal sealed unsafe class VkSwapchain : Swapchain
         _swapchainTextures = new VkTexture[numSwapchainImages];
 
         for (uint i = 0; i < numSwapchainImages; i++)
-            _swapchainTextures[i] = new VkTexture(vk, _device.Device, swapchainImages[i], format);
+            _swapchainTextures[i] = new VkTexture(_vk, _device.Device, swapchainImages[i], format);
+
+        FenceCreateInfo fenceInfo = new()
+        {
+            SType = StructureType.FenceCreateInfo
+        };
+
+        GrabsLog.Log("Creating fence.");
+        _vk.CreateFence(_device.Device, &fenceInfo, null, out _fence).Check("Create fence");
     }
-    
+
+    public override Texture GetNextTexture()
+    {
+        // TODO: Check for invalid swapchains and recreate!
+        _device.KhrSwapchain.AcquireNextImage(_device.Device, _swapchain, ulong.MaxValue, new Semaphore(), _fence,
+            ref _currentImage).Check("Acquire next image");
+
+        _vk.WaitForFences(_device.Device, 1, in _fence, true, ulong.MaxValue).Check("Wait for fence");
+        _vk.ResetFences(_device.Device, 1, in _fence).Check("Reset fence");
+
+        return _swapchainTextures[_currentImage];
+    }
+
+    public override void Present()
+    {
+        SwapchainKHR swapchain = _swapchain;
+        uint currentImage = _currentImage;
+        
+        PresentInfoKHR presentInfo = new()
+        {
+            SType = StructureType.PresentInfoKhr,
+            SwapchainCount = 1,
+            PSwapchains = &swapchain,
+            PImageIndices = &currentImage,
+        };
+        
+        // TODO: Check for invalid swapchains and recreate!
+        _device.KhrSwapchain.QueuePresent(_device.Queues.Present, &presentInfo).Check("Present");
+    }
+
     public override void Dispose()
     {
+        if (IsDisposed)
+            return;
+        IsDisposed = true;
+        
         foreach (VkTexture texture in _swapchainTextures)
             texture.Dispose();
         
         GrabsLog.Log("Destroying swapchain");
         _device.KhrSwapchain.DestroySwapchain(_device.Device, _swapchain, null);
         
-        ResourceManager.DeregisterDeviceResource(_device.Device, this);
+        ResourceTracker.DeregisterDeviceResource(_device.Device, this);
     }
 }

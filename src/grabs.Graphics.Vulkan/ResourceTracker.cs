@@ -1,16 +1,16 @@
 namespace grabs.Graphics.Vulkan;
 
-// The Resource Manager keeps track of all Vulkan resources.
+// The Resource Tracker keeps track of all Vulkan resources.
 // It's against the Vulkan spec to destroy devices + instances without first destroying their child objects.
-// The Resource Manager will automatically handle object destruction ensuring that the application conforms to the spec.
-internal static class ResourceManager
+// The Resource Tracker will automatically handle object destruction ensuring that the application conforms to the spec.
+internal static class ResourceTracker
 {
     private static readonly Dictionary<VulkanInstance, HashSet<IDisposable>> _instanceResources;
     private static readonly Dictionary<VulkanDevice, HashSet<IDisposable>> _deviceResources;
 
     private static bool _isDisposingAllResources;
 
-    static ResourceManager()
+    static ResourceTracker()
     {
         _instanceResources = [];
         _deviceResources = [];

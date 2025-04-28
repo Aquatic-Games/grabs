@@ -16,7 +16,7 @@ internal sealed unsafe class VkTexture : Texture
     // Used in swapchain creation
     public VkTexture(Vk vk, VulkanDevice device, Image image, VkFormat format)
     {
-        ResourceManager.RegisterDeviceResource(device, this);
+        ResourceTracker.RegisterDeviceResource(device, this);
         
         _vk = vk;
         _device = device;
@@ -52,6 +52,10 @@ internal sealed unsafe class VkTexture : Texture
     
     public override void Dispose()
     {
+        if (IsDisposed)
+            return;
+        IsDisposed = true;
+        
         GrabsLog.Log("Destroying image view");
         _vk.DestroyImageView(_device, ImageView, null);
 
@@ -61,6 +65,6 @@ internal sealed unsafe class VkTexture : Texture
             _vk.DestroyImage(_device, Image, null);
         }
 
-        ResourceManager.DeregisterDeviceResource(_device, this);
+        ResourceTracker.DeregisterDeviceResource(_device, this);
     }
 }

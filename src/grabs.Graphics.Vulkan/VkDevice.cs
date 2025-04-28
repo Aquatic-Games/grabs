@@ -13,6 +13,8 @@ internal sealed unsafe class VkDevice : Device
     private readonly Vk _vk;
     private readonly VulkanInstance _instance;
 
+    private readonly CommandPool _commandPool;
+
     public readonly PhysicalDevice PhysicalDevice;
     
     public readonly VulkanDevice Device;
@@ -23,7 +25,7 @@ internal sealed unsafe class VkDevice : Device
     
     public VkDevice(Vk vk, VulkanInstance instance, KhrSurface khrSurface, PhysicalDevice physicalDevice, SurfaceKHR surface)
     {
-        ResourceManager.RegisterInstanceResource(instance, this);
+        ResourceTracker.RegisterInstanceResource(instance, this);
         
         _vk = vk;
         _instance = instance;
@@ -107,6 +109,16 @@ internal sealed unsafe class VkDevice : Device
 
         if (!_vk.TryGetDeviceExtension(_instance, Device, out KhrSwapchain))
             throw new Exception("Failed to get swapchain extension.");
+
+        CommandPoolCreateInfo commandPoolInfo = new()
+        {
+            SType = StructureType.CommandPoolCreateInfo,
+            QueueFamilyIndex = Queues.GraphicsIndex,
+            Flags = CommandPoolCreateFlags.ResetCommandBufferBit
+        };
+        
+        GrabsLog.Log("Creating command pool");
+        _vk.CreateCommandPool(Device, &commandPoolInfo, null, out _commandPool).Check("Create command pool");
     }
 
     public override Swapchain CreateSwapchain(in SwapchainInfo info)
@@ -114,13 +126,18 @@ internal sealed unsafe class VkDevice : Device
         return new VkSwapchain(_vk, this, in info);
     }
 
+    public override CommandList CreateCommandList()
+    {
+        return new VkCommandList(_vk, Device, _commandPool);
+    }
+
     public override void Dispose()
     {
-        ResourceManager.DisposeAllDeviceResources(Device);
+        ResourceTracker.DisposeAllDeviceResources(Device);
         
         GrabsLog.Log("Destroying device.");
         _vk.DestroyDevice(Device, null);
         
-        ResourceManager.DeregisterInstanceResource(_instance, this);
+        ResourceTracker.DeregisterInstanceResource(_instance, this);
     }
 }
