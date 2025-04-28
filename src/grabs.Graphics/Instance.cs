@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using grabs.Core;
+using grabs.Graphics.Debugging;
 
 namespace grabs.Graphics;
 
@@ -81,7 +82,8 @@ public abstract class Instance : IDisposable
         {
             //try
             {
-                return backend.CreateInstance(in info);
+                Instance instance = backend.CreateInstance(in info);
+                return info.Debug ? new DebugInstance(instance) : instance;
             }
             //catch (Exception e) { }
         }
