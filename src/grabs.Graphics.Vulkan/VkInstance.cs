@@ -182,7 +182,6 @@ internal sealed unsafe class VkInstance : Instance
     {
         if (IsDisposed)
             return;
-
         IsDisposed = true;
         
         ResourceTracker.DisposeAllInstanceResources(_instance);

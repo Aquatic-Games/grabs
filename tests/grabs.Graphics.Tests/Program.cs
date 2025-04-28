@@ -75,7 +75,7 @@ unsafe
         
         cl.Begin();
         
-        cl.BeginRenderPass([new ColorTargetInfo(texture, new ColorF(1.0f, 0.5f, 0.25f))]);
+        cl.BeginRenderPass(new ColorAttachmentInfo(texture, new ColorF(1.0f, 0.5f, 0.25f)));
         cl.EndRenderPass();
         
         cl.End();

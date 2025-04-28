@@ -47,16 +47,16 @@ internal sealed unsafe class VkCommandList : CommandList
         _vk.EndCommandBuffer(CommandBuffer).Check("End command buffer");
     }
 
-    public override void BeginRenderPass(in ReadOnlySpan<ColorTargetInfo> colorTargets)
+    public override void BeginRenderPass(in ReadOnlySpan<ColorAttachmentInfo> colorAttachments)
     {
-        Debug.Assert(colorTargets.Length > 0);
+        Debug.Assert(colorAttachments.Length > 0);
         
-        RenderingAttachmentInfo* colorAttachments = stackalloc RenderingAttachmentInfo[colorTargets.Length];
+        RenderingAttachmentInfo* colorRenderAttachments = stackalloc RenderingAttachmentInfo[colorAttachments.Length];
 
-        for (int i = 0; i < colorTargets.Length; i++)
+        for (int i = 0; i < colorAttachments.Length; i++)
         {
-            ref readonly ColorTargetInfo target = ref colorTargets[i];
-            VkTexture texture = ((VkTexture) target.Texture);
+            ref readonly ColorAttachmentInfo attachment = ref colorAttachments[i];
+            VkTexture texture = ((VkTexture) attachment.Texture);
 
             if (texture.IsSwapchainTexture)
             {
@@ -66,28 +66,29 @@ internal sealed unsafe class VkCommandList : CommandList
                 _currentSwapchainTexture = texture;
                 _currentSwapchainTexture.Transition(CommandBuffer, ImageLayout.Undefined, ImageLayout.ColorAttachmentOptimal);
             }
-            
-            colorAttachments[i] = new RenderingAttachmentInfo()
+
+            colorRenderAttachments[i] = new RenderingAttachmentInfo()
             {
                 SType = StructureType.RenderingAttachmentInfo,
                 ImageView = texture.ImageView,
                 ImageLayout = ImageLayout.ColorAttachmentOptimal,
                 ClearValue = new ClearValue()
                 {
-                    Color = new ClearColorValue(target.ClearColor.R, target.ClearColor.G, target.ClearColor.B, target.ClearColor.A)
+                    Color = new ClearColorValue(attachment.ClearColor.R, attachment.ClearColor.G,
+                        attachment.ClearColor.B, attachment.ClearColor.A)
                 },
-                LoadOp = target.LoadOp.ToVk(),
-                StoreOp = target.StoreOp.ToVk()
+                LoadOp = attachment.LoadOp.ToVk(),
+                StoreOp = attachment.StoreOp.ToVk()
             };
         }
 
-        Extent2D size = colorTargets[0].Texture.Size.ToVk();
+        Extent2D size = colorAttachments[0].Texture.Size.ToVk();
 
         RenderingInfo renderingInfo = new()
         {
             SType = StructureType.RenderingInfo,
-            ColorAttachmentCount = (uint) colorTargets.Length,
-            PColorAttachments = colorAttachments,
+            ColorAttachmentCount = (uint) colorAttachments.Length,
+            PColorAttachments = colorRenderAttachments,
             LayerCount = 1,
             RenderArea = new Rect2D()
             {

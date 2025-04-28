@@ -115,7 +115,6 @@ internal sealed unsafe class VkSurface : Surface
     {
         if (IsDisposed)
             return;
-
         IsDisposed = true;
         
         GrabsLog.Log("Destroying surface.");

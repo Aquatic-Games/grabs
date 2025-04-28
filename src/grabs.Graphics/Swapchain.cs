@@ -8,7 +8,7 @@ public abstract class Swapchain : IDisposable
     public abstract bool IsDisposed { get; protected set; }
 
     /// <summary>
-    /// Get the next swapchain texture that can be rendered to.
+    /// Get the next swapchain texture that can be rendered to. You must call this before rendering to the swapchain.
     /// </summary>
     /// <returns>The valid swapchain texture.</returns>
     public abstract Texture GetNextTexture();

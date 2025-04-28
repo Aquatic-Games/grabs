@@ -158,6 +158,10 @@ internal sealed unsafe class VkDevice : Device
 
     public override void Dispose()
     {
+        if (IsDisposed)
+            return;
+        IsDisposed = true;
+        
         ResourceTracker.DisposeAllDeviceResources(Device);
         
         GrabsLog.Log("Destroying command pool.");

@@ -2,7 +2,7 @@ using grabs.Core;
 
 namespace grabs.Graphics;
 
-public struct ColorTargetInfo(
+public struct ColorAttachmentInfo(
     Texture texture,
     ColorF clearColor = default,
     LoadOp loadOp = LoadOp.Clear,
