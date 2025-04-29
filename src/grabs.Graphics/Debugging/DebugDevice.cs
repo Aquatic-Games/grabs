@@ -10,19 +10,28 @@ internal sealed class DebugDevice(Device device) : Device
 
     public override Swapchain CreateSwapchain(in SwapchainInfo info)
         => new DebugSwapchain(device.CreateSwapchain(in info));
-    
+
     public override CommandList CreateCommandList()
-    {
-        throw new NotImplementedException();
-    }
-    
+        => new DebugCommandList(device.CreateCommandList());
+
     public override void ExecuteCommandList(CommandList cl)
     {
-        throw new NotImplementedException();
+        DebugCommandList debugCl = (DebugCommandList) cl;
+
+        if (debugCl.IsBegun)
+        {
+            throw new ValidationException(
+                "Cannot execute command list! The command list is currently active. You must call End() before it can be executed.");
+        }
+
+        if (!debugCl.HasIssuedCommands)
+            throw new ValidationException("Cannot execute command list! No commands have been issued to it.");
+        
+        device.ExecuteCommandList(debugCl.CommandList);
     }
     
     public override void Dispose()
     {
-        throw new NotImplementedException();
+        device.Dispose();
     }
 }
