@@ -6,6 +6,6 @@ public class D3D12Backend : IBackend
     
     public Instance CreateInstance(ref readonly InstanceInfo info)
     {
-        throw new NotImplementedException();
+        return new D3D12Instance(in info);
     }
 }
