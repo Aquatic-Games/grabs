@@ -1,11 +1,13 @@
 ﻿using grabs.Core;
 using grabs.Graphics;
+using grabs.Graphics.D3D12;
 using grabs.Graphics.Vulkan;
 using Silk.NET.SDL;
 using Surface = grabs.Graphics.Surface;
 using Texture = grabs.Graphics.Texture;
 
 GrabsLog.LogMessage += (severity, message, line, file) => Console.WriteLine($"{severity}: {message}");
+Instance.RegisterBackend<D3D12Backend>();
 Instance.RegisterBackend<VulkanBackend>();
 
 unsafe
