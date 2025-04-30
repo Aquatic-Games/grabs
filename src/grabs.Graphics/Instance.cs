@@ -78,14 +78,17 @@ public abstract class Instance : IDisposable
         
         GrabsLog.Log(GrabsLog.Severity.Info, $"Registered backends: {string.Join(", ", _backends.Keys)}");
         
-        foreach ((_, IBackendBase backend) in _backends)
+        foreach ((string name, IBackendBase backend) in _backends)
         {
-            //try
+            try
             {
                 Instance instance = backend.CreateInstance(in info);
                 return info.Debug ? new DebugInstance(instance) : instance;
             }
-            //catch (Exception e) { }
+            catch (Exception e)
+            {
+                GrabsLog.Log(GrabsLog.Severity.Error, $"Failed to create backend '{name}': {e}");
+            }
         }
 
         throw new PlatformNotSupportedException("No backends were supported by this platform.");

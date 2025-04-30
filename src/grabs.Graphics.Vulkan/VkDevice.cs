@@ -138,6 +138,11 @@ internal sealed unsafe class VkDevice : Device
         return new VkCommandList(_vk, Device, _commandPool);
     }
 
+    public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] code, string entryPoint)
+    {
+        return new VkShaderModule(_vk, Device, code, entryPoint);
+    }
+
     public override void ExecuteCommandList(CommandList cl)
     {
         CommandBuffer buffer = ((VkCommandList) cl).CommandBuffer;

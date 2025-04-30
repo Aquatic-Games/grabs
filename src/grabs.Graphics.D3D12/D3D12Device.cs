@@ -34,7 +34,12 @@ internal sealed unsafe class D3D12Device : Device
     {
         throw new NotImplementedException();
     }
-    
+
+    public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] code, string entryPoint)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void ExecuteCommandList(CommandList cl)
     {
         throw new NotImplementedException();

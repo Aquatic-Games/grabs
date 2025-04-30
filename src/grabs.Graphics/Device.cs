@@ -24,6 +24,16 @@ public abstract class Device : IDisposable
     public abstract CommandList CreateCommandList();
 
     /// <summary>
+    /// Create a <see cref="ShaderModule"/>.
+    /// </summary>
+    /// <param name="stage">The shader stage of the module.</param>
+    /// <param name="code">The shader code.</param>
+    /// <param name="entryPoint">The entry point.</param>
+    /// <returns>The created <see cref="ShaderModule"/>.</returns>
+    /// <remarks>This is backend specific. Vulkan will expect SPIR-V, D3D12 will expect DXIL, etc.</remarks>
+    public abstract ShaderModule CreateShaderModule(ShaderStage stage, byte[] code, string entryPoint);
+
+    /// <summary>
     /// Execute the commands in the command list.
     /// </summary>
     /// <param name="cl">The <see cref="CommandList"/> to execute.</param>

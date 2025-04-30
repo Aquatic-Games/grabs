@@ -14,6 +14,9 @@ internal sealed class DebugDevice(Device device) : Device
     public override CommandList CreateCommandList()
         => new DebugCommandList(device.CreateCommandList());
 
+    public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] code, string entryPoint)
+        => device.CreateShaderModule(stage, code, entryPoint);
+
     public override void ExecuteCommandList(CommandList cl)
     {
         DebugCommandList debugCl = (DebugCommandList) cl;
