@@ -145,6 +145,11 @@ internal sealed unsafe class VkDevice : Device
         return new VkShaderModule(_vk, Device, code, entryPoint);
     }
 
+    public override Pipeline CreateGraphicsPipeline(in GraphicsPipelineInfo info)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void ExecuteCommandList(CommandList cl)
     {
         CommandBuffer buffer = ((VkCommandList) cl).CommandBuffer;

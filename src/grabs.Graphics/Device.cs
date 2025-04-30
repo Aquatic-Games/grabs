@@ -39,6 +39,13 @@ public abstract class Device : IDisposable
     public abstract ShaderModule CreateShaderModule(ShaderStage stage, byte[] code, string entryPoint);
 
     /// <summary>
+    /// Create a graphics <see cref="Pipeline"/>.
+    /// </summary>
+    /// <param name="info">The <see cref="GraphicsPipelineInfo"/> used to describe the pipeline.</param>
+    /// <returns>The created <see cref="Pipeline"/>.</returns>
+    public abstract Pipeline CreateGraphicsPipeline(in GraphicsPipelineInfo info);
+
+    /// <summary>
     /// Execute the commands in the command list.
     /// </summary>
     /// <param name="cl">The <see cref="CommandList"/> to execute.</param>

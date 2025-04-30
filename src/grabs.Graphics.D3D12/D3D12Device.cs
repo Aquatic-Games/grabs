@@ -42,6 +42,11 @@ internal sealed unsafe class D3D12Device : Device
         throw new NotImplementedException();
     }
 
+    public override Pipeline CreateGraphicsPipeline(in GraphicsPipelineInfo info)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void ExecuteCommandList(CommandList cl)
     {
         throw new NotImplementedException();
