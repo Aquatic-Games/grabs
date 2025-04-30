@@ -100,6 +100,15 @@ unsafe
 
     ShaderModule vertexModule = device.CreateShaderModuleFromHlsl(ShaderStage.Vertex, ShaderCode, "VSMain");
     ShaderModule pixelModule = device.CreateShaderModuleFromHlsl(ShaderStage.Pixel, ShaderCode, "PSMain");
+
+    GraphicsPipelineInfo pipelineInfo = new()
+    {
+        VertexShader = vertexModule,
+        PixelShader = pixelModule,
+        ColorAttachments = [new ColorAttachmentDescription(Format.B8G8R8A8_UNorm)]
+    };
+
+    Pipeline pipeline = device.CreateGraphicsPipeline(in pipelineInfo);
     
     pixelModule.Dispose();
     vertexModule.Dispose();

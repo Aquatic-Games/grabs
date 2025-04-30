@@ -73,7 +73,7 @@ internal sealed unsafe class VkSwapchain : Swapchain
         
         GrabsLog.Log($"Present mode: {presentMode}");
 
-        VkFormat format = info.Format.ToVk();
+        VulkanFormat format = info.Format.ToVk();
         GrabsLog.Log($"Requested surface format: {format}");
         
         GrabsLog.Log("Checking if format is supported.");

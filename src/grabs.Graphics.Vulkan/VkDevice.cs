@@ -147,7 +147,7 @@ internal sealed unsafe class VkDevice : Device
 
     public override Pipeline CreateGraphicsPipeline(in GraphicsPipelineInfo info)
     {
-        throw new NotImplementedException();
+        return new VkPipeline(_vk, Device, in info);
     }
 
     public override void ExecuteCommandList(CommandList cl)

@@ -16,7 +16,7 @@ internal sealed unsafe class VkTexture : Texture
     public readonly bool IsSwapchainTexture;
 
     // Used in swapchain creation
-    public VkTexture(Vk vk, VulkanDevice device, Image image, VkFormat format, Size2D size) : base(size)
+    public VkTexture(Vk vk, VulkanDevice device, Image image, VulkanFormat format, Size2D size) : base(size)
     {
         ResourceTracker.RegisterDeviceResource(device, this);
         
