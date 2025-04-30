@@ -72,6 +72,17 @@ internal sealed class DebugCommandList(CommandList cl) : CommandList
         
         CommandList.EndRenderPass();
     }
+
+    public override void SetGraphicsPipeline(Pipeline pipeline)
+    {
+        CommandList.SetGraphicsPipeline(pipeline);
+    }
+    
+    public override void Draw(uint numVertices)
+    {
+        CommandList.Draw(numVertices);
+    }
+
     public override void Dispose()
     {
         CommandList.Dispose();

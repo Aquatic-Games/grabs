@@ -37,6 +37,18 @@ public abstract class CommandList : IDisposable
     public abstract void EndRenderPass();
 
     /// <summary>
+    /// Set the graphics <see cref="Pipeline"/> used on next draw.
+    /// </summary>
+    /// <param name="pipeline">The graphics <see cref="Pipeline"/> to use.</param>
+    public abstract void SetGraphicsPipeline(Pipeline pipeline);
+
+    /// <summary>
+    /// Draw with the given number of vertices.
+    /// </summary>
+    /// <param name="numVertices">The number of vertices to draw.</param>
+    public abstract void Draw(uint numVertices);
+
+    /// <summary>
     /// Dispose of this <see cref="CommandList"/>.
     /// </summary>
     public abstract void Dispose();

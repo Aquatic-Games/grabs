@@ -140,6 +140,10 @@ unsafe
         cl.Begin();
         
         cl.BeginRenderPass(new ColorAttachmentInfo(texture, new ColorF(1.0f, 0.5f, 0.25f)));
+        
+        cl.SetGraphicsPipeline(pipeline);
+        cl.Draw(3);
+        
         cl.EndRenderPass();
         
         cl.End();
@@ -149,6 +153,7 @@ unsafe
         swapchain.Present();
     }
     
+    pipeline.Dispose();
     swapchain.Dispose();
     cl.Dispose();
     device.Dispose();

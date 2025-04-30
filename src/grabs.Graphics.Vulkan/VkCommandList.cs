@@ -101,9 +101,9 @@ internal sealed unsafe class VkCommandList : CommandList
         Viewport vp = new()
         {
             X = 0,
-            Y = 0,
+            Y = size.Height,
             Width = size.Width,
-            Height = size.Height,
+            Height = -size.Height,
             MinDepth = 0,
             MaxDepth = 1
         };
@@ -122,6 +122,17 @@ internal sealed unsafe class VkCommandList : CommandList
         
         _currentSwapchainTexture?.Transition(CommandBuffer, ImageLayout.ColorAttachmentOptimal, ImageLayout.PresentSrcKhr);
         _currentSwapchainTexture = null;
+    }
+
+    public override void SetGraphicsPipeline(Pipeline pipeline)
+    {
+        VkPipeline vkPipeline = (VkPipeline) pipeline;
+        _vk.CmdBindPipeline(CommandBuffer, PipelineBindPoint.Graphics, vkPipeline.Pipeline);
+    }
+    
+    public override void Draw(uint numVertices)
+    {
+        _vk.CmdDraw(CommandBuffer, numVertices, 1, 0, 0);
     }
 
     public override void Dispose()

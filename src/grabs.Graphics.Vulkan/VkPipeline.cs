@@ -102,7 +102,9 @@ internal sealed unsafe class VkPipeline : Pipeline
             colorFormats[i] = info.ColorAttachments[i].Format.ToVk();
             blendAttachments[i] = new PipelineColorBlendAttachmentState()
             {
-                BlendEnable = false
+                BlendEnable = false,
+                ColorWriteMask = ColorComponentFlags.RBit | ColorComponentFlags.GBit | ColorComponentFlags.BBit |
+                                 ColorComponentFlags.ABit
             };
         }
 
