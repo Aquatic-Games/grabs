@@ -14,6 +14,8 @@ internal sealed unsafe class D3D12Device : Device
     public override bool IsDisposed { get; protected set; }
 
     public readonly ID3D12Device* Device;
+    
+    public override ShaderFormat ShaderFormat => ShaderFormat.Dxil;
 
     public D3D12Device(IDXGIAdapter1* adapter)
     {
@@ -24,7 +26,7 @@ internal sealed unsafe class D3D12Device : Device
                 .Check("Create D3D12 device");
         }
     }
-    
+
     public override Swapchain CreateSwapchain(in SwapchainInfo info)
     {
         throw new NotImplementedException();

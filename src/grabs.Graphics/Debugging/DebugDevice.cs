@@ -8,6 +8,8 @@ internal sealed class DebugDevice(Device device) : Device
         protected set => throw new NotImplementedException();
     }
 
+    public override ShaderFormat ShaderFormat => device.ShaderFormat;
+
     public override Swapchain CreateSwapchain(in SwapchainInfo info)
         => new DebugSwapchain(device.CreateSwapchain(in info));
 

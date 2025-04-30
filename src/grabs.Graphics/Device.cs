@@ -9,6 +9,11 @@ public abstract class Device : IDisposable
     /// Gets if this <see cref="Device"/> is disposed.
     /// </summary>
     public abstract bool IsDisposed { get; protected set; }
+    
+    /// <summary>
+    /// Gets the <see cref="grabs.Graphics.ShaderFormat"/> that this device accepts.
+    /// </summary>
+    public abstract ShaderFormat ShaderFormat { get; }
 
     /// <summary>
     /// Create a <see cref="Swapchain"/>.
@@ -30,7 +35,7 @@ public abstract class Device : IDisposable
     /// <param name="code">The shader code.</param>
     /// <param name="entryPoint">The entry point.</param>
     /// <returns>The created <see cref="ShaderModule"/>.</returns>
-    /// <remarks>This is backend specific. Vulkan will expect SPIR-V, D3D12 will expect DXIL, etc.</remarks>
+    /// <remarks>This must be in the same format as the <see cref="ShaderFormat"/>.</remarks>
     public abstract ShaderModule CreateShaderModule(ShaderStage stage, byte[] code, string entryPoint);
 
     /// <summary>

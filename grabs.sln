@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Graphics.Tests", "tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.Graphics.D3D12", "src\grabs.Graphics.D3D12\grabs.Graphics.D3D12.csproj", "{FC216E8B-4845-498C-A194-C4EDC7284BC9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grabs.ShaderCompiler", "src\grabs.ShaderCompiler\grabs.ShaderCompiler.csproj", "{5B57C518-039B-4CA7-8D5C-965F7CC6D86E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{FC216E8B-4845-498C-A194-C4EDC7284BC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC216E8B-4845-498C-A194-C4EDC7284BC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC216E8B-4845-498C-A194-C4EDC7284BC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B57C518-039B-4CA7-8D5C-965F7CC6D86E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B57C518-039B-4CA7-8D5C-965F7CC6D86E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B57C518-039B-4CA7-8D5C-965F7CC6D86E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B57C518-039B-4CA7-8D5C-965F7CC6D86E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F4A23FE4-31BA-4D34-8619-8B997963F895} = {C44D31D3-DC8D-4A27-803C-EB82456C636B}

@@ -2,6 +2,7 @@
 using grabs.Graphics;
 using grabs.Graphics.D3D12;
 using grabs.Graphics.Vulkan;
+using grabs.ShaderCompiler;
 using Silk.NET.SDL;
 using Surface = grabs.Graphics.Surface;
 using Texture = grabs.Graphics.Texture;
@@ -9,6 +10,52 @@ using Texture = grabs.Graphics.Texture;
 GrabsLog.LogMessage += (severity, message, line, file) => Console.WriteLine($"{severity}: {message}");
 Instance.RegisterBackend<D3D12Backend>();
 Instance.RegisterBackend<VulkanBackend>();
+
+const string ShaderCode = @"
+struct VSOutput
+{
+    float4 Position: SV_Position;
+    float3 Color: COLOR0;
+};
+
+struct PSOutput
+{
+    float4 Color: SV_Target0;
+};
+
+VSOutput VSMain(const in uint index: SV_VertexID)
+{
+    const float2 vertices[] =
+    {
+        float2(-0.5, -0.5),
+        float2(0.0, 0.5),
+        float2(0.5, -0.5)
+    };
+
+    const float3 colors[] =
+    {
+        float3(1.0, 0.0, 0.0),
+        float3(0.0, 1.0, 0.0),
+        float3(0.0, 0.0, 1.0)
+    };
+
+    VSOutput output;
+
+    output.Position = float4(vertices[index], 0.0, 1.0);
+    output.Color = colors[index];
+
+    return output;
+}
+
+PSOutput PSMain(const in VSOutput input)
+{
+    PSOutput output;
+
+    output.Color = float4(input.Color, 1.0);
+
+    return output;
+}
+";
 
 unsafe
 {
@@ -50,6 +97,12 @@ unsafe
     Swapchain swapchain =
         device.CreateSwapchain(new SwapchainInfo(surface, new Size2D(1280, 720), Format.B8G8R8A8_UNorm,
             PresentMode.Fifo, 2));
+
+    ShaderModule vertexModule = device.CreateShaderModuleFromHlsl(ShaderStage.Vertex, ShaderCode, "VSMain");
+    ShaderModule pixelModule = device.CreateShaderModuleFromHlsl(ShaderStage.Pixel, ShaderCode, "PSMain");
+    
+    pixelModule.Dispose();
+    vertexModule.Dispose();
 
     bool alive = true;
     while (alive)

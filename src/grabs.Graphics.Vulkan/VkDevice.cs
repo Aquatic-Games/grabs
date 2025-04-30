@@ -23,6 +23,8 @@ internal sealed unsafe class VkDevice : Device
     public readonly KhrSurface KhrSurface;
     public readonly KhrSwapchain KhrSwapchain;
     
+    public override ShaderFormat ShaderFormat => ShaderFormat.Spirv;
+    
     public VkDevice(Vk vk, VulkanInstance instance, KhrSurface khrSurface, PhysicalDevice physicalDevice, SurfaceKHR surface)
     {
         ResourceTracker.RegisterInstanceResource(instance, this);
