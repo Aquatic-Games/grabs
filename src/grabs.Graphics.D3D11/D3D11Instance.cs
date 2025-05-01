@@ -15,12 +15,15 @@ internal sealed unsafe class D3D11Instance : Instance
 {
     public override bool IsDisposed { get; protected set; }
 
+    private readonly bool _debug;
     private readonly IDXGIFactory1* _factory;
 
     public override string BackendName => D3D11Backend.Name;
 
     public D3D11Instance(ref readonly InstanceInfo info)
     {
+        _debug = info.Debug;
+        
         if (!OperatingSystem.IsWindows())
             ResolveLibrary += OnResolveLibrary; 
         
@@ -67,12 +70,19 @@ internal sealed unsafe class D3D11Instance : Instance
     
     public override Surface CreateSurface(in SurfaceInfo info)
     {
-        throw new NotImplementedException();
+        return new D3D11Surface(in info);
     }
     
     public override Device CreateDevice(Surface surface, Adapter? adapter = null)
     {
-        throw new NotImplementedException();
+        IDXGIAdapter1* dxgiAdapter;
+
+        if (adapter is Adapter adp)
+            dxgiAdapter = (IDXGIAdapter1*) adp.Handle;
+        else
+            _factory->EnumAdapters1(0, &dxgiAdapter).Check("Enumerate adapter");
+
+        return new D3D11Device(dxgiAdapter, _factory, _debug);
     }
     
     public override void Dispose()
