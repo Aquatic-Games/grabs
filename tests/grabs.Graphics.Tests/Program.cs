@@ -1,5 +1,6 @@
 ﻿using grabs.Core;
 using grabs.Graphics;
+using grabs.Graphics.D3D11;
 using grabs.Graphics.Vulkan;
 using grabs.ShaderCompiler;
 using Silk.NET.SDL;
@@ -7,6 +8,7 @@ using Surface = grabs.Graphics.Surface;
 using Texture = grabs.Graphics.Texture;
 
 GrabsLog.LogMessage += (severity, message, line, file) => Console.WriteLine($"{severity}: {message}");
+Instance.RegisterBackend<D3D11Backend>();
 Instance.RegisterBackend<VulkanBackend>();
 
 const string ShaderCode = @"

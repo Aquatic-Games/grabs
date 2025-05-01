@@ -3,9 +3,7 @@
 public sealed class D3D11Backend : IBackend
 {
     public static string Name => "D3D11";
-    
+
     public Instance CreateInstance(ref readonly InstanceInfo info)
-    {
-        throw new NotImplementedException();
-    }
+        => new D3D11Instance(in info);
 }
