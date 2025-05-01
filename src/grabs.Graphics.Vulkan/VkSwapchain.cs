@@ -16,6 +16,8 @@ internal sealed unsafe class VkSwapchain : Swapchain
     private SwapchainKHR _swapchain;
     private VkTexture[] _swapchainTextures;
     private uint _currentImage;
+    
+    public override Format BufferFormat { get; }
 
     public VkSwapchain(Vk vk, VkDevice device, ref readonly SwapchainInfo info)
     {
@@ -91,6 +93,8 @@ internal sealed unsafe class VkSwapchain : Swapchain
         throw new NotSupportedException($"Format {info.Format} not supported by the surface!");
         
         FORMAT_SUPPORTED: ;
+
+        BufferFormat = info.Format;
 
         SwapchainCreateInfoKHR swapchainInfo = new()
         {

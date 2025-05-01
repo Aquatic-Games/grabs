@@ -20,7 +20,7 @@ internal sealed class DebugDevice(Device device) : Device
         => device.CreateShaderModule(stage, code, entryPoint);
 
     public override Pipeline CreateGraphicsPipeline(in GraphicsPipelineInfo info)
-        => device.CreateGraphicsPipeline(in info);
+        => new DebugPipeline(device, in info);
 
     public override void ExecuteCommandList(CommandList cl)
     {

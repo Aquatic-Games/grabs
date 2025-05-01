@@ -5,6 +5,8 @@ namespace grabs.Graphics.Vulkan;
 
 internal sealed unsafe class VkTexture : Texture
 {
+    public override bool IsDisposed { get; protected set; }
+    
     private readonly Vk _vk;
     private readonly VulkanDevice _device;
     private readonly bool _destroyImage;
@@ -68,7 +70,7 @@ internal sealed unsafe class VkTexture : Texture
         _vk.CmdPipelineBarrier(cb, PipelineStageFlags.ColorAttachmentOutputBit,
             PipelineStageFlags.ColorAttachmentOutputBit, 0, 0, null, 0, null, 1, &memoryBarrier);
     }
-    
+
     public override void Dispose()
     {
         if (IsDisposed)

@@ -7,7 +7,7 @@ public abstract class Texture : IDisposable
     /// <summary>
     /// Gets if this <see cref="Texture"/> is disposed.
     /// </summary>
-    public bool IsDisposed { get; protected set; }
+    public abstract bool IsDisposed { get; protected set; }
 
     /// <summary>
     /// The size in pixels.

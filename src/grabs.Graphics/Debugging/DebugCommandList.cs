@@ -1,4 +1,5 @@
-﻿using grabs.Core;
+﻿using System.Runtime.CompilerServices;
+using grabs.Core;
 
 namespace grabs.Graphics.Debugging;
 
@@ -7,6 +8,9 @@ internal sealed class DebugCommandList(CommandList cl) : CommandList
     public readonly CommandList CommandList = cl;
     
     private bool _isBegunRenderPass;
+
+    private Format[] _renderPassColorFormats = new Format[8];
+    private DebugPipeline? _currentlyBoundPipeline;
     
     public bool IsBegun;
     public bool HasIssuedCommands;
@@ -49,17 +53,31 @@ internal sealed class DebugCommandList(CommandList cl) : CommandList
         if (colorAttachments.Length < 1)
             throw new ValidationException("There must be at least 1 color attachment in a render pass.");
 
+        ColorAttachmentInfo[] convertedColorAttachments = new ColorAttachmentInfo[colorAttachments.Length];
+        _renderPassColorFormats = new Format[colorAttachments.Length];
+        
         Size2D size = colorAttachments[0].Texture.Size;
-        for (int i = 1; i < colorAttachments.Length; i++)
+        for (int i = 0; i < colorAttachments.Length; i++)
         {
-            if (colorAttachments[i].Texture.Size != size)
+            DebugTexture texture = (DebugTexture) colorAttachments[i].Texture;
+            
+            if (texture.Size != size)
             {
                 throw new ValidationException(
-                    $"All color attachments must be the same size. Expected: {size}, Actual: {colorAttachments[i].Texture.Size}");
+                    $"All color attachments must be the same size. Expected: {size}, Actual: {texture.Size}");
             }
+
+            _renderPassColorFormats[i] = texture.Format;
+            convertedColorAttachments[i] = new ColorAttachmentInfo()
+            {
+                Texture = texture.Texture,
+                ClearColor = colorAttachments[i].ClearColor,
+                LoadOp = colorAttachments[i].LoadOp,
+                StoreOp = colorAttachments[i].StoreOp
+            };
         }
         
-        CommandList.BeginRenderPass(in colorAttachments);
+        CommandList.BeginRenderPass(convertedColorAttachments);
     }
     
     public override void EndRenderPass()
@@ -75,11 +93,16 @@ internal sealed class DebugCommandList(CommandList cl) : CommandList
 
     public override void SetGraphicsPipeline(Pipeline pipeline)
     {
-        CommandList.SetGraphicsPipeline(pipeline);
+        CheckIfBegun();
+        CheckIsInRenderPass();
+
+        _currentlyBoundPipeline = (DebugPipeline) pipeline;
+        CommandList.SetGraphicsPipeline(_currentlyBoundPipeline.Pipeline);
     }
     
     public override void Draw(uint numVertices)
     {
+        CheckPipelineValidity();
         CommandList.Draw(numVertices);
     }
 
@@ -92,5 +115,35 @@ internal sealed class DebugCommandList(CommandList cl) : CommandList
     {
         if (!IsBegun)
             throw new ValidationException("You must call Begin() before you can issue any commands to the command list.");
+    }
+
+    private void CheckIsInRenderPass([CallerMemberName] string funcName = "")
+    {
+        if (!_isBegunRenderPass)
+            throw new ValidationException($"{funcName} must only be called inside an active render pass.");
+    }
+
+    private void CheckPipelineValidity([CallerMemberName] string funcName = "")
+    {
+        CheckIfBegun();
+        CheckIsInRenderPass();
+        
+        if (_currentlyBoundPipeline == null)
+            throw new ValidationException("A valid graphics pipeline must be bound before draw calls can be issued.");
+
+        if (_currentlyBoundPipeline.ColorAttachmentFormats.Length != _renderPassColorFormats.Length)
+        {
+            throw new ValidationException(
+                $"Currently bound pipeline requires {_currentlyBoundPipeline.ColorAttachmentFormats.Length} color attachments, however the current render pass has {_renderPassColorFormats.Length}.");
+        }
+
+        for (int i = 0; i < _renderPassColorFormats.Length; i++)
+        {
+            if (_renderPassColorFormats[i] != _currentlyBoundPipeline.ColorAttachmentFormats[i])
+            {
+                throw new ValidationException(
+                    $"Currently bound pipeline expected a color attachment with format {_currentlyBoundPipeline.ColorAttachmentFormats[i]} at index {i}, however the current render pass has format {_renderPassColorFormats[i]}.");
+            }
+        }
     }
 }

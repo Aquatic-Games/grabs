@@ -105,7 +105,7 @@ unsafe
     {
         VertexShader = vertexModule,
         PixelShader = pixelModule,
-        ColorAttachments = [new ColorAttachmentDescription(Format.B8G8R8A8_UNorm)]
+        ColorAttachments = [new ColorAttachmentDescription(swapchain.BufferFormat)]
     };
 
     Pipeline pipeline = device.CreateGraphicsPipeline(in pipelineInfo);
