@@ -4,5 +4,6 @@ public enum ShaderFormat
 {
     Unknown,
     Spirv,
-    Dxil
+    Dxil,
+    Dxbc
 }
