@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using grabs.Core;
 using TerraFX.Interop.DirectX;
+using ColorF = grabs.Core.ColorF;
 
 namespace grabs.Graphics.D3D11;
 
@@ -41,13 +42,32 @@ internal sealed unsafe class D3D11CommandList : CommandList
     
     public override void BeginRenderPass(in ReadOnlySpan<ColorAttachmentInfo> colorAttachments)
     {
-        throw new NotImplementedException();
+        ID3D11RenderTargetView** colorTargets = stackalloc ID3D11RenderTargetView*[colorAttachments.Length];
+
+        for (int i = 0; i < colorAttachments.Length; i++)
+        {
+            ref readonly ColorAttachmentInfo attachment = ref colorAttachments[i];
+            D3D11Texture texture = (D3D11Texture) attachment.Texture;
+            colorTargets[i] = texture.RenderTarget;
+        }
+
+        // It's seemingly more efficient to the driver to set, then clear, even though it requires 2 for loops.
+        _context->OMSetRenderTargets((uint) colorAttachments.Length, colorTargets, null);
+
+        for (int i = 0; i < colorAttachments.Length; i++)
+        {
+            ref readonly ColorAttachmentInfo attachment = ref colorAttachments[i];
+            D3D11Texture texture = (D3D11Texture) attachment.Texture;
+
+            if (attachment.LoadOp == LoadOp.Clear)
+            {
+                ColorF clearColor = attachment.ClearColor;
+                _context->ClearRenderTargetView(texture.RenderTarget, &clearColor.R);
+            }
+        }
     }
     
-    public override void EndRenderPass()
-    {
-        throw new NotImplementedException();
-    }
+    public override void EndRenderPass() { }
     
     public override void SetGraphicsPipeline(Pipeline pipeline)
     {
