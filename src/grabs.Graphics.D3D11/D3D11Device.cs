@@ -63,7 +63,7 @@ internal sealed unsafe class D3D11Device : Device
 
     public override Buffer CreateBuffer(in BufferInfo info, void* pData)
     {
-        throw new NotImplementedException();
+        return new D3D11Buffer(_device, in info, pData);
     }
 
     public override void ExecuteCommandList(CommandList cl)

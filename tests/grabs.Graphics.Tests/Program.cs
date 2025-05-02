@@ -4,6 +4,7 @@ using grabs.Graphics.D3D11;
 using grabs.Graphics.Vulkan;
 using grabs.ShaderCompiler;
 using Silk.NET.SDL;
+using Buffer = grabs.Graphics.Buffer;
 using Surface = grabs.Graphics.Surface;
 using Texture = grabs.Graphics.Texture;
 
@@ -98,6 +99,23 @@ unsafe
         device.CreateSwapchain(new SwapchainInfo(surface, new Size2D(1280, 720), Format.B8G8R8A8_UNorm,
             PresentMode.Fifo, 2));
 
+    ReadOnlySpan<float> vertices =
+    [
+        -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+        -0.5f, +0.5f, 0.0f, 1.0f, 0.0f,
+        +0.5f, +0.5f, 0.0f, 0.0f, 1.0f,
+        +0.5f, -0.5f, 0.0f, 0.0f, 0.0f
+    ];
+
+    ReadOnlySpan<short> indices =
+    [
+        0, 1, 3,
+        1, 2, 3
+    ];
+
+    Buffer vertexBuffer = device.CreateBuffer(BufferUsage.Vertex, vertices);
+    Buffer indexBuffer = device.CreateBuffer(BufferUsage.Index, indices);
+
     ShaderModule vertexModule = device.CreateShaderModuleFromHlsl(ShaderStage.Vertex, ShaderCode, "VSMain");
     ShaderModule pixelModule = device.CreateShaderModuleFromHlsl(ShaderStage.Pixel, ShaderCode, "PSMain");
 
@@ -153,7 +171,9 @@ unsafe
         swapchain.Present();
     }
     
-    //pipeline.Dispose();
+    pipeline.Dispose();
+    indexBuffer.Dispose();
+    vertexBuffer.Dispose();
     swapchain.Dispose();
     cl.Dispose();
     device.Dispose();

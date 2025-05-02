@@ -2,7 +2,7 @@
 
 public struct BufferInfo(BufferUsage usage, uint size)
 {
-    public BufferUsage Usage;
+    public BufferUsage Usage = usage;
 
-    public uint Size;
+    public uint Size = size;
 }

@@ -23,9 +23,7 @@ internal sealed class DebugDevice(Device device) : Device
         => new DebugPipeline(device, in info);
 
     public override unsafe Buffer CreateBuffer(in BufferInfo info, void* pData)
-    {
-        throw new NotImplementedException();
-    }
+        => new DebugBuffer(device.CreateBuffer(in info, pData));
 
     public override void ExecuteCommandList(CommandList cl)
     {
