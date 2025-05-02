@@ -60,7 +60,12 @@ internal sealed unsafe class D3D11Device : Device
     {
         return new D3D11Pipeline(_device, in info);
     }
-    
+
+    public override Buffer CreateBuffer(in BufferInfo info, void* pData)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void ExecuteCommandList(CommandList cl)
     {
         _context->ExecuteCommandList(((D3D11CommandList) cl).CommandList, false);

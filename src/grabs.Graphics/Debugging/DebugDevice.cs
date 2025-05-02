@@ -22,6 +22,11 @@ internal sealed class DebugDevice(Device device) : Device
     public override Pipeline CreateGraphicsPipeline(in GraphicsPipelineInfo info)
         => new DebugPipeline(device, in info);
 
+    public override unsafe Buffer CreateBuffer(in BufferInfo info, void* pData)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void ExecuteCommandList(CommandList cl)
     {
         DebugCommandList debugCl = (DebugCommandList) cl;

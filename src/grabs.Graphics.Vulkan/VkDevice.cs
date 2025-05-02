@@ -150,6 +150,11 @@ internal sealed unsafe class VkDevice : Device
         return new VkPipeline(_vk, Device, in info);
     }
 
+    public override Buffer CreateBuffer(in BufferInfo info, void* pData)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void ExecuteCommandList(CommandList cl)
     {
         CommandBuffer buffer = ((VkCommandList) cl).CommandBuffer;

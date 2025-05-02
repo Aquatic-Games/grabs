@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace grabs.Graphics;
 
 /// <summary>
@@ -44,6 +46,28 @@ public abstract class Device : IDisposable
     /// <param name="info">The <see cref="GraphicsPipelineInfo"/> used to describe the pipeline.</param>
     /// <returns>The created <see cref="Pipeline"/>.</returns>
     public abstract Pipeline CreateGraphicsPipeline(in GraphicsPipelineInfo info);
+
+    public abstract unsafe Buffer CreateBuffer(in BufferInfo info, void* pData);
+
+    public unsafe Buffer CreateBuffer(in BufferInfo info)
+        => CreateBuffer(in info, null);
+
+    public unsafe Buffer CreateBuffer<T>(BufferUsage usage, T data) where T : unmanaged
+    {
+        BufferInfo info = new(usage, (uint) sizeof(T));
+        return CreateBuffer(in info, Unsafe.AsPointer(ref data));
+    }
+
+    public unsafe Buffer CreateBuffer<T>(BufferUsage usage, in ReadOnlySpan<T> data) where T : unmanaged
+    {
+        BufferInfo info = new(usage, (uint) (data.Length * sizeof(T)));
+
+        fixed (void* pData = data)
+            return CreateBuffer(in info, pData);
+    }
+
+    public Buffer CreateBuffer<T>(BufferUsage usage, T[] data) where T : unmanaged
+        => CreateBuffer<T>(usage, data.AsSpan());
 
     /// <summary>
     /// Execute the commands in the command list.
