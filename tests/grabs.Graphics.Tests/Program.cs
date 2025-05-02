@@ -92,7 +92,7 @@ unsafe
     Surface surface = instance.CreateSurface(in surfaceInfo);
     Device device = instance.CreateDevice(surface);
 
-    //CommandList cl = device.CreateCommandList();
+    CommandList cl = device.CreateCommandList();
     
     Swapchain swapchain =
         device.CreateSwapchain(new SwapchainInfo(surface, new Size2D(1280, 720), Format.B8G8R8A8_UNorm,
@@ -137,25 +137,25 @@ unsafe
 
         Texture texture = swapchain.GetNextTexture();
         
-        /*cl.Begin();
+        cl.Begin();
         
-        cl.BeginRenderPass(new ColorAttachmentInfo(texture, new ColorF(1.0f, 0.5f, 0.25f)));
+        /*cl.BeginRenderPass(new ColorAttachmentInfo(texture, new ColorF(1.0f, 0.5f, 0.25f)));
         
         cl.SetGraphicsPipeline(pipeline);
         cl.Draw(3);
         
-        cl.EndRenderPass();
+        cl.EndRenderPass();*/
         
         cl.End();
         
-        device.ExecuteCommandList(cl);*/
+        device.ExecuteCommandList(cl);
         
         swapchain.Present();
     }
     
     //pipeline.Dispose();
     swapchain.Dispose();
-    //cl.Dispose();
+    cl.Dispose();
     device.Dispose();
     surface.Dispose();
     instance.Dispose();

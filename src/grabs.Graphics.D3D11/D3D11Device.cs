@@ -48,7 +48,7 @@ internal sealed unsafe class D3D11Device : Device
     
     public override CommandList CreateCommandList()
     {
-        throw new NotImplementedException();
+        return new D3D11CommandList(_device);
     }
     
     public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] code, string entryPoint)
@@ -63,7 +63,7 @@ internal sealed unsafe class D3D11Device : Device
     
     public override void ExecuteCommandList(CommandList cl)
     {
-        throw new NotImplementedException();
+        _context->ExecuteCommandList(((D3D11CommandList) cl).CommandList, false);
     }
     
     public override void Dispose()
