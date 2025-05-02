@@ -98,7 +98,7 @@ unsafe
         device.CreateSwapchain(new SwapchainInfo(surface, new Size2D(1280, 720), Format.B8G8R8A8_UNorm,
             PresentMode.Fifo, 2));
 
-    /*ShaderModule vertexModule = device.CreateShaderModuleFromHlsl(ShaderStage.Vertex, ShaderCode, "VSMain");
+    ShaderModule vertexModule = device.CreateShaderModuleFromHlsl(ShaderStage.Vertex, ShaderCode, "VSMain");
     ShaderModule pixelModule = device.CreateShaderModuleFromHlsl(ShaderStage.Pixel, ShaderCode, "PSMain");
 
     GraphicsPipelineInfo pipelineInfo = new()
@@ -111,7 +111,7 @@ unsafe
     Pipeline pipeline = device.CreateGraphicsPipeline(in pipelineInfo);
     
     pixelModule.Dispose();
-    vertexModule.Dispose();*/
+    vertexModule.Dispose();
 
     bool alive = true;
     while (alive)
@@ -141,8 +141,8 @@ unsafe
         
         cl.BeginRenderPass(new ColorAttachmentInfo(texture, new ColorF(1.0f, 0.5f, 0.25f)));
         
-        /*cl.SetGraphicsPipeline(pipeline);
-        cl.Draw(3);*/
+        cl.SetGraphicsPipeline(pipeline);
+        cl.Draw(3);
         
         cl.EndRenderPass();
         

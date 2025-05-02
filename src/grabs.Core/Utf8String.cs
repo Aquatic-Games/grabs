@@ -20,6 +20,9 @@ public struct Utf8String : IDisposable
     
     public static unsafe implicit operator byte*(in Utf8String utf8String)
         => (byte*) utf8String.Handle;
+
+    public static unsafe implicit operator sbyte*(in Utf8String utf8String)
+        => (sbyte*) utf8String.Handle;
     
     public void Dispose()
     {

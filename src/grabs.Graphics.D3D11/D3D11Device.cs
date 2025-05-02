@@ -53,12 +53,12 @@ internal sealed unsafe class D3D11Device : Device
     
     public override ShaderModule CreateShaderModule(ShaderStage stage, byte[] code, string entryPoint)
     {
-        throw new NotImplementedException();
+        return new D3D11ShaderModule(code);
     }
     
     public override Pipeline CreateGraphicsPipeline(in GraphicsPipelineInfo info)
     {
-        throw new NotImplementedException();
+        return new D3D11Pipeline(_device, in info);
     }
     
     public override void ExecuteCommandList(CommandList cl)

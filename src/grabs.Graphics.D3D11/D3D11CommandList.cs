@@ -65,18 +65,33 @@ internal sealed unsafe class D3D11CommandList : CommandList
                 _context->ClearRenderTargetView(texture.RenderTarget, &clearColor.R);
             }
         }
+
+        D3D11_VIEWPORT viewport = new()
+        {
+            TopLeftX = 0,
+            TopLeftY = 0,
+            Width = colorAttachments[0].Texture.Size.Width,
+            Height = colorAttachments[0].Texture.Size.Height,
+            MinDepth = 0,
+            MaxDepth = 1
+        };
+        _context->RSSetViewports(1, &viewport);
     }
     
     public override void EndRenderPass() { }
     
     public override void SetGraphicsPipeline(Pipeline pipeline)
     {
-        throw new NotImplementedException();
+        D3D11Pipeline d3dPipeline = (D3D11Pipeline) pipeline;
+
+        _context->VSSetShader(d3dPipeline.VertexShader, null, 0);
+        _context->PSSetShader(d3dPipeline.PixelShader, null, 0);
+        _context->IASetPrimitiveTopology(d3dPipeline.PrimitiveTopology);
     }
     
     public override void Draw(uint numVertices)
     {
-        throw new NotImplementedException();
+        _context->Draw(numVertices, 0);
     }
     
     public override void Dispose()

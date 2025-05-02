@@ -28,7 +28,36 @@ public static unsafe class Compiler
     public static byte[] CompileHlsl(ShaderStage stage, ShaderFormat format, string hlsl, string entryPoint,
         string? includeDir = null, bool debug = false)
     {
-        
+        switch (format)
+        {
+            case ShaderFormat.Unknown:
+            {
+                throw new NotSupportedException(
+                    "Cannot compile for an unknown shader format. Shaders must be precompiled.");
+            }
+            
+            case ShaderFormat.Spirv:
+            case ShaderFormat.Dxil:
+                return CompileHlslWithDxc(stage, hlsl, entryPoint, includeDir, debug, format == ShaderFormat.Spirv);
+            
+            case ShaderFormat.Dxbc:
+                return CompileHlslWithD3DCompiler(stage, hlsl, entryPoint, includeDir, debug);
+            
+            default:
+                throw new ArgumentOutOfRangeException(nameof(format), format, null);
+        }
+    }
+
+    public static ShaderModule CreateShaderModuleFromHlsl(this Device device, ShaderStage stage, string hlsl, string entryPoint,
+        string? includeDir = null, bool debug = false)
+    {
+        byte[] code = CompileHlsl(stage, device.ShaderFormat, hlsl, entryPoint, includeDir, debug);
+        return device.CreateShaderModule(stage, code, entryPoint);
+    }
+
+    private static byte[] CompileHlslWithDxc(ShaderStage stage, string hlsl, string entryPoint, string? includeDir,
+        bool debug, bool spirv)
+    {
         Guid dxcUtils = CLSID_DxcUtils;
         Guid dxcCompiler = CLSID_DxcCompiler;
 
@@ -53,7 +82,7 @@ public static unsafe class Compiler
 
         List<string> args = [];
         
-        if (format == ShaderFormat.Spirv)
+        if (spirv)
             args.Add("-spirv");
 
         if (includeDir != null)
@@ -90,7 +119,7 @@ public static unsafe class Compiler
 
         DxcBuffer buffer = new DxcBuffer()
         {
-            Ptr = pHlsl,
+            Ptr = (void*) pHlsl.Handle,
             Size = (nuint) hlsl.Length * sizeof(byte),
             Encoding = 0
         };
@@ -152,10 +181,39 @@ public static unsafe class Compiler
         return bytes;
     }
 
-    public static ShaderModule CreateShaderModuleFromHlsl(this Device device, ShaderStage stage, string hlsl, string entryPoint,
-        string? includeDir = null, bool debug = false)
+    private static byte[] CompileHlslWithD3DCompiler(ShaderStage stage, string hlsl, string entryPoint,
+        string? includeDir, bool debug)
     {
-        byte[] code = CompileHlsl(stage, device.ShaderFormat, hlsl, entryPoint, includeDir, debug);
-        return device.CreateShaderModule(stage, code, entryPoint);
+        string target = stage switch
+        {
+            ShaderStage.Vertex => "vs_5_0",
+            ShaderStage.Pixel => "ps_5_0",
+            _ => throw new ArgumentOutOfRangeException(nameof(stage), stage, null)
+        };
+
+        using Utf8String pTarget = target;
+        using Utf8String pHlsl = hlsl;
+        using Utf8String pEntryPoint = entryPoint;
+
+        ID3DBlob* resultBlob;
+        ID3DBlob* errorBlob;
+
+        if (D3DCompile((void*) pHlsl.Handle, (nuint) hlsl.Length, null, null, null, pEntryPoint, pTarget, 0, 0,
+                &resultBlob, &errorBlob).FAILED)
+        {
+            throw new Exception($"Failed to compile shader: {new string((sbyte*) resultBlob->GetBufferPointer())}");
+        }
+
+        if (errorBlob != null)
+            errorBlob->Release();
+
+        byte[] bytes = new byte[resultBlob->GetBufferSize()];
+
+        fixed (byte* pBytes = bytes)
+            Unsafe.CopyBlock(pBytes, resultBlob->GetBufferPointer(), (uint) resultBlob->GetBufferSize());
+
+        resultBlob->Release();
+        
+        return bytes;
     }
 }
