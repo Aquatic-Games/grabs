@@ -14,6 +14,8 @@ internal sealed unsafe class D3D11Pipeline : Pipeline
 
     public readonly ID3D11PixelShader* PixelShader;
 
+    public readonly ID3D11InputLayout* InputLayout;
+
     public readonly D3D_PRIMITIVE_TOPOLOGY PrimitiveTopology;
 
     public D3D11Pipeline(ID3D11Device* device, ref readonly GraphicsPipelineInfo info)
@@ -35,6 +37,45 @@ internal sealed unsafe class D3D11Pipeline : Pipeline
                 .Check("Create pixel shader");
         }
 
+        if (info.InputLayout.Length > 0)
+        {
+            D3D11_INPUT_ELEMENT_DESC* inputElements = stackalloc D3D11_INPUT_ELEMENT_DESC[info.InputLayout.Length];
+
+            List<Utf8String> semanticStrings = [];
+
+            for (int i = 0; i < info.InputLayout.Length; i++)
+            {
+                ref readonly InputElementDescription element = ref info.InputLayout[i];
+
+                Utf8String pSemantic = element.Semantic switch
+                {
+                    SemanticType.TexCoord => "TEXCOORD",
+                    SemanticType.Position => "POSITION",
+                    SemanticType.Color => "COLOR",
+                    SemanticType.Normal => "NORMAL",
+                    SemanticType.Tangent => "TANGENT",
+                    SemanticType.Bitangent => "BITANGENT",
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+                semanticStrings.Add(pSemantic);
+
+                inputElements[i] = new D3D11_INPUT_ELEMENT_DESC()
+                {
+                    SemanticName = pSemantic,
+                    SemanticIndex = element.SemanticIndex,
+                    Format = element.Format.ToD3D(),
+                    AlignedByteOffset = element.Offset
+                };
+            }
+
+            GrabsLog.Log("Creating input layout.");
+            fixed (ID3D11InputLayout** layout = &InputLayout)
+            {
+                device->CreateInputLayout(inputElements, (uint) info.InputLayout.Length, vertexModule.Code,
+                    vertexModule.CodeLength, layout).Check("Create input layout");
+            }
+        }
+
         PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
     }
     
@@ -44,6 +85,9 @@ internal sealed unsafe class D3D11Pipeline : Pipeline
             return;
         IsDisposed = true;
 
+        if (InputLayout != null)
+            InputLayout->Release();
+        
         PixelShader->Release();
         VertexShader->Release();
     }

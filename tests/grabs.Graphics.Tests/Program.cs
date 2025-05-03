@@ -13,6 +13,12 @@ Instance.RegisterBackend<D3D11Backend>();
 Instance.RegisterBackend<VulkanBackend>();
 
 const string ShaderCode = @"
+struct VSInput
+{
+    float2 Position: POSITION0;
+    float3 Color:    COLOR0;
+};
+
 struct VSOutput
 {
     float4 Position: SV_Position;
@@ -24,26 +30,12 @@ struct PSOutput
     float4 Color: SV_Target0;
 };
 
-VSOutput VSMain(const in uint index: SV_VertexID)
+VSOutput VSMain(const in VSInput input)
 {
-    const float2 vertices[] =
-    {
-        float2(-0.5, -0.5),
-        float2(0.0, 0.5),
-        float2(0.5, -0.5)
-    };
-
-    const float3 colors[] =
-    {
-        float3(1.0, 0.0, 0.0),
-        float3(0.0, 1.0, 0.0),
-        float3(0.0, 0.0, 1.0)
-    };
-
     VSOutput output;
 
-    output.Position = float4(vertices[index], 0.0, 1.0);
-    output.Color = colors[index];
+    output.Position = float4(input.Position, 0.0, 1.0);
+    output.Color = input.Color;
 
     return output;
 }
@@ -123,7 +115,12 @@ unsafe
     {
         VertexShader = vertexModule,
         PixelShader = pixelModule,
-        ColorAttachments = [new ColorAttachmentDescription(swapchain.BufferFormat)]
+        ColorAttachments = [new ColorAttachmentDescription(swapchain.BufferFormat)],
+        InputLayout =
+        [
+            new InputElementDescription(SemanticType.Position, 0, Format.R32G32_Float, 0),
+            new InputElementDescription(SemanticType.Color, 0, Format.R32G32B32_Float, 8)
+        ]
     };
 
     Pipeline pipeline = device.CreateGraphicsPipeline(in pipelineInfo);
@@ -160,7 +157,10 @@ unsafe
         cl.BeginRenderPass(new ColorAttachmentInfo(texture, new ColorF(1.0f, 0.5f, 0.25f)));
         
         cl.SetGraphicsPipeline(pipeline);
-        cl.Draw(3);
+        cl.SetVertexBuffer(0, vertexBuffer, 5 * sizeof(float));
+        cl.SetIndexBuffer(indexBuffer, Format.R16_UInt);
+        
+        cl.DrawIndexed(6);
         
         cl.EndRenderPass();
         

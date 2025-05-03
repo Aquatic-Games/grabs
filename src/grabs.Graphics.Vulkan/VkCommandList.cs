@@ -129,10 +129,25 @@ internal sealed unsafe class VkCommandList : CommandList
         VkPipeline vkPipeline = (VkPipeline) pipeline;
         _vk.CmdBindPipeline(CommandBuffer, PipelineBindPoint.Graphics, vkPipeline.Pipeline);
     }
+
+    public override void SetVertexBuffer(uint slot, Buffer buffer, uint stride, uint offset = 0)
+    {
+        throw new NotImplementedException();
+    }
     
+    public override void SetIndexBuffer(Buffer buffer, Format format, uint offset = 0)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void Draw(uint numVertices)
     {
         _vk.CmdDraw(CommandBuffer, numVertices, 1, 0, 0);
+    }
+
+    public override void DrawIndexed(uint numIndices)
+    {
+        throw new NotImplementedException();
     }
 
     public override void Dispose()

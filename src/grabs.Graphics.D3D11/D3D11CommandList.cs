@@ -86,14 +86,37 @@ internal sealed unsafe class D3D11CommandList : CommandList
 
         _context->VSSetShader(d3dPipeline.VertexShader, null, 0);
         _context->PSSetShader(d3dPipeline.PixelShader, null, 0);
+
+        if (d3dPipeline.InputLayout != null)
+            _context->IASetInputLayout(d3dPipeline.InputLayout);
+        
         _context->IASetPrimitiveTopology(d3dPipeline.PrimitiveTopology);
     }
+
+    public override void SetVertexBuffer(uint slot, Buffer buffer, uint stride, uint offset = 0)
+    {
+        D3D11Buffer d3dBuffer = (D3D11Buffer) buffer;
+        ID3D11Buffer* buf = d3dBuffer.Buffer;
+
+        _context->IASetVertexBuffers(slot, 1, &buf, &stride, &offset);
+    }
     
+    public override void SetIndexBuffer(Buffer buffer, Format format, uint offset = 0)
+    {
+        D3D11Buffer d3dBuffer = (D3D11Buffer) buffer;
+        _context->IASetIndexBuffer(d3dBuffer.Buffer, format.ToD3D(), offset);
+    }
+
     public override void Draw(uint numVertices)
     {
         _context->Draw(numVertices, 0);
     }
-    
+
+    public override void DrawIndexed(uint numIndices)
+    {
+        _context->DrawIndexed(numIndices, 0, 0);
+    }
+
     public override void Dispose()
     {
         if (CommandList != null)

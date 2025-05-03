@@ -99,11 +99,28 @@ internal sealed class DebugCommandList(CommandList cl) : CommandList
         _currentlyBoundPipeline = (DebugPipeline) pipeline;
         CommandList.SetGraphicsPipeline(_currentlyBoundPipeline.Pipeline);
     }
+
+    public override void SetVertexBuffer(uint slot, Buffer buffer, uint stride, uint offset = 0)
+    {
+        DebugBuffer debugBuffer = (DebugBuffer) buffer;
+        CommandList.SetVertexBuffer(slot, debugBuffer.Buffer, stride, offset);
+    }
     
+    public override void SetIndexBuffer(Buffer buffer, Format format, uint offset = 0)
+    {
+        DebugBuffer debugBuffer = (DebugBuffer) buffer;
+        CommandList.SetIndexBuffer(debugBuffer.Buffer, format, offset);
+    }
+
     public override void Draw(uint numVertices)
     {
         CheckPipelineValidity();
         CommandList.Draw(numVertices);
+    }
+
+    public override void DrawIndexed(uint numIndices)
+    {
+        CommandList.DrawIndexed(numIndices);
     }
 
     public override void Dispose()

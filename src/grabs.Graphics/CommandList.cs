@@ -43,10 +43,33 @@ public abstract class CommandList : IDisposable
     public abstract void SetGraphicsPipeline(Pipeline pipeline);
 
     /// <summary>
+    /// Set the vertex <see cref="Buffer"/> used on next draw.
+    /// </summary>
+    /// <param name="slot">The slot to bind the buffer to.</param>
+    /// <param name="buffer">The buffer to bind.</param>
+    /// <param name="stride">The buffer's stride.</param>
+    /// <param name="offset">The offset into the buffer.</param>
+    public abstract void SetVertexBuffer(uint slot, Buffer buffer, uint stride, uint offset = 0);
+
+    /// <summary>
+    /// Set the index <see cref="Buffer"/> used on next draw.
+    /// </summary>
+    /// <param name="buffer">The buffer to bind.</param>
+    /// <param name="format">The buffer's index format.</param>
+    /// <param name="offset">The offset into the buffer.</param>
+    public abstract void SetIndexBuffer(Buffer buffer, Format format, uint offset = 0);
+
+    /// <summary>
     /// Draw with the given number of vertices.
     /// </summary>
     /// <param name="numVertices">The number of vertices to draw.</param>
     public abstract void Draw(uint numVertices);
+
+    /// <summary>
+    /// Draw with the given number of indices.
+    /// </summary>
+    /// <param name="numIndices">The number of indices to draw.</param>
+    public abstract void DrawIndexed(uint numIndices);
 
     /// <summary>
     /// Dispose of this <see cref="CommandList"/>.
