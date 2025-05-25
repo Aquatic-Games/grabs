@@ -14,5 +14,10 @@
     <ItemGroup>
       <PackageReference Include="TerraFX.Interop.Windows" Version="10.0.26100.2" />
     </ItemGroup>
+    
+    <ItemGroup>
+        <None Include="*.dll" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="*.so" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
 
 </Project>
